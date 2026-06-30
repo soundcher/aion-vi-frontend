@@ -1,0 +1,8 @@
+flask
+anthropic
+flask-cors
+ephem
+pytz
+requests
+geopy
+weasyprint

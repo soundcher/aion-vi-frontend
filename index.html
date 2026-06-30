@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AION Vi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d1525;
+    --teal: #5E8B76;
+    --teal-dim: #3a5a4e;
+    --teal-pale: rgba(94,139,118,0.13);
+    --teal-border: rgba(94,139,118,0.35);
+    --text: #e8e0d0;
+    --text-dim: #9a9080;
+    --text-faint: #4a5060;
+    --line: rgba(200,180,140,0.10);
+    --error: #c46a4a;
+    --gold: #c9a563;
+    --gold-dim: #8a6d3a;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Туман */
+  .fog { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(80px); opacity: 0.17; }
+  .fog-1 { width: 520px; height: 420px; background: radial-gradient(ellipse, #2d6b5a 0%, transparent 70%); top: -10%; left: -8%; animation: drift1 18s ease-in-out infinite alternate; }
+  .fog-2 { width: 380px; height: 380px; background: radial-gradient(ellipse, #1e4d40 0%, transparent 70%); top: 40%; right: -10%; animation: drift2 22s ease-in-out infinite alternate; }
+  .fog-3 { width: 300px; height: 280px; background: radial-gradient(ellipse, #3a7a62 0%, transparent 70%); bottom: 5%; left: 25%; animation: drift3 16s ease-in-out infinite alternate; }
+  .fog-4 { width: 200px; height: 200px; background: radial-gradient(ellipse, #1a3d32 0%, transparent 70%); top: 20%; left: 55%; animation: drift1 25s ease-in-out infinite alternate-reverse; }
+  @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,20px) scale(1.08); } }
+  @keyframes drift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-20px,-30px) scale(1.05); } }
+  @keyframes drift3 { from { transform: translate(0,0) scale(1); } to { transform: translate(15px,-20px) scale(1.1); } }
+
+  /* Переключатель языка */
+  .lang-bar {
+    position: fixed;
+    top: 18px; right: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+    animation: fadeIn 1s ease;
+  }
+  .lang-btn {
+    font-size: 22px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    padding: 4px 6px;
+    line-height: 1;
+    border-radius: 4px;
+  }
+  .lang-btn:hover { opacity: 1; transform: scale(1.15); background: rgba(255,255,255,0.15); }
+  .lang-btn.active { opacity: 1; transform: scale(1.2); background: rgba(255,255,255,0.18); }
+
+  /* Контейнер */
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: 36px 24px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Логотип сверху */
+  .logo-wrap {
+    margin-bottom: 16px;
+    text-align: center;
+    width: 100%;
+  }
+  .logo-img {
+    width: 360px;
+    max-width: 92vw;
+    opacity: 0.96;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 75%);
+    filter: drop-shadow(0 0 24px rgba(94,139,118,0.2));
+    animation: fadeIn 1.2s ease;
+  }
+
+  /* Подзаголовок */
+  .tagline {
+    font-size: 11px;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    text-align: center;
+    animation: fadeIn 1.5s ease;
+  }
+
+  /* Форма */
+  .form-box {
+    width: 100%;
+    background: rgba(13,21,37,0.72);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 30px 26px;
+    backdrop-filter: blur(10px);
+    animation: slideUp 0.9s ease;
+  }
+
+  .form-title {
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--text);
+    margin-bottom: 24px;
+    text-align: center;
+    opacity: 0.88;
+  }
+
+  .field { margin-bottom: 15px; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 7px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+  }
+
+  input {
+    width: 100%;
+    background: var(--teal-pale);
+    border: 1px solid var(--teal-border);
+    color: var(--teal);
+    padding: 11px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    border-radius: 2px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  input:focus { border-color: var(--teal); background: rgba(94,139,118,0.18); }
+  input::placeholder { color: rgba(94,139,118,0.38); font-size: 13px; }
+  input#inp-promo { letter-spacing: 2px; font-family: 'Courier New', monospace; font-size: 13px; text-transform: uppercase; }
+
+  .btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 18px;
+    background: transparent;
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.25s;
+  }
+  .btn:hover { background: var(--teal); color: var(--bg); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn.loading .lbl { display: none; }
+  .btn.loading .spin { display: inline; }
+  .btn .spin { display: none; }
+
+  .msg { margin-top: 14px; font-size: 12px; text-align: center; min-height: 18px; line-height: 1.6; display: none; }
+  .msg.error { color: var(--error); display: block; }
+  .msg.success { color: var(--teal); display: block; }
+
+  .divider { width: 100%; height: 1px; background: var(--line); margin: 20px 0; }
+
+  .beta-note { font-size: 11px; color: var(--text-faint); text-align: center; line-height: 1.8; letter-spacing: 0.5px; }
+
+  /* Уже вошёл */
+  .already-in { display: none; text-align: center; }
+  .welcome { font-size: 20px; color: var(--gold); margin-bottom: 8px; }
+  .sub-welcome { font-size: 11px; color: var(--text-dim); margin-bottom: 20px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .count { font-size: 48px; color: var(--teal); line-height: 1; margin-bottom: 4px; }
+  .count-label { font-size: 10px; color: var(--text-faint); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 28px; }
+  .btn-open {
+    display: inline-block; padding: 13px 36px;
+    border: 1px solid var(--teal); color: var(--teal);
+    font-family: inherit; font-size: 11px; letter-spacing: 3px;
+    text-transform: uppercase; cursor: pointer;
+    background: transparent; border-radius: 2px;
+    transition: all 0.25s; text-decoration: none;
+  }
+  .btn-open:hover { background: var(--teal); color: var(--bg); }
+
+  .note { margin-top: 24px; font-size: 11px; color: var(--text-faint); text-align: center; line-height: 1.8; }
+  .note a { color: var(--gold-dim); text-decoration: none; }
+  .note a:hover { color: var(--gold); }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 480px) {
+    .form-box { padding: 22px 16px; }
+    .logo-img { width: 240px; }
+    .lang-btn { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="fog fog-1"></div>
+<div class="fog fog-2"></div>
+<div class="fog fog-3"></div>
+<div class="fog fog-4"></div>
+
+<!-- Языки -->
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('en')" title="English">🇬🇧</button>
+  <button class="lang-btn" onclick="setLang('uk')" title="Українська">🇺🇦</button>
+  <button class="lang-btn" onclick="setLang('pl')" title="Polski">🇵🇱</button>
+  <button class="lang-btn" onclick="setLang('ru')" title="Русский">🇷🇺</button>
+</div>
+
+<div class="container">
+
+  <!-- Логотип -->
+  <div class="logo-wrap">
+    <img src="logo_FINAL_v30.png" alt="AION Vi" class="logo-img">
+  </div>
+
+  <!-- Подзаголовок -->
+  <div class="tagline" id="t-tagline">Your personal navigator</div>
+
+  <!-- Форма входа -->
+  <div class="form-box" id="login-form">
+    <div class="form-title" id="t-form-title">Access to AION Vi</div>
+
+    <div class="field">
+      <label id="t-lbl-nickname">Friends call me</label>
+      <input type="text" id="inp-nickname" autocomplete="nickname">
+    </div>
+
+    <div class="field">
+      <label id="t-lbl-email">Email</label>
+      <input type="email" id="inp-email" autocomplete="email">
+    </div>
+
+    <div class="field">
+      <label id="t-lbl-promo">Promo code</label>
+      <input type="text" id="inp-promo" maxlength="14" oninput="this.value=this.value.toUpperCase()">
+    </div>
+
+    <button class="btn" id="btn-enter" onclick="enterApp()">
+      <span class="lbl" id="t-btn-enter">✦ Enter</span>
+      <span class="spin">⟳</span>
+    </button>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="divider"></div>
+    <div class="beta-note" id="t-beta-note">Closed beta · Promo code from the organizer</div>
+  </div>
+
+  <!-- Уже вошёл -->
+  <div class="form-box already-in" id="already-in">
+    <div class="welcome" id="welcome-name">Welcome back</div>
+    <div class="sub-welcome" id="t-sub-welcome">AION Vi is glad to see you</div>
+    <div class="count" id="analyses-left">—</div>
+    <div class="count-label" id="t-count-label">analyses available</div>
+    <a href="calculator.html" class="btn-open" id="t-btn-open">✦ Open navigator</a>
+    <div style="margin-top:18px;">
+      <button onclick="logout()" id="t-logout"
+        style="background:none;border:none;color:var(--text-faint);font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">
+        Sign out
+      </button>
+    </div>
+  </div>
+
+  <div class="note">
+    <span id="t-group-note">Group analysis (5+ people) —</span><br>
+    <a href="mailto:aionvi_kod@gmail.com">aionvi_kod@gmail.com</a>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// ПЕРЕВОДЫ
+// ══════════════════════════════════════════════
+const TRANSLATIONS = {
+  en: {
+    tagline: 'Your personal navigator',
+    formTitle: 'Access to AION Vi',
+    lblNickname: 'Friends call me',
+    phNickname: 'Slava, Kate, Max...',
+    lblEmail: 'Email',
+    phEmail: 'your@email.com',
+    lblPromo: 'Promo code',
+    phPromo: 'AION-XXX-0000',
+    btnEnter: '✦ Enter',
+    betaNote: 'Closed beta · Promo code from the organizer',
+    errName: 'Enter the name your friends use',
+    errEmail: 'Enter a valid email',
+    errPromo: 'Enter your promo code',
+    errNotFound: 'Promo code not found. Check spelling.',
+    errUsed: 'This promo code has already been used.',
+    welcome: (n) => `Welcome back, ${n}`,
+    subWelcome: 'AION Vi is glad to see you',
+    countLabel: 'analyses available',
+    btnOpen: '✦ Open navigator',
+    logout: 'Sign out',
+    groupNote: 'Group analysis (5+ people) —',
+    entering: (n) => `✦ Welcome, ${n}! Opening navigator...`,
+  },
+  uk: {
+    tagline: 'Твій персональний навігатор',
+    formTitle: 'Доступ до AION Vi',
+    lblNickname: 'Як тебе називають друзі?',
+    phNickname: 'Слава, Катя, Макс...',
+    lblEmail: 'Email',
+    phEmail: 'your@email.com',
+    lblPromo: 'Промокод',
+    phPromo: 'AION-XXX-0000',
+    btnEnter: '✦ Увійти',
+    betaNote: 'Закрите тестування · Промокод у організатора',
+    errName: 'Введи імʼя — як тебе називають друзі',
+    errEmail: 'Введи коректний email',
+    errPromo: 'Введи промокод',
+    errNotFound: 'Промокод не знайдено. Перевір правильність.',
+    errUsed: 'Цей промокод вже використано.',
+    welcome: (n) => `З поверненням, ${n}`,
+    subWelcome: 'AION Vi радий бачити тебе знову',
+    countLabel: 'аналізів доступно',
+    btnOpen: '✦ Відкрити навігатор',
+    logout: 'Вийти',
+    groupNote: 'Груповий аналіз (5+ людей) —',
+    entering: (n) => `✦ Ласкаво просимо, ${n}! Відкриваю навігатор...`,
+  },
+  pl: {
+    tagline: 'Twój osobisty nawigator',
+    formTitle: 'Dostęp do AION Vi',
+    lblNickname: 'Jak nazywają cię przyjaciele?',
+    phNickname: 'Sława, Kasia, Max...',
+    lblEmail: 'Email',
+    phEmail: 'twoj@email.com',
+    lblPromo: 'Kod promocyjny',
+    phPromo: 'AION-XXX-0000',
+    btnEnter: '✦ Wejdź',
+    betaNote: 'Zamknięte testy · Kod promocyjny od organizatora',
+    errName: 'Podaj imię, którym zwracają się do ciebie przyjaciele',
+    errEmail: 'Podaj prawidłowy email',
+    errPromo: 'Wpisz kod promocyjny',
+    errNotFound: 'Kod promocyjny nie znaleziony. Sprawdź pisownię.',
+    errUsed: 'Ten kod promocyjny został już wykorzystany.',
+    welcome: (n) => `Witaj z powrotem, ${n}`,
+    subWelcome: 'AION Vi jest rad cię widzieć',
+    countLabel: 'analiz dostępnych',
+    btnOpen: '✦ Otwórz nawigator',
+    logout: 'Wyloguj',
+    groupNote: 'Analiza grupowa (5+ osób) —',
+    entering: (n) => `✦ Witaj, ${n}! Otwieram nawigator...`,
+  },
+  ru: {
+    tagline: 'Твой персональный навигатор',
+    formTitle: 'Доступ к AION Vi',
+    lblNickname: 'Как к тебе обращаются друзья?',
+    phNickname: 'Слава, Катя, Макс...',
+    lblEmail: 'Email',
+    phEmail: 'your@email.com',
+    lblPromo: 'Промокод',
+    phPromo: 'AION-XXX-0000',
+    btnEnter: '✦ Войти',
+    betaNote: 'Закрытое тестирование · Промокод у организатора',
+    errName: 'Введи имя — как тебя называют друзья',
+    errEmail: 'Введи корректный email',
+    errPromo: 'Введи промокод',
+    errNotFound: 'Промокод не найден. Проверь правильность ввода.',
+    errUsed: 'Этот промокод уже был использован.',
+    welcome: (n) => `С возвращением, ${n}`,
+    subWelcome: 'AION Vi рад видеть тебя снова',
+    countLabel: 'анализов доступно',
+    btnOpen: '✦ Открыть навигатор',
+    logout: 'Выйти',
+    groupNote: 'Групповой анализ (5+ человек) —',
+    entering: (n) => `✦ Добро пожаловать, ${n}! Открываю навигатор...`,
+  }
+};
+
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  const T = TRANSLATIONS[lang];
+
+  // Флаги
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  const flags = { en: 0, uk: 1, pl: 2, ru: 3 };
+  document.querySelectorAll('.lang-btn')[flags[lang]].classList.add('active');
+
+  // Тексты
+  document.getElementById('t-tagline').textContent = T.tagline;
+  document.getElementById('t-form-title').textContent = T.formTitle;
+  document.getElementById('t-lbl-nickname').textContent = T.lblNickname;
+  document.getElementById('inp-nickname').placeholder = T.phNickname;
+  document.getElementById('t-lbl-email').textContent = T.lblEmail;
+  document.getElementById('inp-email').placeholder = T.phEmail;
+  document.getElementById('t-lbl-promo').textContent = T.lblPromo;
+  document.getElementById('inp-promo').placeholder = T.phPromo;
+  document.getElementById('t-btn-enter').textContent = T.btnEnter;
+  document.getElementById('t-beta-note').textContent = T.betaNote;
+  document.getElementById('t-sub-welcome').textContent = T.subWelcome;
+  document.getElementById('t-count-label').textContent = T.countLabel;
+  document.getElementById('t-btn-open').textContent = T.btnOpen;
+  document.getElementById('t-logout').textContent = T.logout;
+  document.getElementById('t-group-note').textContent = T.groupNote;
+
+  // Обновляем приветствие если уже вошёл
+  const user = getUser();
+  if (user && user.nickname) {
+    document.getElementById('welcome-name').textContent = T.welcome(user.nickname);
+  }
+
+  localStorage.setItem('aion_lang', lang);
+}
+
+// ══════════════════════════════════════════════
+// ПРОМОКОДЫ
+// ══════════════════════════════════════════════
+const VALID_CODES = [
+  'AION-GXV-2080','AION-JGQ-0832','AION-SDR-9002','AION-PLJ-2148','AION-MWM-1423',
+  'AION-WZQ-3123','AION-VUR-3083','AION-NML-6099','AION-QSG-1716','AION-GUW-6887',
+  'AION-GDA-0293','AION-XXX-2791','AION-EHF-0821','AION-LXW-9440','AION-BXP-6304',
+  'AION-IZH-8028','AION-MPW-3485','AION-VHT-0181','AION-PBL-5301','AION-JLE-2324',
+  'AION-KSQ-6406','AION-PMY-4592','AION-ALU-3105','AION-VVS-7597','AION-OIU-5848',
+  'AION-ILD-8534','AION-WVJ-0006','AION-MPL-1905','AION-KKU-9413','AION-ZAD-2600',
+  'AION-XTV-7917','AION-VTT-1197','AION-FEY-7893','AION-SKN-0009','AION-JTA-8187',
+  'AION-BNA-2831','AION-QTN-8910','AION-IZU-9276','AION-EWV-2766','AION-RTY-6131',
+  'AION-DYJ-8051','AION-AUH-6315','AION-PVW-0891','AION-CDZ-9473','AION-JCL-5503',
+  'AION-MIC-7411','AION-IMH-6949','AION-RVX-8930','AION-BQY-1478','AION-CDG-4810'
+];
+
+const ANALYSES_PER_CODE = 5;
+
+function getUser() {
+  try { return JSON.parse(localStorage.getItem('aion_user')); } catch { return null; }
+}
+function saveUser(u) { localStorage.setItem('aion_user', JSON.stringify(u)); }
+function getUsedCodes() {
+  try { return JSON.parse(localStorage.getItem('aion_used_codes') || '[]'); } catch { return []; }
+}
+function markCodeUsed(code) {
+  const used = getUsedCodes();
+  if (!used.includes(code)) { used.push(code); localStorage.setItem('aion_used_codes', JSON.stringify(used)); }
+}
+
+window.onload = function() {
+  // Восстанавливаем язык
+  const savedLang = localStorage.getItem('aion_lang') || 'en';
+  setLang(savedLang);
+
+  const user = getUser();
+  if (user && user.email && user.analysesLeft > 0) showAlreadyIn(user);
+};
+
+function showAlreadyIn(user) {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('already-in').style.display = 'block';
+  const T = TRANSLATIONS[currentLang];
+  document.getElementById('welcome-name').textContent = T.welcome(user.nickname || '');
+  document.getElementById('analyses-left').textContent = user.analysesLeft;
+}
+
+async function enterApp() {
+  const T = TRANSLATIONS[currentLang];
+  const nickname = document.getElementById('inp-nickname').value.trim();
+  const email    = document.getElementById('inp-email').value.trim().toLowerCase();
+  const promo    = document.getElementById('inp-promo').value.trim().toUpperCase();
+  const btn      = document.getElementById('btn-enter');
+
+  showMsg('', '');
+
+  if (!nickname)                    { showMsg(T.errName,  'error'); return; }
+  if (!email || !email.includes('@')){ showMsg(T.errEmail, 'error'); return; }
+  if (!promo)                       { showMsg(T.errPromo, 'error'); return; }
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  await new Promise(r => setTimeout(r, 700));
+
+  if (!VALID_CODES.includes(promo)) {
+    showMsg(T.errNotFound, 'error');
+    btn.classList.remove('loading'); btn.disabled = false; return;
+  }
+  if (getUsedCodes().includes(promo)) {
+    showMsg(T.errUsed, 'error');
+    btn.classList.remove('loading'); btn.disabled = false; return;
+  }
+
+  const user = { nickname, email, promo, analysesLeft: ANALYSES_PER_CODE, registeredAt: new Date().toISOString(), lang: currentLang };
+  saveUser(user);
+  markCodeUsed(promo);
+
+  showMsg(T.entering(nickname), 'success');
+  setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
+}
+
+function showMsg(text, type) {
+  const el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = type ? `msg ${type}` : 'msg';
+}
+
+function logout() {
+  localStorage.removeItem('aion_user');
+  document.getElementById('already-in').style.display = 'none';
+  document.getElementById('login-form').style.display = 'block';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') enterApp(); });
+</script>
+</body>
+</html>
