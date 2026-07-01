@@ -387,14 +387,14 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
     <div class="field">
       <label id="label-firstname">Имя</label>
       <div class="autocomplete-wrap">
-        <input type="text" id="firstname" placeholder="Aion" autocomplete="off" oninput="onFirstnameInput(this.value)" onblur="hideAC('firstname-list')" onkeydown="acKeydown(event,'firstname-list')">
+        <input type="text" id="firstname" placeholder="Aion" autocomplete="off" oninput="cleanNameInput(this);onFirstnameInput(this.value)" onblur="hideAC('firstname-list')" onkeydown="acKeydown(event,'firstname-list')">
         <div class="autocomplete-list" id="firstname-list"></div>
       </div>
     </div>
     <div class="field">
       <label id="label-lastname">Фамилия</label>
       <div class="autocomplete-wrap">
-        <input type="text" id="lastname" placeholder="Vi" autocomplete="off" oninput="onLastnameInput(this.value)" onblur="hideAC('lastname-list')" onkeydown="acKeydown(event,'lastname-list')">
+        <input type="text" id="lastname" placeholder="Vi" autocomplete="off" oninput="cleanNameInput(this);onLastnameInput(this.value)" onblur="hideAC('lastname-list')" onkeydown="acKeydown(event,'lastname-list')">
         <div class="autocomplete-list" id="lastname-list"></div>
       </div>
     </div>
@@ -413,7 +413,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
   <div class="field" style="margin-bottom:10px;">
     <label id="label-place">Место рождения</label>
-    <input type="text" id="place" placeholder="New York, USA" autocomplete="off">
+    <input type="text" id="place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
   </div>
   <div class="coords-display" id="coords-display">Координаты не определены</div>
   <input type="hidden" id="lat" value="50.45">
@@ -452,11 +452,11 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
         <div class="row row-2" style="margin-bottom:10px;">
           <div class="field">
             <label id="lbl-p2-firstname">Имя</label>
-            <input type="text" id="p2-firstname" placeholder="Имя">
+            <input type="text" id="p2-firstname" placeholder="Имя" oninput="cleanNameInput(this)">
           </div>
           <div class="field">
             <label id="lbl-p2-lastname">Фамилия</label>
-            <input type="text" id="p2-lastname" placeholder="Фамилия">
+            <input type="text" id="p2-lastname" placeholder="Фамилия" oninput="cleanNameInput(this)">
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
@@ -468,7 +468,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
         </div>
         <div class="field">
           <label>Место рождения</label>
-          <input type="text" id="p2-place" placeholder="New York, USA" autocomplete="off">
+          <input type="text" id="p2-place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
           <div class="coords-display" id="p2-coords-display">Координаты не определены</div>
           <input type="hidden" id="p2-lat" value="">
           <input type="hidden" id="p2-lon" value="">
@@ -2674,6 +2674,16 @@ function onRequestInput(el) {
 }
 
 // ── Автопереход между полями дат ──
+// Фильтр текстовых полей (имя/фамилия/город): буквы, пробел, дефис, апостроф, точка
+function cleanNameInput(el) {
+  const cleaned = el.value.replace(/[^\p{L}\s'.\-]/gu, '');
+  if (cleaned !== el.value) {
+    const pos = el.selectionStart - (el.value.length - cleaned.length);
+    el.value = cleaned;
+    try { el.setSelectionRange(pos, pos); } catch(e) {}
+  }
+}
+
 // Обрезка значения по границам + подсветка ошибки
 function clampField(el, min, max, label) {
   let v = el.value.replace(/[^\d]/g, ''); // только цифры
