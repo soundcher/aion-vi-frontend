@@ -12,6 +12,7 @@ on:
       - 'Music_Piano/**'
       - 'firebase.json'
       - '.firebaserc'
+      - '.github/workflows/**'
 
 jobs:
   deploy:
