@@ -461,7 +461,7 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
           <div class="field"><label>День</label><input type="number" id="p2-day" min="1" max="31" placeholder="1" oninput="autoNext(this,'p2-month',2)"></div>
           <div class="field"><label>Месяц</label><input type="number" id="p2-month" min="1" max="12" placeholder="1" oninput="autoNext(this,'p2-year',2)"></div>
           <div class="field"><label>Год</label><input type="number" id="p2-year" min="1900" max="2026" placeholder="1990" oninput="autoNext(this,'p2-hour',4)"></div>
-          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-hour" min="0" max="23" placeholder="—"></div>
+          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-hour" min="0" max="23" placeholder="—" oninput="autoNext(this,'p2-minute',2)"></div>
           <div class="field"><label>Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-minute" min="0" max="59" placeholder="—"></div>
         </div>
         <div class="field">
@@ -648,7 +648,7 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
       <span id="label-request" style="font-size:15px;font-weight:bold;color:var(--text);text-transform:none;letter-spacing:normal;">Запрос</span>
       <span id="req-counter" style="font-size:11px;color:var(--text-faint);font-weight:normal;">0 / 500</span>
     </label>
-    <textarea id="request" maxlength="500" placeholder="Задай вопрос и подробно опиши контекст" oninput="onRequestInput(this)" onfocus="autoGeocodeAll()" style="min-height:80px;"></textarea>
+    <textarea id="request" maxlength="1000" placeholder="Задай вопрос и подробно опиши контекст" oninput="onRequestInput(this)" onfocus="autoGeocodeAll()" style="min-height:80px;"></textarea>
     <div id="req-warning" style="display:none;font-size:11px;color:var(--red);margin-top:3px;">⚠ Осталось менее 50 знаков — формулируй лаконично</div>
   </div>
 
@@ -808,6 +808,7 @@ const LANG = {
     btnHistory: '📋 History',
     btnDownload: '⬇ Download PDF',
     btnGift: '🎁 Gift',
+    btnShare: '↗ Share',
     btnCopy: 'Copy text',
     btnShowSummary: 'Show summary',
     btnCopySummary: 'Copy for Claude',
@@ -907,6 +908,7 @@ const LANG = {
     btnHistory: '📋 Historia',
     btnDownload: '⬇ Pobierz PDF',
     btnGift: '🎁 Podaruj',
+    btnShare: '↗ Udostępnij',
     btnCopy: 'Kopiuj tekst',
     btnShowSummary: 'Pokaż podsumowanie',
     btnCopySummary: 'Kopiuj dla Claude',
@@ -1000,6 +1002,7 @@ const LANG = {
     btnHistory: '📋 Історія',
     btnDownload: '⬇ Завантажити PDF',
     btnGift: '🎁 Подарувати',
+    btnShare: '↗ Поділитися',
     btnCopy: 'Скопіювати текст',
     btnShowSummary: 'Показати зведення',
     btnCopySummary: 'Скопіювати для Claude',
@@ -1093,6 +1096,7 @@ const LANG = {
     btnHistory: '📋 История',
     btnDownload: '⬇ Загрузить PDF',
     btnGift: '🎁 Подарить',
+    btnShare: '↗ Поделиться',
     btnCopy: 'Скопировать текст',
     btnShowSummary: 'Показать сводку',
     btnCopySummary: 'Скопировать для Claude',
@@ -1214,7 +1218,7 @@ function applyTranslations() {
   const dlBtn = document.getElementById('action-btn-download');
   if (dlBtn) dlBtn.textContent = L.btnDownload;
   const giftBtn = document.getElementById('action-btn-gift');
-  if (giftBtn) giftBtn.textContent = L.btnGift;
+  if (giftBtn) giftBtn.textContent = L.btnShare;
   const copyBtn = document.getElementById('action-btn-copy');
   if (copyBtn) copyBtn.textContent = L.btnCopy;
 
@@ -2186,10 +2190,10 @@ async function generateAnalysis() {
 
     // Кнопки действий
     box.insertAdjacentHTML('afterend', `
-      <div class="action-buttons" id="action-buttons">
+      <div class="action-buttons" id="action-buttons" style="justify-content:space-between;">
         <button class="btn-download" id="action-btn-download" onclick="downloadPDF()">${t('btnDownload')}</button>
-        <button class="btn-gift" id="action-btn-gift" onclick="openGiftModal()">${t('btnGift')}</button>
-        <button class="btn-copy-analysis" id="action-btn-copy" onclick="copyAnalysis()">${t('btnCopy')}</button>
+        <button class="btn-copy-analysis" id="action-btn-copy" onclick="copyAnalysis()" style="margin:0 auto;">${t('btnCopy')}</button>
+        <button class="btn-gift" id="action-btn-gift" onclick="openGiftModal()">${t('btnShare')}</button>
       </div>
     `);
 
@@ -2244,13 +2248,20 @@ async function downloadPDF() {
   if (btn) { btn.disabled = true; btn.textContent = '⟳ Генерирую...'; }
 
   try {
-    const resp = await fetch(`${SERVER}/generate-pdf`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ analysis: currentAnalysis, name, birthdate })
-    });
+    let useFallback = false;
+    let resp;
+    try {
+      resp = await fetch(`${SERVER}/generate-pdf`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysis: currentAnalysis, name, birthdate }),
+        signal: AbortSignal.timeout(15000) // таймаут 15 сек
+      });
+    } catch(fetchErr) {
+      useFallback = true;
+    }
 
-    if (resp.ok && resp.headers.get('content-type')?.includes('application/pdf')) {
+    if (!useFallback && resp.ok && resp.headers.get('content-type')?.includes('application/pdf')) {
       // Сервер вернул настоящий PDF
       const blob = await resp.blob();
       const filename = `AION_Vi_${name.replace(/\s+/g,'_')}_${birthdate.replace(/\./g,'-')}.pdf`;
@@ -2282,17 +2293,10 @@ async function downloadPDF() {
       setTimeout(() => URL.revokeObjectURL(url), 3000);
 
     } else {
-      // Fallback — WeasyPrint не установлен, используем печать браузера
-      const data = await resp.json();
-      if (data.html) {
-        const win = window.open('', '_blank');
-        win.document.write(data.html);
-        win.document.close();
-        win.focus();
-        setTimeout(() => { win.print(); }, 600);
-      }
+      useFallback = true;
     }
-  } catch(e) {
+
+    if (useFallback) {
     // Сервер недоступен — fallback на печать
     const text = currentAnalysis.replace(/\n/g, '<br>');
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -2601,10 +2605,11 @@ async function copySummary() {
 // ── Счётчик символов запроса ──
 function onRequestInput(el) {
   const len = el.value.length;
+  const limit = parseInt(el.maxLength) || (compatEnabled ? 1000 : 500);
   const counter = document.getElementById('req-counter');
   const warning = document.getElementById('req-warning');
-  counter.textContent = len + ' / 500';
-  if (len >= 450) {
+  counter.textContent = len + ' / ' + limit;
+  if (len >= limit - 50) {
     counter.style.color = 'var(--red)';
     warning.style.display = 'block';
   } else {

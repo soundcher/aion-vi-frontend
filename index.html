@@ -214,6 +214,10 @@
     .lang-btn { font-size: 20px; }
   }
 </style>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -266,6 +270,21 @@
 
     <div class="msg" id="msg"></div>
 
+    <div class="divider" style="margin:16px 0 12px;"></div>
+
+    <!-- Вход через соцсети -->
+    <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-faint);text-align:center;margin-bottom:10px;" id="t-or-signin">or sign in with</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="signInWithGoogle()" style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid var(--line);border-radius:2px;color:var(--text);font-family:inherit;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Google
+      </button>
+      <button onclick="signInWithFacebook()" style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid var(--line);border-radius:2px;color:var(--text);font-family:inherit;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Facebook
+      </button>
+    </div>
+
     <div class="divider"></div>
     <div class="beta-note" id="t-beta-note">Closed beta · Promo code from the organizer</div>
   </div>
@@ -308,6 +327,7 @@ const TRANSLATIONS = {
     phPromo: 'AION-XXX-0000',
     btnEnter: '✦ Enter',
     betaNote: 'Closed beta · Promo code from the organizer',
+    orSignIn: 'or sign in with',
     errName: 'Enter the name your friends use',
     errEmail: 'Enter a valid email',
     errPromo: 'Enter your promo code',
@@ -332,6 +352,7 @@ const TRANSLATIONS = {
     phPromo: 'AION-XXX-0000',
     btnEnter: '✦ Увійти',
     betaNote: 'Закрите тестування · Промокод у організатора',
+    orSignIn: 'або увійди через',
     errName: 'Введи імʼя — як тебе називають друзі',
     errEmail: 'Введи коректний email',
     errPromo: 'Введи промокод',
@@ -356,6 +377,7 @@ const TRANSLATIONS = {
     phPromo: 'AION-XXX-0000',
     btnEnter: '✦ Wejdź',
     betaNote: 'Zamknięte testy · Kod promocyjny od organizatora',
+    orSignIn: 'lub zaloguj przez',
     errName: 'Podaj imię, którym zwracają się do ciebie przyjaciele',
     errEmail: 'Podaj prawidłowy email',
     errPromo: 'Wpisz kod promocyjny',
@@ -380,6 +402,7 @@ const TRANSLATIONS = {
     phPromo: 'AION-XXX-0000',
     btnEnter: '✦ Войти',
     betaNote: 'Закрытое тестирование · Промокод у организатора',
+    orSignIn: 'или войди через',
     errName: 'Введи имя — как тебя называют друзья',
     errEmail: 'Введи корректный email',
     errPromo: 'Введи промокод',
@@ -417,6 +440,8 @@ function setLang(lang) {
   document.getElementById('inp-promo').placeholder = T.phPromo;
   document.getElementById('t-btn-enter').textContent = T.btnEnter;
   document.getElementById('t-beta-note').textContent = T.betaNote;
+  const orEl = document.getElementById('t-or-signin');
+  if (orEl) orEl.textContent = T.orSignIn;
   document.getElementById('t-sub-welcome').textContent = T.subWelcome;
   document.getElementById('t-count-label').textContent = T.countLabel;
   document.getElementById('t-btn-open').textContent = T.btnOpen;
@@ -430,6 +455,27 @@ function setLang(lang) {
   }
 
   localStorage.setItem('aion_lang', lang);
+}
+
+// ══════════════════════════════════════════════
+// FIREBASE КОНФИГУРАЦИЯ
+// ══════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyAM1VKa9iaC4Ox1Fzx1e1bEgRdbjVxK4QY",
+  authDomain: "aion-vi.firebaseapp.com",
+  databaseURL: "https://aion-vi-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "aion-vi",
+  storageBucket: "aion-vi.firebasestorage.app",
+  messagingSenderId: "422204652530",
+  appId: "1:422204652530:web:23222b39b8ec3ffce3096b"
+};
+
+let db, auth;
+
+function initFirebaseApp() {
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+  auth = firebase.auth();
 }
 
 // ══════════════════════════════════════════════
@@ -447,69 +493,135 @@ const VALID_CODES = [
   'AION-DYJ-8051','AION-AUH-6315','AION-PVW-0891','AION-CDZ-9473','AION-JCL-5503',
   'AION-MIC-7411','AION-IMH-6949','AION-RVX-8930','AION-BQY-1478','AION-CDG-4810'
 ];
-
 const ANALYSES_PER_CODE = 5;
 
-function getUser() {
-  try { return JSON.parse(localStorage.getItem('aion_user')); } catch { return null; }
-}
+// Локальное хранилище
+function getUser() { try { return JSON.parse(localStorage.getItem('aion_user')); } catch { return null; } }
 function saveUser(u) { localStorage.setItem('aion_user', JSON.stringify(u)); }
-function getUsedCodes() {
-  try { return JSON.parse(localStorage.getItem('aion_used_codes') || '[]'); } catch { return []; }
-}
+function getUsedCodes() { try { return JSON.parse(localStorage.getItem('aion_used_codes') || '[]'); } catch { return []; } }
 function markCodeUsed(code) {
   const used = getUsedCodes();
   if (!used.includes(code)) { used.push(code); localStorage.setItem('aion_used_codes', JSON.stringify(used)); }
 }
 
+// ══════════════════════════════════════════════
+// FIREBASE DATABASE
+// ══════════════════════════════════════════════
+function emailToKey(email) { return email.replace(/\./g,'_').replace(/@/g,'__at__'); }
+
+async function saveUserToFirebase(user) {
+  try {
+    await db.ref('users/' + emailToKey(user.email)).set({
+      nickname: user.nickname || '',
+      email: user.email,
+      promo: user.promo || 'social',
+      analysesLeft: user.analysesLeft,
+      registeredAt: user.registeredAt,
+      lang: user.lang || 'ru',
+      loginMethod: user.loginMethod || 'promo'
+    });
+  } catch(e) { console.warn('Firebase DB:', e.message); }
+}
+
+async function getUserFromFirebase(email) {
+  try {
+    const snap = await db.ref('users/' + emailToKey(email)).once('value');
+    return snap.val();
+  } catch(e) { return null; }
+}
+
+// ══════════════════════════════════════════════
+// ВХОД ЧЕРЕЗ GOOGLE
+// ══════════════════════════════════════════════
+async function signInWithGoogle() {
+  try {
+    const result = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    await handleSocialLogin(result.user, 'google');
+  } catch(e) { showMsg(e.message, 'error'); }
+}
+
+// ══════════════════════════════════════════════
+// ВХОД ЧЕРЕЗ FACEBOOK
+// ══════════════════════════════════════════════
+async function signInWithFacebook() {
+  try {
+    const result = await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
+    await handleSocialLogin(result.user, 'facebook');
+  } catch(e) {
+    if (e.code === 'auth/account-exists-with-different-credential') {
+      showMsg('Email уже зарегистрирован через другой способ входа.', 'error');
+    } else { showMsg(e.message, 'error'); }
+  }
+}
+
+async function handleSocialLogin(firebaseUser, method) {
+  const email = firebaseUser.email;
+  const nickname = (firebaseUser.displayName || email).split(' ')[0];
+  let existing = await getUserFromFirebase(email);
+  if (existing) {
+    saveUser({ ...existing, email });
+    showMsg(`С возвращением, ${existing.nickname || nickname}!`, 'success');
+  } else {
+    const user = { nickname, email, promo: 'social-' + method, analysesLeft: ANALYSES_PER_CODE,
+      registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: method };
+    saveUser(user);
+    await saveUserToFirebase(user);
+    showMsg(TRANSLATIONS[currentLang].entering(nickname), 'success');
+  }
+  setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
+}
+
+// ══════════════════════════════════════════════
+// ИНИЦИАЛИЗАЦИЯ
+// ══════════════════════════════════════════════
 window.onload = function() {
-  // Восстанавливаем язык
+  initFirebaseApp();
   const savedLang = localStorage.getItem('aion_lang') || 'en';
   setLang(savedLang);
-
   const user = getUser();
-  if (user && user.email && user.analysesLeft > 0) showAlreadyIn(user);
+  if (user && user.email && user.analysesLeft > 0) {
+    getUserFromFirebase(user.email).then(fb => {
+      showAlreadyIn(fb ? { ...user, analysesLeft: fb.analysesLeft } : user);
+    }).catch(() => showAlreadyIn(user));
+  }
 };
 
 function showAlreadyIn(user) {
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('already-in').style.display = 'block';
-  const T = TRANSLATIONS[currentLang];
-  document.getElementById('welcome-name').textContent = T.welcome(user.nickname || '');
+  document.getElementById('welcome-name').textContent = TRANSLATIONS[currentLang].welcome(user.nickname || '');
   document.getElementById('analyses-left').textContent = user.analysesLeft;
 }
 
+// ══════════════════════════════════════════════
+// ВХОД ПО ПРОМОКОДУ
+// ══════════════════════════════════════════════
 async function enterApp() {
   const T = TRANSLATIONS[currentLang];
   const nickname = document.getElementById('inp-nickname').value.trim();
   const email    = document.getElementById('inp-email').value.trim().toLowerCase();
   const promo    = document.getElementById('inp-promo').value.trim().toUpperCase();
   const btn      = document.getElementById('btn-enter');
-
   showMsg('', '');
-
-  if (!nickname)                    { showMsg(T.errName,  'error'); return; }
-  if (!email || !email.includes('@')){ showMsg(T.errEmail, 'error'); return; }
-  if (!promo)                       { showMsg(T.errPromo, 'error'); return; }
-
-  btn.classList.add('loading');
-  btn.disabled = true;
-
+  if (!nickname)                     { showMsg(T.errName, 'error'); return; }
+  if (!email || !email.includes('@')) { showMsg(T.errEmail, 'error'); return; }
+  if (!promo)                        { showMsg(T.errPromo, 'error'); return; }
+  btn.classList.add('loading'); btn.disabled = true;
   await new Promise(r => setTimeout(r, 700));
-
   if (!VALID_CODES.includes(promo)) {
-    showMsg(T.errNotFound, 'error');
-    btn.classList.remove('loading'); btn.disabled = false; return;
+    showMsg(T.errNotFound, 'error'); btn.classList.remove('loading'); btn.disabled = false; return;
   }
-  if (getUsedCodes().includes(promo)) {
-    showMsg(T.errUsed, 'error');
-    btn.classList.remove('loading'); btn.disabled = false; return;
+  try {
+    const snap = await db.ref('used_codes/' + promo).once('value');
+    if (snap.val()) { showMsg(T.errUsed, 'error'); btn.classList.remove('loading'); btn.disabled = false; return; }
+  } catch(e) {
+    if (getUsedCodes().includes(promo)) { showMsg(T.errUsed, 'error'); btn.classList.remove('loading'); btn.disabled = false; return; }
   }
-
-  const user = { nickname, email, promo, analysesLeft: ANALYSES_PER_CODE, registeredAt: new Date().toISOString(), lang: currentLang };
-  saveUser(user);
-  markCodeUsed(promo);
-
+  const user = { nickname, email, promo, analysesLeft: ANALYSES_PER_CODE,
+    registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: 'promo' };
+  saveUser(user); markCodeUsed(promo);
+  await saveUserToFirebase(user);
+  try { await db.ref('used_codes/' + promo).set(true); } catch(e) {}
   showMsg(T.entering(nickname), 'success');
   setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
 }
@@ -521,6 +633,7 @@ function showMsg(text, type) {
 }
 
 function logout() {
+  auth.signOut().catch(() => {});
   localStorage.removeItem('aion_user');
   document.getElementById('already-in').style.display = 'none';
   document.getElementById('login-form').style.display = 'block';
