@@ -2088,6 +2088,25 @@ function showError(msg) {
 // ГЕНЕРАЦИЯ АНАЛИЗА
 // ══════════════════════════════════════════════
 async function generateAnalysis() {
+  // Проверка остатка анализов ДО любых расходов на API
+  try {
+    const u = JSON.parse(localStorage.getItem('aion_user') || 'null');
+    if (u && typeof u.analysesLeft === 'number' && u.analysesLeft <= 0) {
+      const box = document.getElementById('analysis-box');
+      box.innerHTML = `
+        <div style="text-align:center;padding:20px 10px;">
+          <div style="font-size:15px;color:var(--gold);margin-bottom:12px;">Твои анализы на этом пакете закончились</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px;">
+            Мы разобрали лишь малую часть того, что скрыто в твоём коде. Впереди — ответы о твоём пути, отношениях, решениях. Я готов продолжить, как только ты будешь готов.
+          </div>
+          <button class="btn-generate" onclick="location.href='index.html'" style="max-width:280px;margin:0 auto;">Продолжить с новым пакетом</button>
+        </div>`;
+      box.classList.add('show');
+      box.scrollIntoView({behavior:'smooth', block:'start'});
+      return;
+    }
+  } catch(e) {}
+
   if (!currentSummary) {
     // Блок "О тебе" заморожен — считаем данные автоматически в фоне
     const ok = await calculate(true);
@@ -2134,8 +2153,32 @@ async function generateAnalysis() {
             })
           });
           const d2 = await r2.json();
-          if (d2.summary) compatSummary = d2.summary;
-        } catch(e) {}
+          if (d2.summary) {
+            compatSummary = d2.summary;
+          } else {
+            // Расчёт второго человека не удался — не отправляем пустую
+            // совместимость к API (это дало бы бессмысленный результат)
+            stopMusic(false);
+            box.innerHTML = `<div style="text-align:center;padding:16px;color:var(--gold);">
+              Не получилось рассчитать данные второго человека.<br>
+              <span style="color:var(--text);font-size:13px;">${d2.message || 'Проверь дату рождения и попробуй ещё раз.'}</span>
+            </div>`;
+            box.classList.add('show');
+            btn.disabled = false;
+            spinner.classList.remove('show');
+            return;
+          }
+        } catch(e) {
+          stopMusic(false);
+          box.innerHTML = `<div style="text-align:center;padding:16px;color:var(--gold);">
+            Не удалось связаться с сервером для расчёта второго человека.<br>
+            <span style="color:var(--text);font-size:13px;">Проверь соединение и попробуй ещё раз.</span>
+          </div>`;
+          box.classList.add('show');
+          btn.disabled = false;
+          spinner.classList.remove('show');
+          return;
+        }
       }
     }
 
