@@ -2321,6 +2321,7 @@ async function downloadPDF() {
     win.document.close();
     win.focus();
     setTimeout(() => { win.print(); }, 600);
+    }
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = t('btnDownload'); }
   }
