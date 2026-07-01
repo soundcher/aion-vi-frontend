@@ -267,6 +267,8 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
 .summary-box.show{display:block;}
 
 .error-box{background:#2a1010;border:1px solid #5a2020;color:#e07070;padding:12px 14px;border-radius:2px;font-size:12px;margin-top:10px;display:none;}
+input.field-error{border-color:#c05555 !important;background:#241414 !important;}
+.field-hint{color:#c07070;font-size:10px;margin-top:3px;min-height:12px;line-height:1.3;}
 .error-box.show{display:block;}
 
 .section-sep{height:1px;background:var(--line2);margin:20px 0;}
@@ -399,11 +401,11 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
   </div>
 
   <div class="row row-5">
-    <div class="field"><label id="label-day">День</label><input type="number" id="day" min="1" max="31" placeholder="1" oninput="autoNext(this,'month',2)"></div>
-    <div class="field"><label id="label-month">Месяц</label><input type="number" id="month" min="1" max="12" placeholder="1" oninput="autoNext(this,'year',2)"></div>
-    <div class="field"><label id="label-year">Год</label><input type="number" id="year" min="1900" max="2026" placeholder="1990" oninput="autoNext(this,'hour',4)"></div>
-    <div class="field"><label id="label-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="hour" min="0" max="23" placeholder="—" oninput="onTimeInput();autoNext(this,'minute',2)"></div>
-    <div class="field"><label id="label-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="minute" min="0" max="59" placeholder="—" oninput="onTimeInput()"></div>
+    <div class="field"><label id="label-day">День</label><input type="number" id="day" min="1" max="31" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'month',2)"></div>
+    <div class="field"><label id="label-month">Месяц</label><input type="number" id="month" min="1" max="12" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'year',2)"></div>
+    <div class="field"><label id="label-year">Год</label><input type="number" id="year" min="1900" max="2026" placeholder="1990" oninput="clampField(this,1900,2043,'Год');autoNext(this,'hour',4)"></div>
+    <div class="field"><label id="label-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="hour" min="0" max="23" placeholder="—" oninput="clampField(this,0,23,'Часы');onTimeInput();autoNext(this,'minute',2)"></div>
+    <div class="field"><label id="label-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="minute" min="0" max="59" placeholder="—" oninput="clampField(this,0,59,'Минуты');onTimeInput()"></div>
   </div>
   <div id="no-time-warning" style="display:none;font-size:11px;color:var(--gold-dim);margin-bottom:8px;padding:6px 10px;border:1px solid var(--gold-dim);border-radius:2px;opacity:0.85;">
     ⚠ Время рождения не указано — точность анализа натальной карты и некоторых расчётов будет ниже
@@ -458,11 +460,11 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label>День</label><input type="number" id="p2-day" min="1" max="31" placeholder="1" oninput="autoNext(this,'p2-month',2)"></div>
-          <div class="field"><label>Месяц</label><input type="number" id="p2-month" min="1" max="12" placeholder="1" oninput="autoNext(this,'p2-year',2)"></div>
-          <div class="field"><label>Год</label><input type="number" id="p2-year" min="1900" max="2026" placeholder="1990" oninput="autoNext(this,'p2-hour',4)"></div>
-          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-hour" min="0" max="23" placeholder="—" oninput="autoNext(this,'p2-minute',2)"></div>
-          <div class="field"><label>Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-minute" min="0" max="59" placeholder="—"></div>
+          <div class="field"><label>День</label><input type="number" id="p2-day" min="1" max="31" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p2-month',2)"></div>
+          <div class="field"><label>Месяц</label><input type="number" id="p2-month" min="1" max="12" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p2-year',2)"></div>
+          <div class="field"><label>Год</label><input type="number" id="p2-year" min="1900" max="2026" placeholder="1990" oninput="clampField(this,1900,2043,'Год');autoNext(this,'p2-hour',4)"></div>
+          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-hour" min="0" max="23" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p2-minute',2)"></div>
+          <div class="field"><label>Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-minute" min="0" max="59" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
         </div>
         <div class="field">
           <label>Место рождения</label>
@@ -2672,6 +2674,36 @@ function onRequestInput(el) {
 }
 
 // ── Автопереход между полями дат ──
+// Обрезка значения по границам + подсветка ошибки
+function clampField(el, min, max, label) {
+  let v = el.value.replace(/[^\d]/g, ''); // только цифры
+  el.value = v;
+  clearFieldError(el);
+  if (v === '') return; // пустое — не ошибка на этом этапе
+  const n = parseInt(v);
+  if (n > max) { el.value = String(max); }      // не даём превысить максимум
+  if (v.length >= String(max).length && n < min && min > 0) {
+    setFieldError(el, `${label}: от ${min} до ${max}`);
+  }
+}
+
+function setFieldError(el, msg) {
+  el.classList.add('field-error');
+  let hint = el.parentElement.querySelector('.field-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'field-hint';
+    el.parentElement.appendChild(hint);
+  }
+  hint.textContent = msg;
+}
+
+function clearFieldError(el) {
+  el.classList.remove('field-error');
+  const hint = el.parentElement.querySelector('.field-hint');
+  if (hint) hint.textContent = '';
+}
+
 function autoNext(el, nextId, maxLen) {
   if (String(el.value).length >= maxLen) {
     const next = document.getElementById(nextId);
