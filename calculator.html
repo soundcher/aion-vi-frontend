@@ -1285,6 +1285,8 @@ async function initFirebase() {
 // СЕРВЕР И СОСТОЯНИЕ
 // ══════════════════════════════════════════════
 const SERVER = 'https://aion-vi-server-production.up.railway.app';
+// ⚠️ Когда подключишь свой домен вместо Firebase-адреса — замени строку ниже
+const SITE_URL = 'https://aion-vi.web.app';
 let currentSummary = '';
 let currentAnalysis = '';
 let currentClientData = {};
@@ -2350,10 +2352,17 @@ function openGiftModal() {
   if (!currentAnalysis) return;
   const client = currentClientData;
   const name = [client.firstname, client.lastname].filter(Boolean).join(' ') || '';
-  const preview = `✦ AION Vi — Персональный анализ${name ? ' для ' + name : ''}\n\n${currentAnalysis.substring(0,300)}...`;
+
+  // Метка отправителя для будущей реферальной программы —
+  // берём промокод пользователя, а если его нет (соц-вход) — nickname
+  const senderUser = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const refTag = senderUser?.promo || senderUser?.nickname || 'friend';
+  const shareUrl = `${SITE_URL}/?ref=${encodeURIComponent(refTag)}`;
+
+  const preview = `✦ AION Vi — Персональный анализ${name ? ' для ' + name : ''}\n\n${currentAnalysis.substring(0,300)}...\n\n${shareUrl}`;
   const text = encodeURIComponent(preview);
 
-  document.getElementById('share-telegram').href = `https://t.me/share/url?text=${text}`;
+  document.getElementById('share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${text}`;
   document.getElementById('share-whatsapp').href = `https://wa.me/?text=${text}`;
   document.getElementById('share-viber').href = `viber://forward?text=${text}`;
   document.getElementById('share-gmail').href = `https://mail.google.com/mail/?view=cm&body=${text}&su=${encodeURIComponent('AION Vi — Твой персональный анализ')}`;
