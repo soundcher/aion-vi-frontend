@@ -841,7 +841,7 @@ const LANG = {
     themeRomantic: '💑 Romance', themeFamily: '👨‍👩‍👧 Family', themeBusiness: '🤝 Business',
     themeTeam: '💼 Work', themeFriendship: '🌿 Friendship', themeOther: '✦ Other',
     lblPerson2: '✦ Second Person', lblPerson3: '✦ Third Person', lblPerson4: '✦ Fourth Person',
-    btnAddP3: '+ Third Person', btnAddP4: '+ Fourth Person',
+    btnAddP2: '+ Second Person', btnAddP3: '+ Third Person', btnAddP4: '+ Fourth Person',
     groupAnalysisHint: '✦ Group analysis (5+ people) — on request',
     btnFeedback: '✉ Feedback', fbTitle: '✉ Feedback', fbLblName: 'Name', fbLblEmail: 'Email',
     fbLblMessage: 'Message', fbSendBtn: '✦ Send', fbCloseBtn: 'Close',
@@ -953,7 +953,7 @@ const LANG = {
     themeRomantic: '💑 Romans', themeFamily: '👨‍👩‍👧 Rodzina', themeBusiness: '🤝 Biznes',
     themeTeam: '💼 Praca', themeFriendship: '🌿 Przyjaźń', themeOther: '✦ Inne',
     lblPerson2: '✦ Druga osoba', lblPerson3: '✦ Trzecia osoba', lblPerson4: '✦ Czwarta osoba',
-    btnAddP3: '+ Trzecia osoba', btnAddP4: '+ Czwarta osoba',
+    btnAddP2: '+ Druga osoba', btnAddP3: '+ Trzecia osoba', btnAddP4: '+ Czwarta osoba',
     groupAnalysisHint: '✦ Analiza grupowa (5+ osób) — na życzenie',
     btnFeedback: '✉ Kontakt', fbTitle: '✉ Kontakt', fbLblName: 'Imię', fbLblEmail: 'Email',
     fbLblMessage: 'Wiadomość', fbSendBtn: '✦ Wyślij', fbCloseBtn: 'Zamknij',
@@ -1059,7 +1059,7 @@ const LANG = {
     themeRomantic: '💑 Романтика', themeFamily: '👨‍👩‍👧 Сім\'я', themeBusiness: '🤝 Бізнес',
     themeTeam: '💼 Робота', themeFriendship: '🌿 Дружба', themeOther: '✦ Інше',
     lblPerson2: '✦ Друга людина', lblPerson3: '✦ Третя людина', lblPerson4: '✦ Четверта людина',
-    btnAddP3: '+ Третя людина', btnAddP4: '+ Четверта людина',
+    btnAddP2: '+ Друга людина', btnAddP3: '+ Третя людина', btnAddP4: '+ Четверта людина',
     groupAnalysisHint: '✦ Груповий аналіз (5+ людей) — за запитом',
     btnFeedback: '✉ Зворотний зв\'язок', fbTitle: '✉ Зворотний зв\'язок', fbLblName: 'Ім\'я', fbLblEmail: 'Email',
     fbLblMessage: 'Питання', fbSendBtn: '✦ Надіслати', fbCloseBtn: 'Закрити',
@@ -1165,7 +1165,7 @@ const LANG = {
     themeRomantic: '💑 Романтика', themeFamily: '👨‍👩‍👧 Семья', themeBusiness: '🤝 Бизнес',
     themeTeam: '💼 Работа', themeFriendship: '🌿 Дружба', themeOther: '✦ Другое',
     lblPerson2: '✦ Второй человек', lblPerson3: '✦ Третий человек', lblPerson4: '✦ Четвёртый человек',
-    btnAddP3: '+ Третий человек', btnAddP4: '+ Четвёртый человек',
+    btnAddP2: '+ Второй человек', btnAddP3: '+ Третий человек', btnAddP4: '+ Четвёртый человек',
     groupAnalysisHint: '✦ Групповой анализ (5 и более человек) — по запросу',
     btnFeedback: '✉ Обратная связь', fbTitle: '✉ Обратная связь', fbLblName: 'Имя', fbLblEmail: 'Email',
     fbLblMessage: 'Вопрос', fbSendBtn: '✦ Отправить', fbCloseBtn: 'Закрыть',
@@ -1324,6 +1324,7 @@ function applyTranslations() {
   setText('lbl-person2', L.lblPerson2);
   setText('lbl-person3', L.lblPerson3);
   setText('lbl-person4', L.lblPerson4);
+  setText('btn-add-p2', L.btnAddP2);
   setText('btn-add-p3', L.btnAddP3);
   setText('btn-add-p4', L.btnAddP4);
 
@@ -1904,13 +1905,14 @@ async function geocodeP2() {
 function initGreeting() {
   const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
   const nickname = user?.nickname || '';
-  const lastVisit = localStorage.getItem('aion_last_visit');
+  const emailKey = user?.email ? user.email.replace(/\./g,'_').replace(/@/g,'__at__') : 'anon';
+  const lastVisit = localStorage.getItem(`aion_last_visit_${emailKey}`);
   const now = Date.now();
-  const isFirstEver = !localStorage.getItem('aion_visited_calc');
+  const isFirstEver = !localStorage.getItem(`aion_visited_calc_${emailKey}`);
   const daysSince = lastVisit ? (now - parseInt(lastVisit)) / (1000*60*60*24) : 0;
 
-  localStorage.setItem('aion_last_visit', now);
-  localStorage.setItem('aion_visited_calc', '1');
+  localStorage.setItem(`aion_last_visit_${emailKey}`, now);
+  localStorage.setItem(`aion_visited_calc_${emailKey}`, '1');
 
   let greeting = '';
   const namePart = nickname ? nickname + ', ' : '';
@@ -2332,6 +2334,7 @@ async function generateAnalysis() {
         compat_theme: themeLabel,
         compat_summary: compatSummary,
         no_time: currentClientData.no_time || false,
+        nickname: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).nickname || '',
         email: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || ''
       })
     });
@@ -2874,16 +2877,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lang-select').value = savedLang;
   applyTranslations();
 
-  // Подставляем nickname из регистрации в поле firstname
-  try {
-    const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
-    if (user?.nickname) {
-      const firstnameEl = document.getElementById('firstname');
-      if (firstnameEl && !firstnameEl.value) {
-        firstnameEl.value = user.nickname;
-      }
-    }
-  } catch(e) {}
+  // Nickname из регистрации намеренно НЕ подставляется в "Данные клиента" —
+  // для нумерологии нужно полное имя, а не короткое "как зовут друзья".
+  // Nickname используется отдельно — см. передачу в /generate ниже.
 
   // Живое приветствие AION Vi
   initGreeting();
