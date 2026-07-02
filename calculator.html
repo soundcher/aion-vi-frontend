@@ -2197,7 +2197,8 @@ async function generateAnalysis() {
         compat_enabled: compatEnabled,
         compat_theme: themeLabel,
         compat_summary: compatSummary,
-        no_time: currentClientData.no_time || false
+        no_time: currentClientData.no_time || false,
+        email: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || ''
       })
     });
     const data = await r.json();
@@ -2244,13 +2245,13 @@ async function generateAnalysis() {
       </div>
     `);
 
-    // Списываем -1 анализ из счётчика
+    // Синхронизируем счётчик с сервером — сервер единственный, кто реально
+    // списывает анализ, браузер только отображает актуальное число
     try {
       const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
-      if (user && typeof user.analysesLeft === 'number' && user.analysesLeft > 0) {
-        user.analysesLeft -= 1;
+      if (user && typeof data.analyses_left === 'number') {
+        user.analysesLeft = data.analyses_left;
         localStorage.setItem('aion_user', JSON.stringify(user));
-        // Показываем остаток если мало
         if (user.analysesLeft <= 2) {
           const warn = user.analysesLeft === 0
             ? '⚠ Анализы закончились. Для продолжения нужен новый промокод или подписка.'
