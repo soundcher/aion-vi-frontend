@@ -445,12 +445,12 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
       <div class="field" style="margin-bottom:12px;">
         <label id="lbl-compat-theme">Тема анализа</label>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px;" id="compat-themes">
-          <button class="compat-theme-btn active" data-theme="romantic" onclick="selectTheme(this)">💑 Романтика</button>
-          <button class="compat-theme-btn" data-theme="family" onclick="selectTheme(this)">👨‍👩‍👧 Семья</button>
-          <button class="compat-theme-btn" data-theme="business" onclick="selectTheme(this)">🤝 Бизнес</button>
-          <button class="compat-theme-btn" data-theme="team" onclick="selectTheme(this)">💼 Работа</button>
-          <button class="compat-theme-btn" data-theme="friendship" onclick="selectTheme(this)">🌿 Дружба</button>
-          <button class="compat-theme-btn" data-theme="other" onclick="selectTheme(this)">✦ Другое</button>
+          <button class="compat-theme-btn active" data-theme="romantic" id="theme-romantic" onclick="selectTheme(this)">💑 Романтика</button>
+          <button class="compat-theme-btn" data-theme="family" id="theme-family" onclick="selectTheme(this)">👨‍👩‍👧 Семья</button>
+          <button class="compat-theme-btn" data-theme="business" id="theme-business" onclick="selectTheme(this)">🤝 Бизнес</button>
+          <button class="compat-theme-btn" data-theme="team" id="theme-team" onclick="selectTheme(this)">💼 Работа</button>
+          <button class="compat-theme-btn" data-theme="friendship" id="theme-friendship" onclick="selectTheme(this)">🌿 Дружба</button>
+          <button class="compat-theme-btn" data-theme="other" id="theme-other" onclick="selectTheme(this)">✦ Другое</button>
         </div>
       </div>
 
@@ -472,7 +472,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
           </div>
         </div>
         <div class="field" style="margin-bottom:10px;">
-          <label>Пол</label>
+          <label id="lbl-p2-gender">Пол</label>
           <input type="hidden" id="p2-gender" value="">
           <div class="gender-toggle">
             <div class="gender-btn" id="p2-gender-m-btn" onclick="setGender('m','p2-')">Мужской</div>
@@ -480,14 +480,14 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label>День</label><input type="number" id="p2-day" min="1" max="31" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p2-month',2)"></div>
-          <div class="field"><label>Месяц</label><input type="number" id="p2-month" min="1" max="12" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p2-year',2)"></div>
-          <div class="field"><label>Год</label><input type="number" id="p2-year" min="1900" max="2026" placeholder="1990" oninput="clampField(this,1900,2043,'Год');autoNext(this,'p2-hour',4)"></div>
-          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-hour" min="0" max="23" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p2-minute',2)"></div>
-          <div class="field"><label>Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-minute" min="0" max="59" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
+          <div class="field"><label id="lbl-p2-day">День</label><input type="number" id="p2-day" min="1" max="31" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p2-month',2)"></div>
+          <div class="field"><label id="lbl-p2-month">Месяц</label><input type="number" id="p2-month" min="1" max="12" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p2-year',2)"></div>
+          <div class="field"><label id="lbl-p2-year">Год</label><input type="number" id="p2-year" min="1900" max="2026" placeholder="1990" oninput="clampField(this,1900,2043,'Год');autoNext(this,'p2-hour',4)"></div>
+          <div class="field"><label id="lbl-p2-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-hour" min="0" max="23" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p2-minute',2)"></div>
+          <div class="field"><label id="lbl-p2-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-minute" min="0" max="59" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
         </div>
         <div class="field">
-          <label>Место рождения</label>
+          <label id="lbl-p2-place">Место рождения</label>
           <input type="text" id="p2-place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
           <div class="coords-display" id="p2-coords-display">Координаты не определены</div>
           <input type="hidden" id="p2-lat" value="">
@@ -501,15 +501,15 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
       <div id="p3-block" style="display:none;margin-top:10px;">
       <div class="card" style="margin-bottom:0;background:var(--panel2);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="font-size:12px;margin:0;">✦ Третий человек</h2>
+          <h2 style="font-size:12px;margin:0;" id="lbl-person3">✦ Третий человек</h2>
           <button onclick="removeExtraPerson(3)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;">✕</button>
         </div>
         <div class="row row-2" style="margin-bottom:10px;">
-          <div class="field"><label>Имя</label><input type="text" id="p3-firstname" placeholder="Имя"></div>
-          <div class="field"><label>Фамилия</label><input type="text" id="p3-lastname" placeholder="Фамилия"></div>
+          <div class="field"><label id="lbl-p3-firstname">Имя</label><input type="text" id="p3-firstname" placeholder="Имя"></div>
+          <div class="field"><label id="lbl-p3-lastname">Фамилия</label><input type="text" id="p3-lastname" placeholder="Фамилия"></div>
         </div>
         <div class="field" style="margin-bottom:10px;">
-          <label>Пол</label>
+          <label id="lbl-p3-gender">Пол</label>
           <input type="hidden" id="p3-gender" value="">
           <div class="gender-toggle">
             <div class="gender-btn" id="p3-gender-m-btn" onclick="setGender('m','p3-')">Мужской</div>
@@ -517,14 +517,14 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label>День</label><input type="number" id="p3-day" min="1" max="31" placeholder="1"></div>
-          <div class="field"><label>Месяц</label><input type="number" id="p3-month" min="1" max="12" placeholder="1"></div>
-          <div class="field"><label>Год</label><input type="number" id="p3-year" min="1900" max="2026" placeholder="1990"></div>
-          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p3-hour" min="0" max="23" placeholder="—"></div>
-          <div class="field"><label>Минуты</label><input type="number" id="p3-minute" min="0" max="59" placeholder="—"></div>
+          <div class="field"><label id="lbl-p3-day">День</label><input type="number" id="p3-day" min="1" max="31" placeholder="1"></div>
+          <div class="field"><label id="lbl-p3-month">Месяц</label><input type="number" id="p3-month" min="1" max="12" placeholder="1"></div>
+          <div class="field"><label id="lbl-p3-year">Год</label><input type="number" id="p3-year" min="1900" max="2026" placeholder="1990"></div>
+          <div class="field"><label id="lbl-p3-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p3-hour" min="0" max="23" placeholder="—"></div>
+          <div class="field"><label id="lbl-p3-minute">Минуты</label><input type="number" id="p3-minute" min="0" max="59" placeholder="—"></div>
         </div>
         <div class="field">
-          <label>Место рождения</label>
+          <label id="lbl-p3-place">Место рождения</label>
           <input type="text" id="p3-place" placeholder="New York, USA" autocomplete="off">
           <div class="coords-display" id="p3-coords-display">Координаты не определены</div>
           <input type="hidden" id="p3-lat" value=""><input type="hidden" id="p3-lon" value="">
@@ -536,15 +536,15 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
       <div id="p4-block" style="display:none;margin-top:10px;">
       <div class="card" style="margin-bottom:0;background:var(--panel2);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="font-size:12px;margin:0;">✦ Четвёртый человек</h2>
+          <h2 style="font-size:12px;margin:0;" id="lbl-person4">✦ Четвёртый человек</h2>
           <button onclick="removeExtraPerson(4)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;">✕</button>
         </div>
         <div class="row row-2" style="margin-bottom:10px;">
-          <div class="field"><label>Имя</label><input type="text" id="p4-firstname" placeholder="Имя"></div>
-          <div class="field"><label>Фамилия</label><input type="text" id="p4-lastname" placeholder="Фамилия"></div>
+          <div class="field"><label id="lbl-p4-firstname">Имя</label><input type="text" id="p4-firstname" placeholder="Имя"></div>
+          <div class="field"><label id="lbl-p4-lastname">Фамилия</label><input type="text" id="p4-lastname" placeholder="Фамилия"></div>
         </div>
         <div class="field" style="margin-bottom:10px;">
-          <label>Пол</label>
+          <label id="lbl-p4-gender">Пол</label>
           <input type="hidden" id="p4-gender" value="">
           <div class="gender-toggle">
             <div class="gender-btn" id="p4-gender-m-btn" onclick="setGender('m','p4-')">Мужской</div>
@@ -552,14 +552,14 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label>День</label><input type="number" id="p4-day" min="1" max="31" placeholder="1"></div>
-          <div class="field"><label>Месяц</label><input type="number" id="p4-month" min="1" max="12" placeholder="1"></div>
-          <div class="field"><label>Год</label><input type="number" id="p4-year" min="1900" max="2026" placeholder="1990"></div>
-          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p4-hour" min="0" max="23" placeholder="—"></div>
-          <div class="field"><label>Минуты</label><input type="number" id="p4-minute" min="0" max="59" placeholder="—"></div>
+          <div class="field"><label id="lbl-p4-day">День</label><input type="number" id="p4-day" min="1" max="31" placeholder="1"></div>
+          <div class="field"><label id="lbl-p4-month">Месяц</label><input type="number" id="p4-month" min="1" max="12" placeholder="1"></div>
+          <div class="field"><label id="lbl-p4-year">Год</label><input type="number" id="p4-year" min="1900" max="2026" placeholder="1990"></div>
+          <div class="field"><label id="lbl-p4-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p4-hour" min="0" max="23" placeholder="—"></div>
+          <div class="field"><label id="lbl-p4-minute">Минуты</label><input type="number" id="p4-minute" min="0" max="59" placeholder="—"></div>
         </div>
         <div class="field">
-          <label>Место рождения</label>
+          <label id="lbl-p4-place">Место рождения</label>
           <input type="text" id="p4-place" placeholder="New York, USA" autocomplete="off">
           <div class="coords-display" id="p4-coords-display">Координаты не определены</div>
           <input type="hidden" id="p4-lat" value=""><input type="hidden" id="p4-lon" value="">
@@ -573,7 +573,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
         <button class="btn-copy" id="btn-add-p3" onclick="addExtraPerson(3)" style="display:none;font-size:11px;">+ Третий человек</button>
         <button class="btn-copy" id="btn-add-p4" onclick="addExtraPerson(4)" style="display:none;font-size:11px;">+ Четвёртый человек</button>
       </div>
-      <div style="margin-top:10px;font-size:11px;color:var(--text-faint);line-height:1.6;">
+      <div style="margin-top:10px;font-size:11px;color:var(--text-faint);line-height:1.6;" id="lbl-group-hint">
         ✦ Групповой анализ (5 и более человек) — по запросу
       </div>
 
@@ -713,28 +713,28 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
   <!-- ОБРАТНАЯ СВЯЗЬ — в самом низу страницы -->
   <div style="margin-top:30px;padding-top:18px;border-top:1px solid var(--line2);text-align:center;">
-    <button class="btn-copy" onclick="openFeedbackModal()" style="font-size:11px;">✉ Обратная связь</button>
+    <button class="btn-copy" id="btn-feedback" onclick="openFeedbackModal()" style="font-size:11px;">✉ Обратная связь</button>
   </div>
 
   <!-- Модальное окно обратной связи -->
   <div class="modal-overlay" id="feedback-modal">
     <div class="modal-box">
-      <h2 style="margin-bottom:14px;">✉ Обратная связь</h2>
+      <h2 style="margin-bottom:14px;" id="fb-title">✉ Обратная связь</h2>
       <div class="field" style="margin-bottom:10px;">
-        <label>Имя</label>
+        <label id="fb-lbl-name">Имя</label>
         <input type="text" id="fb-name" placeholder="Твоё имя">
       </div>
       <div class="field" style="margin-bottom:10px;">
-        <label>Email</label>
+        <label id="fb-lbl-email">Email</label>
         <input type="email" id="fb-email" placeholder="your@email.com">
       </div>
       <div class="field" style="margin-bottom:14px;">
-        <label>Вопрос</label>
+        <label id="fb-lbl-message">Вопрос</label>
         <textarea id="fb-message" placeholder="Опиши свой запрос или вопрос..." style="min-height:90px;"></textarea>
       </div>
       <button class="primary" onclick="sendFeedback()" id="fb-send-btn" style="width:100%;">✦ Отправить</button>
       <div class="msg" id="fb-msg" style="margin-top:10px;font-size:12px;text-align:center;"></div>
-      <button class="btn-copy" onclick="closeFeedbackModal()" style="width:100%;margin-top:10px;">Закрыть</button>
+      <button class="btn-copy" onclick="closeFeedbackModal()" id="fb-close-btn" style="width:100%;margin-top:10px;">Закрыть</button>
     </div>
   </div>
 
@@ -836,6 +836,15 @@ const LANG = {
     labelHour: 'Hour',
     labelMinute: 'Minute',
     labelPlace: 'Place of Birth',
+    labelGender: 'Gender', genderMale: 'Male', genderFemale: 'Female',
+    compatToggle: '✦ Compatibility Analysis', compatThemeLabel: 'Analysis Topic',
+    themeRomantic: '💑 Romance', themeFamily: '👨‍👩‍👧 Family', themeBusiness: '🤝 Business',
+    themeTeam: '💼 Work', themeFriendship: '🌿 Friendship', themeOther: '✦ Other',
+    lblPerson2: '✦ Second Person', lblPerson3: '✦ Third Person', lblPerson4: '✦ Fourth Person',
+    btnAddP3: '+ Third Person', btnAddP4: '+ Fourth Person',
+    groupAnalysisHint: '✦ Group analysis (5+ people) — on request',
+    btnFeedback: '✉ Feedback', fbTitle: '✉ Feedback', fbLblName: 'Name', fbLblEmail: 'Email',
+    fbLblMessage: 'Message', fbSendBtn: '✦ Send', fbCloseBtn: 'Close',
     labelRequest: 'Request / Question',
     requestPlaceholder: 'Request/Question. Add context for a more accurate reading.',
     requestHint: '⚠ Less than 50 characters left — be concise',
@@ -939,6 +948,15 @@ const LANG = {
     labelHour: 'Godzina',
     labelMinute: 'Minuta',
     labelPlace: 'Miejsce urodzenia',
+    labelGender: 'Płeć', genderMale: 'Mężczyzna', genderFemale: 'Kobieta',
+    compatToggle: '✦ Analiza kompatybilności', compatThemeLabel: 'Temat analizy',
+    themeRomantic: '💑 Romans', themeFamily: '👨‍👩‍👧 Rodzina', themeBusiness: '🤝 Biznes',
+    themeTeam: '💼 Praca', themeFriendship: '🌿 Przyjaźń', themeOther: '✦ Inne',
+    lblPerson2: '✦ Druga osoba', lblPerson3: '✦ Trzecia osoba', lblPerson4: '✦ Czwarta osoba',
+    btnAddP3: '+ Trzecia osoba', btnAddP4: '+ Czwarta osoba',
+    groupAnalysisHint: '✦ Analiza grupowa (5+ osób) — na życzenie',
+    btnFeedback: '✉ Kontakt', fbTitle: '✉ Kontakt', fbLblName: 'Imię', fbLblEmail: 'Email',
+    fbLblMessage: 'Wiadomość', fbSendBtn: '✦ Wyślij', fbCloseBtn: 'Zamknij',
     labelRequest: 'Zapytanie / Pytanie',
     requestPlaceholder: 'Zapytanie/Pytanie. Dodaj kontekst dla dokładniejszej analizy.',
     requestHint: '⚠ Zostało mniej niż 50 znaków — bądź zwięzły',
@@ -1036,6 +1054,15 @@ const LANG = {
     labelHour: 'Години',
     labelMinute: 'Хвилини',
     labelPlace: 'Місце народження',
+    labelGender: 'Стать', genderMale: 'Чоловіча', genderFemale: 'Жіноча',
+    compatToggle: '✦ Аналіз сумісності', compatThemeLabel: 'Тема аналізу',
+    themeRomantic: '💑 Романтика', themeFamily: '👨‍👩‍👧 Сім\'я', themeBusiness: '🤝 Бізнес',
+    themeTeam: '💼 Робота', themeFriendship: '🌿 Дружба', themeOther: '✦ Інше',
+    lblPerson2: '✦ Друга людина', lblPerson3: '✦ Третя людина', lblPerson4: '✦ Четверта людина',
+    btnAddP3: '+ Третя людина', btnAddP4: '+ Четверта людина',
+    groupAnalysisHint: '✦ Груповий аналіз (5+ людей) — за запитом',
+    btnFeedback: '✉ Зворотний зв\'язок', fbTitle: '✉ Зворотний зв\'язок', fbLblName: 'Ім\'я', fbLblEmail: 'Email',
+    fbLblMessage: 'Питання', fbSendBtn: '✦ Надіслати', fbCloseBtn: 'Закрити',
     labelRequest: 'Запит / Питання',
     requestPlaceholder: 'Запит/Питання. Для точнішого розрахунку додай контекст.',
     requestHint: '⚠ Залишилось менше 50 знаків — формулюй лаконічно',
@@ -1133,6 +1160,15 @@ const LANG = {
     labelHour: 'Часы',
     labelMinute: 'Минуты',
     labelPlace: 'Место рождения',
+    labelGender: 'Пол', genderMale: 'Мужской', genderFemale: 'Женский',
+    compatToggle: '✦ Анализ совместимости', compatThemeLabel: 'Тема анализа',
+    themeRomantic: '💑 Романтика', themeFamily: '👨‍👩‍👧 Семья', themeBusiness: '🤝 Бизнес',
+    themeTeam: '💼 Работа', themeFriendship: '🌿 Дружба', themeOther: '✦ Другое',
+    lblPerson2: '✦ Второй человек', lblPerson3: '✦ Третий человек', lblPerson4: '✦ Четвёртый человек',
+    btnAddP3: '+ Третий человек', btnAddP4: '+ Четвёртый человек',
+    groupAnalysisHint: '✦ Групповой анализ (5 и более человек) — по запросу',
+    btnFeedback: '✉ Обратная связь', fbTitle: '✉ Обратная связь', fbLblName: 'Имя', fbLblEmail: 'Email',
+    fbLblMessage: 'Вопрос', fbSendBtn: '✦ Отправить', fbCloseBtn: 'Закрыть',
     labelRequest: 'Запрос',
     requestPlaceholder: 'Запрос/Вопрос. Для более точного расчёта добавь контекст.',
     requestHint: '⚠ Осталось менее 50 знаков — формулируй лаконично',
@@ -1249,6 +1285,50 @@ function applyTranslations() {
   setText('label-hour', L.labelHour);
   setText('label-minute', L.labelMinute);
   setText('label-place', L.labelPlace);
+  setText('label-gender', L.labelGender);
+  setText('gender-m-btn', L.genderMale);
+  setText('gender-f-btn', L.genderFemale);
+
+  // Блок совместимости
+  setText('lbl-compat-toggle', L.compatToggle);
+  setText('lbl-compat-theme', L.compatThemeLabel);
+  setText('theme-romantic', L.themeRomantic);
+  setText('theme-family', L.themeFamily);
+  setText('theme-business', L.themeBusiness);
+  setText('theme-team', L.themeTeam);
+  setText('theme-friendship', L.themeFriendship);
+  setText('theme-other', L.themeOther);
+  setText('lbl-group-hint', L.groupAnalysisHint);
+
+  // Второй/третий/четвёртый человек — переиспользуем метки основного человека
+  ['p2','p3','p4'].forEach(p => {
+    setText(`lbl-${p}-firstname`, L.labelFirstname);
+    setText(`lbl-${p}-lastname`, L.labelLastname);
+    setText(`lbl-${p}-gender`, L.labelGender);
+    setText(`${p}-gender-m-btn`, L.genderMale);
+    setText(`${p}-gender-f-btn`, L.genderFemale);
+    setText(`lbl-${p}-day`, L.labelDay);
+    setText(`lbl-${p}-month`, L.labelMonth);
+    setText(`lbl-${p}-year`, L.labelYear);
+    setText(`lbl-${p}-hour`, L.labelHour);
+    setText(`lbl-${p}-minute`, L.labelMinute);
+    setText(`lbl-${p}-place`, L.labelPlace);
+  });
+  setText('lbl-person2', L.lblPerson2);
+  setText('lbl-person3', L.lblPerson3);
+  setText('lbl-person4', L.lblPerson4);
+  setText('btn-add-p3', L.btnAddP3);
+  setText('btn-add-p4', L.btnAddP4);
+
+  // Обратная связь
+  setText('btn-feedback', L.btnFeedback);
+  setText('fb-title', L.fbTitle);
+  setText('fb-lbl-name', L.fbLblName);
+  setText('fb-lbl-email', L.fbLblEmail);
+  setText('fb-lbl-message', L.fbLblMessage);
+  setText('fb-send-btn', L.fbSendBtn);
+  setText('fb-close-btn', L.fbCloseBtn);
+
   setText('label-request', L.labelRequest);
   setPlaceholder('request', L.requestPlaceholder);
   setText('req-warning', L.requestHint);
