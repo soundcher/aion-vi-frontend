@@ -1304,6 +1304,8 @@ function applyTranslations() {
   ['p2','p3','p4'].forEach(p => {
     setText(`lbl-${p}-firstname`, L.labelFirstname);
     setText(`lbl-${p}-lastname`, L.labelLastname);
+    setPlaceholder(`${p}-firstname`, L.labelFirstname);
+    setPlaceholder(`${p}-lastname`, L.labelLastname);
     setText(`lbl-${p}-gender`, L.labelGender);
     setText(`${p}-gender-m-btn`, L.genderMale);
     setText(`${p}-gender-f-btn`, L.genderFemale);
@@ -1313,6 +1315,11 @@ function applyTranslations() {
     setText(`lbl-${p}-hour`, L.labelHour);
     setText(`lbl-${p}-minute`, L.labelMinute);
     setText(`lbl-${p}-place`, L.labelPlace);
+    // Координаты — только если ещё не найдены (не затираем уже найденный результат)
+    const coordsEl = el(`${p}-coords-display`);
+    if (coordsEl && !document.getElementById(`${p}-lat`)?.value) {
+      coordsEl.textContent = L.coordsDefault;
+    }
   });
   setText('lbl-person2', L.lblPerson2);
   setText('lbl-person3', L.lblPerson3);
