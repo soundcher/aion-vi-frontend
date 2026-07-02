@@ -213,6 +213,9 @@
     .logo-img { width: 240px; }
     .lang-btn { font-size: 20px; }
   }
+.gender-toggle{display:flex;gap:8px;}
+.gender-btn{flex:1;padding:9px;text-align:center;border:1px solid var(--line);border-radius:2px;cursor:pointer;font-size:12px;color:var(--text-dim);transition:all .15s;}
+.gender-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,165,99,0.08);}
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -251,6 +254,15 @@
     <div class="field">
       <label id="t-lbl-nickname">Friends call me</label>
       <input type="text" id="inp-nickname" autocomplete="nickname">
+    </div>
+
+    <div class="field">
+      <label id="t-lbl-gender">Gender</label>
+      <input type="hidden" id="inp-gender" value="">
+      <div class="gender-toggle">
+        <div class="gender-btn" id="gender-m-btn" onclick="setRegGender('m')">Male</div>
+        <div class="gender-btn" id="gender-f-btn" onclick="setRegGender('f')">Female</div>
+      </div>
     </div>
 
     <div class="field">
@@ -320,6 +332,7 @@ const TRANSLATIONS = {
     tagline: 'Your personal navigator',
     formTitle: 'Access to AION Vi',
     lblNickname: 'Friends call me',
+    lblGender: 'Gender', genderMale: 'Male', genderFemale: 'Female',
     phNickname: 'Slava, Kate, Max...',
     lblEmail: 'Email',
     phEmail: 'your@email.com',
@@ -345,6 +358,7 @@ const TRANSLATIONS = {
     tagline: 'Твій персональний навігатор',
     formTitle: 'Доступ до AION Vi',
     lblNickname: 'Як тебе називають друзі?',
+    lblGender: 'Стать', genderMale: 'Чоловіча', genderFemale: 'Жіноча',
     phNickname: 'Слава, Катя, Макс...',
     lblEmail: 'Email',
     phEmail: 'your@email.com',
@@ -370,6 +384,7 @@ const TRANSLATIONS = {
     tagline: 'Twój osobisty nawigator',
     formTitle: 'Dostęp do AION Vi',
     lblNickname: 'Jak nazywają cię przyjaciele?',
+    lblGender: 'Płeć', genderMale: 'Mężczyzna', genderFemale: 'Kobieta',
     phNickname: 'Sława, Kasia, Max...',
     lblEmail: 'Email',
     phEmail: 'twoj@email.com',
@@ -395,6 +410,7 @@ const TRANSLATIONS = {
     tagline: 'Твой персональный навигатор',
     formTitle: 'Доступ к AION Vi',
     lblNickname: 'Как к тебе обращаются друзья?',
+    lblGender: 'Пол', genderMale: 'Мужской', genderFemale: 'Женский',
     phNickname: 'Слава, Катя, Макс...',
     lblEmail: 'Email',
     phEmail: 'your@email.com',
@@ -434,6 +450,9 @@ function setLang(lang) {
   document.getElementById('t-form-title').textContent = T.formTitle;
   document.getElementById('t-lbl-nickname').textContent = T.lblNickname;
   document.getElementById('inp-nickname').placeholder = T.phNickname;
+  document.getElementById('t-lbl-gender').textContent = T.lblGender;
+  document.getElementById('gender-m-btn').textContent = T.genderMale;
+  document.getElementById('gender-f-btn').textContent = T.genderFemale;
   document.getElementById('t-lbl-email').textContent = T.lblEmail;
   document.getElementById('inp-email').placeholder = T.phEmail;
   document.getElementById('t-lbl-promo').textContent = T.lblPromo;
@@ -496,6 +515,12 @@ const VALID_CODES = [
 const ANALYSES_PER_CODE = 5;
 
 // Локальное хранилище
+function setRegGender(value) {
+  document.getElementById('inp-gender').value = value;
+  document.getElementById('gender-m-btn').classList.toggle('active', value === 'm');
+  document.getElementById('gender-f-btn').classList.toggle('active', value === 'f');
+}
+
 function getUser() { try { return JSON.parse(localStorage.getItem('aion_user')); } catch { return null; } }
 function saveUser(u) { localStorage.setItem('aion_user', JSON.stringify(u)); }
 function getUsedCodes() { try { return JSON.parse(localStorage.getItem('aion_used_codes') || '[]'); } catch { return []; } }
@@ -562,7 +587,7 @@ async function handleSocialLogin(firebaseUser, method) {
     saveUser({ ...existing, email });
     showMsg(`С возвращением, ${existing.nickname || nickname}!`, 'success');
   } else {
-    const user = { nickname, email, promo: 'social-' + method, analysesLeft: ANALYSES_PER_CODE,
+    const user = { nickname, email, gender: '', promo: 'social-' + method, analysesLeft: ANALYSES_PER_CODE,
       registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: method };
     saveUser(user);
     await saveUserToFirebase(user);
@@ -599,6 +624,7 @@ function showAlreadyIn(user) {
 async function enterApp() {
   const T = TRANSLATIONS[currentLang];
   const nickname = document.getElementById('inp-nickname').value.trim();
+  const gender   = document.getElementById('inp-gender').value;
   const email    = document.getElementById('inp-email').value.trim().toLowerCase();
   const promo    = document.getElementById('inp-promo').value.trim().toUpperCase();
   const btn      = document.getElementById('btn-enter');
@@ -617,7 +643,7 @@ async function enterApp() {
   } catch(e) {
     if (getUsedCodes().includes(promo)) { showMsg(T.errUsed, 'error'); btn.classList.remove('loading'); btn.disabled = false; return; }
   }
-  const user = { nickname, email, promo, analysesLeft: ANALYSES_PER_CODE,
+  const user = { nickname, email, promo, gender, analysesLeft: ANALYSES_PER_CODE,
     registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: 'promo' };
   saveUser(user); markCodeUsed(promo);
   await saveUserToFirebase(user);
