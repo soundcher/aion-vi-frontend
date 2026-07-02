@@ -271,6 +271,7 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
 .gender-btn{flex:1;padding:9px;text-align:center;border:1px solid var(--line2);border-radius:2px;cursor:pointer;font-size:12px;color:var(--text-dim);transition:all .15s;background:var(--panel2);}
 .gender-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,165,99,0.08);}
 input.field-error{border-color:#c05555 !important;background:#241414 !important;}
+.gender-btn.field-error{border-color:#c05555 !important;background:#241414 !important;}
 .field-hint{color:#c07070;font-size:10px;margin-top:3px;min-height:12px;line-height:1.3;}
 .error-box.show{display:block;}
 
@@ -928,6 +929,7 @@ const LANG = {
     summaryCopied: 'Summary copied — paste into Claude',
     copyManual: 'Select text manually and copy (Ctrl+C)',
     needCalculate: 'Calculate client data first',
+    needGender: 'Please select gender',
     shareGmailSubject: 'AION Vi — Your Personal Analysis',
     shareTelegramText: 'AION Vi — Personal Analysis',
     greetFirst: '{name}Hi! I\'m AION Vi. I know too much about you to stay silent. Ask — I\'ll tell you everything! 😊',
@@ -1034,6 +1036,7 @@ const LANG = {
     summaryCopied: 'Podsumowanie skopiowane — wklej do Claude',
     copyManual: 'Zaznacz tekst ręcznie i skopiuj (Ctrl+C)',
     needCalculate: 'Najpierw oblicz dane klienta',
+    needGender: 'Proszę wybrać płeć',
     shareGmailSubject: 'AION Vi — Twoja Osobista Analiza',
     shareTelegramText: 'AION Vi — Osobista Analiza',
     greetFirst: '{name}Cześć! Jestem AION Vi. Wiem o tobie zbyt wiele, by milczeć. Pytaj — wszystko ci powiem! 😊',
@@ -1140,6 +1143,7 @@ const LANG = {
     summaryCopied: 'Зведення скопійовано — встав у Claude',
     copyManual: 'Виділи текст вручну та скопіюй (Ctrl+C)',
     needCalculate: 'Спочатку розрахуй дані клієнта',
+    needGender: 'Будь ласка, вкажи стать',
     shareGmailSubject: 'AION Vi — Твій персональний аналіз',
     shareTelegramText: 'AION Vi — Персональний аналіз',
     greetFirst: '{name}Привіт! Мене звати AION Vi. Я знаю про тебе занадто багато, щоб мовчати. Питай — я все розповім! 😊',
@@ -1246,6 +1250,7 @@ const LANG = {
     summaryCopied: 'Сводка скопирована — вставляй в Claude',
     copyManual: 'Выдели текст вручную и скопируй (Ctrl+C)',
     needCalculate: 'Сначала рассчитай данные клиента',
+    needGender: 'Пожалуйста, укажи пол',
     shareGmailSubject: 'AION Vi — Твой персональный анализ',
     shareTelegramText: 'AION Vi — Персональный анализ',
     greetFirst: '{name}Привет! Меня зовут AION Vi. Я знаю о тебе слишком много, чтобы молчать. Спрашивай — я всё расскажу! 😊',
@@ -2244,6 +2249,14 @@ async function generateAnalysis() {
     }
   } catch(e) {}
 
+  if (!document.getElementById('gender').value) {
+    document.getElementById('gender-m-btn').classList.add('field-error');
+    document.getElementById('gender-f-btn').classList.add('field-error');
+    document.getElementById('gender-m-btn').scrollIntoView({behavior:'smooth', block:'center'});
+    alert(t('needGender'));
+    return;
+  }
+
   if (!currentSummary) {
     // Блок "О тебе" заморожен — считаем данные автоматически в фоне
     const ok = await calculate(true);
@@ -2819,6 +2832,8 @@ function setGender(value, prefix) {
   document.getElementById(prefix + 'gender').value = value;
   document.getElementById(prefix + 'gender-m-btn').classList.toggle('active', value === 'm');
   document.getElementById(prefix + 'gender-f-btn').classList.toggle('active', value === 'f');
+  document.getElementById(prefix + 'gender-m-btn').classList.remove('field-error');
+  document.getElementById(prefix + 'gender-f-btn').classList.remove('field-error');
 }
 
 function cleanNameInput(el) {
