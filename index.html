@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AION Vi</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0d1525">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -584,7 +588,7 @@ async function handleSocialLogin(firebaseUser, method) {
     saveUser({ ...existing, email });
     showMsg(`С возвращением, ${existing.nickname || nickname}!`, 'success');
   } else {
-    const user = { nickname, email, promo: 'social-' + method, analysesLeft: ANALYSES_PER_CODE,
+    const user = { nickname, email, promo: 'social-' + method, analysesLeft: ANALYSES_PER_CODE, analysesTotal: ANALYSES_PER_CODE,
       registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: method };
     saveUser(user);
     await saveUserToFirebase(user);
@@ -639,7 +643,7 @@ async function enterApp() {
   } catch(e) {
     if (getUsedCodes().includes(promo)) { showMsg(T.errUsed, 'error'); btn.classList.remove('loading'); btn.disabled = false; return; }
   }
-  const user = { nickname, email, promo, analysesLeft: ANALYSES_PER_CODE,
+  const user = { nickname, email, promo, analysesLeft: ANALYSES_PER_CODE, analysesTotal: ANALYSES_PER_CODE,
     registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: 'promo' };
   saveUser(user); markCodeUsed(promo);
   await saveUserToFirebase(user);
@@ -662,6 +666,11 @@ function logout() {
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Enter') enterApp(); });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
 </script>
 </body>
 </html>
