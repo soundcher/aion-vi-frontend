@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AION Vi — Навигатор Жизни</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon-32.png" sizes="32x32">
@@ -365,6 +366,10 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--line2);padding-bottom:12px;margin-bottom:12px;">
   <h1 style="border-bottom:none;margin-bottom:0;padding-bottom:0;" id="app-title">Навигатор Жизни</h1>
   <div style="display:flex;align-items:center;gap:10px;">
+    <div style="display:flex;align-items:center;gap:4px;border:1px solid var(--line2);border-radius:2px;padding:2px;">
+      <button onclick="adjustFontScale(-1)" style="background:transparent;border:none;color:var(--text-dim);cursor:pointer;padding:4px 8px;font-size:12px;font-family:inherit;" title="Уменьшить текст">A−</button>
+      <button onclick="adjustFontScale(1)" style="background:transparent;border:none;color:var(--gold);cursor:pointer;padding:4px 8px;font-size:16px;font-family:inherit;" title="Увеличить текст">A+</button>
+    </div>
     <div class="lang-select-wrap">
       <select class="lang-select" id="lang-select" onchange="setLanguage(this.value)">
         <option value="en" selected>🌐 English</option>
@@ -1283,6 +1288,23 @@ let currentLang = 'en';
 function t(key) {
   return (LANG[currentLang] && LANG[currentLang][key]) || (LANG.ru[key]) || key;
 }
+
+// Регулятор размера текста — свойство zoom масштабирует всё разом,
+// поддерживается в Safari (iOS) и Chrome (Android) в 2026 году.
+const FONT_SCALES = [1, 1.15, 1.3, 1.45];
+function applyFontScale(idx) {
+  idx = Math.max(0, Math.min(FONT_SCALES.length - 1, idx));
+  document.body.style.zoom = FONT_SCALES[idx];
+  localStorage.setItem('aion_font_scale_idx', idx);
+}
+function adjustFontScale(direction) {
+  let idx = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
+  applyFontScale(idx + direction);
+}
+(function() {
+  const saved = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
+  if (saved > 0) applyFontScale(saved);
+})();
 
 function setLanguage(lang) {
   currentLang = lang;
