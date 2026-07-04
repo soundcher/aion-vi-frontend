@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <title>AION Vi — Навигатор Жизни</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0d1525">
 <style>
 /* Туман */
 .fog{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);opacity:0.13;}
@@ -381,6 +385,17 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 <div class="server-status">
   <div class="dot" id="server-dot"></div>
   <span id="server-label">Проверка сервера...</span>
+</div>
+
+<!-- Счётчик анализов -->
+<div id="analyses-counter" style="display:none;margin-bottom:14px;">
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:4px;">
+    <span id="analyses-counter-label">Осталось анализов</span>
+    <span id="analyses-counter-numbers"></span>
+  </div>
+  <div style="height:5px;background:var(--panel2);border-radius:3px;overflow:hidden;">
+    <div id="analyses-counter-bar" style="height:100%;background:var(--gold);border-radius:3px;transition:width .4s;width:100%;"></div>
+  </div>
 </div>
 
 <!-- ВВОД ДАННЫХ -->
@@ -930,6 +945,7 @@ const LANG = {
     copyManual: 'Select text manually and copy (Ctrl+C)',
     needCalculate: 'Calculate client data first',
     needGender: 'Please select gender',
+    analysesLeftLabel: 'Analyses left',
     shareGmailSubject: 'AION Vi — Your Personal Analysis',
     shareTelegramText: 'AION Vi — Personal Analysis',
     greetFirst: '{name}Hi! I\'m AION Vi. I know too much about you to stay silent. Ask — I\'ll tell you everything! 😊',
@@ -1037,6 +1053,7 @@ const LANG = {
     copyManual: 'Zaznacz tekst ręcznie i skopiuj (Ctrl+C)',
     needCalculate: 'Najpierw oblicz dane klienta',
     needGender: 'Proszę wybrać płeć',
+    analysesLeftLabel: 'Pozostało analiz',
     shareGmailSubject: 'AION Vi — Twoja Osobista Analiza',
     shareTelegramText: 'AION Vi — Osobista Analiza',
     greetFirst: '{name}Cześć! Jestem AION Vi. Wiem o tobie zbyt wiele, by milczeć. Pytaj — wszystko ci powiem! 😊',
@@ -1144,6 +1161,7 @@ const LANG = {
     copyManual: 'Виділи текст вручну та скопіюй (Ctrl+C)',
     needCalculate: 'Спочатку розрахуй дані клієнта',
     needGender: 'Будь ласка, вкажи стать',
+    analysesLeftLabel: 'Залишилось аналізів',
     shareGmailSubject: 'AION Vi — Твій персональний аналіз',
     shareTelegramText: 'AION Vi — Персональний аналіз',
     greetFirst: '{name}Привіт! Мене звати AION Vi. Я знаю про тебе занадто багато, щоб мовчати. Питай — я все розповім! 😊',
@@ -1251,6 +1269,7 @@ const LANG = {
     copyManual: 'Выдели текст вручную и скопируй (Ctrl+C)',
     needCalculate: 'Сначала рассчитай данные клиента',
     needGender: 'Пожалуйста, укажи пол',
+    analysesLeftLabel: 'Осталось анализов',
     shareGmailSubject: 'AION Vi — Твой персональный анализ',
     shareTelegramText: 'AION Vi — Персональный анализ',
     greetFirst: '{name}Привет! Меня зовут AION Vi. Я знаю о тебе слишком много, чтобы молчать. Спрашивай — я всё расскажу! 😊',
@@ -1290,6 +1309,7 @@ function applyTranslations() {
   setText('label-hour', L.labelHour);
   setText('label-minute', L.labelMinute);
   setText('label-place', L.labelPlace);
+  setText('analyses-counter-label', L.analysesLeftLabel);
   setText('label-gender', L.labelGender);
   setText('gender-m-btn', L.genderMale);
   setText('gender-f-btn', L.genderFemale);
@@ -1907,6 +1927,18 @@ async function geocodeP2() {
 // ══════════════════════════════════════════════
 // ЖИВОЕ ПРИВЕТСТВИЕ AION Vi
 // ══════════════════════════════════════════════
+function renderAnalysesCounter() {
+  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const box = document.getElementById('analyses-counter');
+  if (!user || typeof user.analysesLeft !== 'number') { box.style.display = 'none'; return; }
+  const total = Math.max(user.analysesTotal || 5, user.analysesLeft, 1);
+  const pct = Math.round((user.analysesLeft / total) * 100);
+  document.getElementById('analyses-counter-numbers').textContent = `${user.analysesLeft} / ${total}`;
+  document.getElementById('analyses-counter-bar').style.width = pct + '%';
+  if (pct <= 20) document.getElementById('analyses-counter-bar').style.background = 'var(--red, #c46a4a)';
+  box.style.display = 'block';
+}
+
 function initGreeting() {
   const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
   const nickname = user?.nickname || '';
@@ -2402,6 +2434,7 @@ async function generateAnalysis() {
       if (user && typeof data.analyses_left === 'number') {
         user.analysesLeft = data.analyses_left;
         localStorage.setItem('aion_user', JSON.stringify(user));
+        renderAnalysesCounter();
         if (user.analysesLeft <= 2) {
           const warn = user.analysesLeft === 0
             ? '⚠ Анализы закончились. Для продолжения нужен новый промокод или подписка.'
@@ -2898,6 +2931,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Живое приветствие AION Vi
   initGreeting();
+  renderAnalysesCounter();
 
   checkServer();
   setInterval(checkServer, 10000);
@@ -2917,6 +2951,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') { e.preventDefault(); geocode(); }
   });
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
 </script>
 </body>
 </html>
