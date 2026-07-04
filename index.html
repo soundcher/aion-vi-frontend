@@ -234,6 +234,8 @@
 
 <!-- Языки -->
 <div class="lang-bar">
+  <button onclick="adjustFontScale(-1)" class="lang-btn" style="font-size:12px;" title="Меньше текст">A−</button>
+  <button onclick="adjustFontScale(1)" class="lang-btn" style="font-size:16px;" title="Больше текст">A+</button>
   <button class="lang-btn active" onclick="setLang('en')" title="English">🇬🇧</button>
   <button class="lang-btn" onclick="setLang('uk')" title="Українська">🇺🇦</button>
   <button class="lang-btn" onclick="setLang('pl')" title="Polski">🇵🇱</button>
@@ -426,6 +428,17 @@ const TRANSLATIONS = {
 
 let currentLang = 'en';
 
+const FONT_SCALES = [1, 1.15, 1.3, 1.45];
+function applyFontScale(idx) {
+  idx = Math.max(0, Math.min(FONT_SCALES.length - 1, idx));
+  document.body.style.zoom = FONT_SCALES[idx];
+  localStorage.setItem('aion_font_scale_idx', idx);
+}
+function adjustFontScale(direction) {
+  let idx = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
+  applyFontScale(idx + direction);
+}
+
 function setLang(lang) {
   currentLang = lang;
   const T = TRANSLATIONS[lang];
@@ -601,6 +614,8 @@ async function handleSocialLogin(firebaseUser, method) {
 // ИНИЦИАЛИЗАЦИЯ
 // ══════════════════════════════════════════════
 window.onload = function() {
+  const savedScale = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
+  if (savedScale > 0) applyFontScale(savedScale);
   initFirebaseApp();
   const savedLang = localStorage.getItem('aion_lang') || 'en';
   setLang(savedLang);
