@@ -713,7 +713,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
   <!-- ГЕНЕРАЦИЯ АНАЛИЗА — под полем запроса -->
   <div class="analysis-section">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
       <button class="btn-generate" onclick="generateAnalysis()" id="gen-btn">✦ Сгенерировать анализ</button>
       <button class="btn-music-toggle" id="btn-music-toggle" onclick="toggleMusicGlobal()">♪ Музыка вкл</button>
       <span class="analysis-spinner" id="gen-spinner">⟳ Генерирую... (~40 сек)</span>
@@ -1577,6 +1577,7 @@ function onLastnameInput(val) {
       document.getElementById('lat').value = p.lat;
       document.getElementById('lon').value = p.lon;
       document.getElementById('coords-display').textContent = `${parseFloat(p.lat).toFixed(4)}° с.ш. / ${parseFloat(p.lon).toFixed(4)}° в.д.`;
+      if (p.gender === 'm' || p.gender === 'f') setGender(p.gender);
       list.innerHTML = '';
       // Фокус на запрос
       document.getElementById('request').focus();
@@ -1616,23 +1617,23 @@ function acKeydown(e, listId) {
 // МУЗЫКА
 // ══════════════════════════════════════════════
 const TRACKS_MAGIC = [
-  { file: 'Music/track1.wav', name: 'AION Vi — I' },
-  { file: 'Music/track2.wav', name: 'AION Vi — II' },
-  { file: 'Music/track3.wav', name: 'AION Vi — III' },
-  { file: 'Music/track4.wav', name: 'AION Vi — IV' },
-  { file: 'Music/track5.wav', name: 'AION Vi — V' },
-  { file: 'Music/track6.wav', name: 'AION Vi — VI' },
+  { file: 'Music/track1.mp3', name: 'AION Vi — I' },
+  { file: 'Music/track2.mp3', name: 'AION Vi — II' },
+  { file: 'Music/track3.mp3', name: 'AION Vi — III' },
+  { file: 'Music/track4.mp3', name: 'AION Vi — IV' },
+  { file: 'Music/track5.mp3', name: 'AION Vi — V' },
+  { file: 'Music/track6.mp3', name: 'AION Vi — VI' },
 ];
 const TRACKS_PIANO = [
-  { file: 'Music_Piano/piano1.wav', name: 'AION Vi · Piano I' },
-  { file: 'Music_Piano/piano2.wav', name: 'AION Vi · Piano II' },
-  { file: 'Music_Piano/piano3.wav', name: 'AION Vi · Piano III' },
-  { file: 'Music_Piano/piano4.wav', name: 'AION Vi · Piano IV' },
-  { file: 'Music_Piano/piano5.wav', name: 'AION Vi · Piano V' },
-  { file: 'Music_Piano/piano6.wav', name: 'AION Vi · Piano VI' },
-  { file: 'Music_Piano/piano7.wav', name: 'AION Vi · Piano VII' },
-  { file: 'Music_Piano/piano8.wav', name: 'AION Vi · Piano VIII' },
-  { file: 'Music_Piano/piano9.wav', name: 'AION Vi · Piano IX' },
+  { file: 'Music_Piano/piano1.mp3', name: 'AION Vi · Piano I' },
+  { file: 'Music_Piano/piano2.mp3', name: 'AION Vi · Piano II' },
+  { file: 'Music_Piano/piano3.mp3', name: 'AION Vi · Piano III' },
+  { file: 'Music_Piano/piano4.mp3', name: 'AION Vi · Piano IV' },
+  { file: 'Music_Piano/piano5.mp3', name: 'AION Vi · Piano V' },
+  { file: 'Music_Piano/piano6.mp3', name: 'AION Vi · Piano VI' },
+  { file: 'Music_Piano/piano7.mp3', name: 'AION Vi · Piano VII' },
+  { file: 'Music_Piano/piano8.mp3', name: 'AION Vi · Piano VIII' },
+  { file: 'Music_Piano/piano9.mp3', name: 'AION Vi · Piano IX' },
 ];
 
 let audioPlayer = null;
