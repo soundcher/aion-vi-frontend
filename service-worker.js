@@ -12,6 +12,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Просто пропускаем все запросы напрямую в сеть — без кеша.
+  // Аудио/видео и запросы "по кускам" (для потокового воспроизведения)
+  // НЕ трогаем — иначе браузер не может нормально проигрывать музыку.
+  const isMedia = /\.(wav|mp3|ogg|m4a|mp4|webm)$/i.test(event.request.url);
+  const isRangeRequest = event.request.headers.has('range');
+  if (isMedia || isRangeRequest) {
+    return; // пропускаем как есть, без вмешательства
+  }
   event.respondWith(fetch(event.request));
 });
