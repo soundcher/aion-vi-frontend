@@ -711,6 +711,16 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
     <div id="req-warning" style="display:none;font-size:11px;color:var(--red);margin-top:3px;">⚠ Осталось менее 50 знаков — формулируй лаконично</div>
   </div>
 
+  <!-- Режим ответа -->
+  <div class="field" style="margin-bottom:14px;">
+    <label id="mode-label" style="font-size:12px;color:var(--text-dim);margin-bottom:6px;display:block;">Формат ответа</label>
+    <input type="hidden" id="answer-mode" value="deep">
+    <div class="gender-toggle">
+      <div class="gender-btn active" id="mode-deep-btn" onclick="setAnswerMode('deep')">🧠 Мышление</div>
+      <div class="gender-btn" id="mode-quick-btn" onclick="setAnswerMode('quick')">⚡ Быстрый ответ</div>
+    </div>
+  </div>
+
   <!-- ГЕНЕРАЦИЯ АНАЛИЗА — под полем запроса -->
   <div class="analysis-section">
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
@@ -867,6 +877,7 @@ const LANG = {
     btnFeedback: '✉ Feedback', fbTitle: '✉ Feedback', fbLblName: 'Name', fbLblEmail: 'Email',
     fbLblMessage: 'Message', fbSendBtn: '✦ Send', fbCloseBtn: 'Close',
     labelRequest: 'Request / Question',
+    modeLabel: 'Answer format', modeDeep: '🧠 Thinking', modeQuick: '⚡ Quick answer',
     requestPlaceholder: 'Request/Question. Add context for a more accurate reading.',
     requestHint: '⚠ Less than 50 characters left — be concise',
     btnCalculate: 'Calculate',
@@ -986,6 +997,7 @@ const LANG = {
     btnFeedback: '✉ Kontakt', fbTitle: '✉ Kontakt', fbLblName: 'Imię', fbLblEmail: 'Email',
     fbLblMessage: 'Wiadomość', fbSendBtn: '✦ Wyślij', fbCloseBtn: 'Zamknij',
     labelRequest: 'Zapytanie / Pytanie',
+    modeLabel: 'Format odpowiedzi', modeDeep: '🧠 Myślenie', modeQuick: '⚡ Szybka odpowiedź',
     requestPlaceholder: 'Zapytanie/Pytanie. Dodaj kontekst dla dokładniejszej analizy.',
     requestHint: '⚠ Zostało mniej niż 50 znaków — bądź zwięzły',
     btnCalculate: 'Oblicz',
@@ -1099,6 +1111,7 @@ const LANG = {
     btnFeedback: '✉ Зворотний зв\'язок', fbTitle: '✉ Зворотний зв\'язок', fbLblName: 'Ім\'я', fbLblEmail: 'Email',
     fbLblMessage: 'Питання', fbSendBtn: '✦ Надіслати', fbCloseBtn: 'Закрити',
     labelRequest: 'Запит / Питання',
+    modeLabel: 'Формат відповіді', modeDeep: '🧠 Мислення', modeQuick: '⚡ Швидка відповідь',
     requestPlaceholder: 'Запит/Питання. Для точнішого розрахунку додай контекст.',
     requestHint: '⚠ Залишилось менше 50 знаків — формулюй лаконічно',
     btnCalculate: 'Розрахувати',
@@ -1212,6 +1225,7 @@ const LANG = {
     btnFeedback: '✉ Обратная связь', fbTitle: '✉ Обратная связь', fbLblName: 'Имя', fbLblEmail: 'Email',
     fbLblMessage: 'Вопрос', fbSendBtn: '✦ Отправить', fbCloseBtn: 'Закрыть',
     labelRequest: 'Запрос',
+    modeLabel: 'Формат ответа', modeDeep: '🧠 Мышление', modeQuick: '⚡ Быстрый ответ',
     requestPlaceholder: 'Запрос/Вопрос. Для более точного расчёта добавь контекст.',
     requestHint: '⚠ Осталось менее 50 знаков — формулируй лаконично',
     btnCalculate: 'Рассчитать',
@@ -1405,6 +1419,9 @@ function applyTranslations() {
   setText('fb-close-btn', L.fbCloseBtn);
 
   setText('label-request', L.labelRequest);
+  setText('mode-label', L.modeLabel);
+  setText('mode-deep-btn', L.modeDeep);
+  setText('mode-quick-btn', L.modeQuick);
   setPlaceholder('request', L.requestPlaceholder);
   setText('req-warning', L.requestHint);
   setText('calc-btn', L.btnCalculate);
@@ -2491,6 +2508,7 @@ async function generateAnalysis() {
         compat_theme: themeLabel,
         compat_summary: compatSummary,
         no_time: currentClientData.no_time || false,
+        answer_mode: document.getElementById('answer-mode').value,
         nickname: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).nickname || '',
         email: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || ''
       })
@@ -2984,6 +3002,12 @@ function onRequestInput(el) {
 
 // ── Автопереход между полями дат ──
 // Фильтр текстовых полей (имя/фамилия/город): буквы, пробел, дефис, апостроф, точка
+function setAnswerMode(mode) {
+  document.getElementById('answer-mode').value = mode;
+  document.getElementById('mode-deep-btn').classList.toggle('active', mode === 'deep');
+  document.getElementById('mode-quick-btn').classList.toggle('active', mode === 'quick');
+}
+
 function setGender(value, prefix) {
   prefix = prefix || '';
   document.getElementById(prefix + 'gender').value = value;
