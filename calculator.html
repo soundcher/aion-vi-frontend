@@ -401,6 +401,36 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <div style="height:5px;background:var(--panel2);border-radius:3px;overflow:hidden;">
     <div id="analyses-counter-bar" style="height:100%;background:var(--gold);border-radius:3px;transition:width .4s;width:100%;"></div>
   </div>
+  <div style="text-align:right;margin-top:4px;">
+    <span onclick="openPricingModal()" style="font-size:11px;color:var(--gold);cursor:pointer;text-decoration:underline;" id="pricing-link">Пополнить пакет</span>
+  </div>
+</div>
+
+<!-- Модальное окно тарифов -->
+<div class="modal-overlay" id="pricing-modal">
+  <div class="modal-box" style="max-width:420px;">
+    <h2 style="margin-bottom:14px;" id="pricing-title">✦ Выбери пакет</h2>
+
+    <div style="border:1px solid var(--line2);border-radius:2px;padding:14px;margin-bottom:10px;">
+      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">Старт — €9.99/мес</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">8 анализов + история</div>
+      <a href="#" id="checkout-start" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
+    </div>
+
+    <div style="border:1px solid var(--gold);border-radius:2px;padding:14px;margin-bottom:10px;">
+      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">Базовый — €19.99/мес</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">15 анализов + совместимость</div>
+      <a href="#" id="checkout-basic" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
+    </div>
+
+    <div style="border:1px solid var(--line2);border-radius:2px;padding:14px;margin-bottom:14px;">
+      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">Про — €29.99/мес</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">30 анализов + транзиты + PDF с брендингом</div>
+      <a href="#" id="checkout-pro" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
+    </div>
+
+    <button class="btn-copy" onclick="closePricingModal()" style="width:100%;">Закрыть</button>
+  </div>
 </div>
 
 <!-- ВВОД ДАННЫХ -->
@@ -2722,6 +2752,31 @@ ${name ? '👤 ' + name + '\n' : ''}\n${currentAnalysis}`;
 // ══════════════════════════════════════════════
 // МОДАЛЬНОЕ ОКНО "ПОДАРИТЬ"
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// ТАРИФЫ — Lemon Squeezy
+// ══════════════════════════════════════════════
+// ВАЖНО: замени плейсхолдеры ниже на реальные ссылки чекаута после
+// создания продуктов в Lemon Squeezy (Store → Products → Share → Copy link).
+const LEMONSQUEEZY_LINKS = {
+  start: 'https://ЗАМЕНИ-НА-СВОЙ-МАГАЗИН.lemonsqueezy.com/buy/ЗАМЕНИ-ID-СТАРТ',
+  basic: 'https://ЗАМЕНИ-НА-СВОЙ-МАГАЗИН.lemonsqueezy.com/buy/ЗАМЕНИ-ID-БАЗОВЫЙ',
+  pro:   'https://ЗАМЕНИ-НА-СВОЙ-МАГАЗИН.lemonsqueezy.com/buy/ЗАМЕНИ-ID-ПРО',
+};
+
+function openPricingModal() {
+  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const email = user?.email || '';
+  // Передаём email как custom data — вебхук на сервере получит его обратно
+  // и поймёт, кому именно начислять пакет после оплаты.
+  document.getElementById('checkout-start').href = `${LEMONSQUEEZY_LINKS.start}?checkout[email]=${encodeURIComponent(email)}`;
+  document.getElementById('checkout-basic').href = `${LEMONSQUEEZY_LINKS.basic}?checkout[email]=${encodeURIComponent(email)}`;
+  document.getElementById('checkout-pro').href = `${LEMONSQUEEZY_LINKS.pro}?checkout[email]=${encodeURIComponent(email)}`;
+  document.getElementById('pricing-modal').classList.add('show');
+}
+function closePricingModal() {
+  document.getElementById('pricing-modal').classList.remove('show');
+}
+
 function openGiftModal() {
   if (!currentAnalysis) return;
   const client = currentClientData;
