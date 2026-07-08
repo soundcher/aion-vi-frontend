@@ -725,6 +725,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <div class="analysis-section">
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
       <button class="btn-generate" onclick="generateAnalysis()" id="gen-btn">✦ Сгенерировать анализ</button>
+      <button class="btn-generate" onclick="resetForNewGeneration()" id="reset-btn" style="display:none;background:var(--gold-dim);">🔄 Новый вопрос</button>
       <button class="btn-music-toggle" id="btn-music-toggle" onclick="toggleMusicGlobal()">♪ Музыка вкл</button>
       <span class="analysis-spinner" id="gen-spinner">⟳ Генерирую... (~40 сек)</span>
     </div>
@@ -1740,9 +1741,8 @@ const TRACKS_PIANO = [
 let audioPlayer = null;
 let musicEnabled = true;
 let currentTrackIdx = -1;
-let currentPlaylist = [];
-let currentShuffled = [];  // перемешанная очередь без повторов
-let shufflePos = 0;
+let playlistStates = new Map(); // отдельная память очереди для каждого плейлиста
+let currentPlaylist = [];       // какой плейлист сейчас активен (для обработчика 'ended')
 let fadeInterval = null;
 
 // Fisher-Yates shuffle — честное перемешивание
@@ -1775,26 +1775,25 @@ function fadeOutAndStop(cb) {
 function playFromPlaylist(playlist, volume) {
   if (!musicEnabled) return;
 
-  // Если это новый плейлист — создаём новую перемешанную очередь
-  if (playlist !== currentPlaylist) {
-    currentPlaylist = playlist;
-    currentShuffled = shuffleArray(playlist);
-    shufflePos = 0;
+  // У каждого плейлиста — своя независимая память очереди
+  let state = playlistStates.get(playlist);
+  if (!state) {
+    state = { shuffled: shuffleArray(playlist), pos: 0 };
+    playlistStates.set(playlist, state);
   }
 
-  // Берём следующий трек из перемешанной очереди
-  if (shufflePos >= currentShuffled.length) {
-    // Очередь закончилась — перемешиваем заново, избегая повтора первого трека
-    const lastIdx = currentShuffled[currentShuffled.length - 1];
-    currentShuffled = shuffleArray(playlist);
-    // Если первый совпадает с последним — меняем местами с вторым
-    if (currentShuffled[0] === lastIdx && currentShuffled.length > 1) {
-      [currentShuffled[0], currentShuffled[1]] = [currentShuffled[1], currentShuffled[0]];
+  // Очередь этого конкретного плейлиста закончилась — перемешиваем заново
+  if (state.pos >= state.shuffled.length) {
+    const lastIdx = state.shuffled[state.shuffled.length - 1];
+    state.shuffled = shuffleArray(playlist);
+    if (state.shuffled[0] === lastIdx && state.shuffled.length > 1) {
+      [state.shuffled[0], state.shuffled[1]] = [state.shuffled[1], state.shuffled[0]];
     }
-    shufflePos = 0;
+    state.pos = 0;
   }
 
-  const idx = currentShuffled[shufflePos++];
+  const idx = state.shuffled[state.pos++];
+  currentPlaylist = playlist; // для обработчика 'ended' — знать, какой плейлист продолжать
   currentTrackIdx = idx;
   const track = playlist[idx];
 
@@ -2548,6 +2547,10 @@ async function generateAnalysis() {
     box.innerHTML = data.analysis.replace(/\n/g, '<br>') +
       `<div class="analysis-meta">${t('analysisTokens')}: ${data.tokens_used || '—'}</div>`;
 
+    // Шлюз: одна генерация — один анализ. Дальше только через явный сброс.
+    document.getElementById('gen-btn').style.display = 'none';
+    document.getElementById('reset-btn').style.display = 'inline-block';
+
     // Кнопки действий
     box.insertAdjacentHTML('afterend', `
       <div class="action-buttons" id="action-buttons" style="justify-content:center;">
@@ -3002,6 +3005,30 @@ function onRequestInput(el) {
 
 // ── Автопереход между полями дат ──
 // Фильтр текстовых полей (имя/фамилия/город): буквы, пробел, дефис, апостроф, точка
+function resetForNewGeneration() {
+  // Очищаем результат прошлой генерации
+  document.getElementById('analysis-box').innerHTML = '';
+  const actionButtons = document.getElementById('action-buttons');
+  if (actionButtons) actionButtons.remove();
+  const ratingBlock = document.getElementById('rating-block');
+  if (ratingBlock) ratingBlock.remove();
+  currentAnalysis = '';
+  currentRating = 0;
+
+  // Очищаем поле запроса — новый вопрос печатается с чистого листа
+  document.getElementById('request').value = '';
+  onRequestInput(document.getElementById('request'));
+
+  // Данные клиента (имя, дата, место, пол) НЕ трогаем — currentClientData/currentSummary остаются
+
+  // Возвращаем кнопку генерации
+  document.getElementById('reset-btn').style.display = 'none';
+  document.getElementById('gen-btn').style.display = 'inline-block';
+
+  document.getElementById('request').focus();
+  document.getElementById('request-block').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
 function setAnswerMode(mode) {
   document.getElementById('answer-mode').value = mode;
   document.getElementById('mode-deep-btn').classList.toggle('active', mode === 'deep');
