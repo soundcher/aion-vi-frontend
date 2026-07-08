@@ -1523,11 +1523,11 @@ let db = null;
 async function initFirebase() {
   try {
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } =
+    const { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where } =
       await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const app = initializeApp(FIREBASE_CONFIG);
     db = getFirestore(app);
-    window._fs = { collection, addDoc, getDocs, query, orderBy, limit };
+    window._fs = { collection, addDoc, getDocs, query, orderBy, limit, where };
     console.log('Firebase OK');
   } catch(e) {
     console.warn('Firebase недоступен:', e.message);
@@ -2537,6 +2537,7 @@ async function generateAnalysis() {
         compat_theme: themeLabel,
         compat_summary: compatSummary,
         no_time: currentClientData.no_time || false,
+        client_info: { firstname: currentClientData.firstname || '', lastname: currentClientData.lastname || '' },
         answer_mode: document.getElementById('answer-mode').value,
         nickname: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).nickname || '',
         email: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || ''
@@ -2569,7 +2570,7 @@ async function generateAnalysis() {
     }
 
     // Сохраняем в Firebase
-    saveToFirebase(currentAnalysis, currentClientData, document.getElementById('request').value.trim());
+    // История сохраняется сервером автоматически при генерации — клиенту писать не нужно
 
     // Заполняем PDF-блок
     fillPdfBlock(currentAnalysis, currentClientData);
@@ -2826,7 +2827,9 @@ async function saveToFirebase(analysis, client, request) {
   if (!db) return;
   try {
     const { collection, addDoc } = window._fs;
+    const owner = (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || '';
     await addDoc(collection(db, 'analyses'), {
+      ownerEmail: owner,
       createdAt: new Date().toISOString(),
       firstname: client.firstname || '',
       lastname: client.lastname || '',
@@ -2852,24 +2855,29 @@ async function openHistory() {
   itemsEl.innerHTML = '<div class="history-empty">Загружаю...</div>';
   overlay.classList.add('show');
 
-  if (!db) {
-    itemsEl.innerHTML = '<div class="history-empty">Firebase не подключён. История недоступна.</div>';
+  const myEmail = (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || '';
+  if (!myEmail) {
+    itemsEl.innerHTML = '<div class="history-empty">Войди в аккаунт, чтобы видеть свою историю.</div>';
     return;
   }
 
   try {
-    const { collection, getDocs, query, orderBy, limit } = window._fs;
-    const q = query(collection(db, 'analyses'), orderBy('createdAt', 'desc'), limit(50));
-    const snapshot = await getDocs(q);
+    // История хранится на сервере в закрытом разделе — клиент получает ТОЛЬКО свою
+    const resp = await fetch(`${SERVER}/history`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email: myEmail })
+    });
+    const result = await resp.json();
+    const docs = result.items || [];
 
-    if (snapshot.empty) {
+    if (!docs.length) {
       itemsEl.innerHTML = '<div class="history-empty">История пуста — анализы появятся здесь после генерации</div>';
       return;
     }
 
     itemsEl.innerHTML = '';
-    snapshot.forEach(doc => {
-      const d = doc.data();
+    docs.forEach(d => {
       const dateStr = d.createdAt ? new Date(d.createdAt).toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
       const name = [d.firstname, d.lastname].filter(Boolean).join(' ') || 'Без имени';
       const preview = (d.analysis || '').substring(0, 120).replace(/\n/g,' ') + '...';
