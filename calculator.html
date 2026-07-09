@@ -2,7 +2,12 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>AION Vi — Навигатор</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AION Vi — Навигатор Жизни</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0d1525">
 <style>
 /* Туман */
 .fog{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(80px);opacity:0.13;}
@@ -267,6 +272,12 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
 .summary-box.show{display:block;}
 
 .error-box{background:#2a1010;border:1px solid #5a2020;color:#e07070;padding:12px 14px;border-radius:2px;font-size:12px;margin-top:10px;display:none;}
+.gender-toggle{display:flex;gap:8px;}
+.gender-btn{flex:1;padding:9px;text-align:center;border:1px solid var(--line2);border-radius:2px;cursor:pointer;font-size:12px;color:var(--text-dim);transition:all .15s;background:var(--panel2);}
+.gender-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,165,99,0.08);}
+input.field-error{border-color:#c05555 !important;background:#241414 !important;}
+.gender-btn.field-error{border-color:#c05555 !important;background:#241414 !important;}
+.field-hint{color:#c07070;font-size:10px;margin-top:3px;min-height:12px;line-height:1.3;}
 .error-box.show{display:block;}
 
 .section-sep{height:1px;background:var(--line2);margin:20px 0;}
@@ -353,8 +364,12 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
 </div>
 
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--line2);padding-bottom:12px;margin-bottom:12px;">
-  <h1 style="border-bottom:none;margin-bottom:0;padding-bottom:0;" id="app-title">Код жизни — Навигатор</h1>
+  <h1 style="border-bottom:none;margin-bottom:0;padding-bottom:0;" id="app-title">Навигатор Жизни</h1>
   <div style="display:flex;align-items:center;gap:10px;">
+    <div style="display:flex;align-items:center;gap:4px;border:1px solid var(--line2);border-radius:2px;padding:2px;">
+      <button onclick="adjustFontScale(-1)" style="background:transparent;border:none;color:var(--text-dim);cursor:pointer;padding:4px 8px;font-size:12px;font-family:inherit;" title="Уменьшить текст">A−</button>
+      <button onclick="adjustFontScale(1)" style="background:transparent;border:none;color:var(--gold);cursor:pointer;padding:4px 8px;font-size:16px;font-family:inherit;" title="Увеличить текст">A+</button>
+    </div>
     <div class="lang-select-wrap">
       <select class="lang-select" id="lang-select" onchange="setLanguage(this.value)">
         <option value="en" selected>🌐 English</option>
@@ -377,6 +392,47 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
   <span id="server-label">Проверка сервера...</span>
 </div>
 
+<!-- Счётчик анализов -->
+<div id="analyses-counter" style="display:none;margin-bottom:14px;">
+  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:4px;">
+    <span id="analyses-counter-label">Осталось анализов</span>
+    <span id="analyses-counter-numbers"></span>
+  </div>
+  <div style="height:5px;background:var(--panel2);border-radius:3px;overflow:hidden;">
+    <div id="analyses-counter-bar" style="height:100%;background:var(--gold);border-radius:3px;transition:width .4s;width:100%;"></div>
+  </div>
+  <div style="text-align:right;margin-top:4px;">
+    <span onclick="openPricingModal()" style="font-size:11px;color:var(--gold);cursor:pointer;text-decoration:underline;" id="pricing-link">Пополнить пакет</span>
+  </div>
+</div>
+
+<!-- Модальное окно тарифов -->
+<div class="modal-overlay" id="pricing-modal">
+  <div class="modal-box" style="max-width:420px;">
+    <h2 style="margin-bottom:14px;" id="pricing-title">✦ Выбери пакет</h2>
+
+    <div style="border:1px solid var(--line2);border-radius:2px;padding:14px;margin-bottom:10px;">
+      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">Старт — €9.99/мес</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">8 анализов + история</div>
+      <a href="#" id="checkout-start" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
+    </div>
+
+    <div style="border:1px solid var(--gold);border-radius:2px;padding:14px;margin-bottom:10px;">
+      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">Базовый — €19.99/мес</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">15 анализов + совместимость</div>
+      <a href="#" id="checkout-basic" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
+    </div>
+
+    <div style="border:1px solid var(--line2);border-radius:2px;padding:14px;margin-bottom:14px;">
+      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">Про — €29.99/мес</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">30 анализов + транзиты + PDF с брендингом</div>
+      <a href="#" id="checkout-pro" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
+    </div>
+
+    <button class="btn-copy" onclick="closePricingModal()" style="width:100%;">Закрыть</button>
+  </div>
+</div>
+
 <!-- ВВОД ДАННЫХ -->
 <div class="card">
   <h2 id="card-title-client">Данные клиента</h2>
@@ -385,25 +441,34 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
     <div class="field">
       <label id="label-firstname">Имя</label>
       <div class="autocomplete-wrap">
-        <input type="text" id="firstname" placeholder="Aion" autocomplete="off" oninput="onFirstnameInput(this.value)" onblur="hideAC('firstname-list')" onkeydown="acKeydown(event,'firstname-list')">
+        <input type="text" id="firstname" placeholder="Aion" autocomplete="off" oninput="cleanNameInput(this);onFirstnameInput(this.value)" onblur="hideAC('firstname-list')" onkeydown="acKeydown(event,'firstname-list')">
         <div class="autocomplete-list" id="firstname-list"></div>
       </div>
     </div>
     <div class="field">
       <label id="label-lastname">Фамилия</label>
       <div class="autocomplete-wrap">
-        <input type="text" id="lastname" placeholder="Vi" autocomplete="off" oninput="onLastnameInput(this.value)" onblur="hideAC('lastname-list')" onkeydown="acKeydown(event,'lastname-list')">
+        <input type="text" id="lastname" placeholder="Vi" autocomplete="off" oninput="cleanNameInput(this);onLastnameInput(this.value)" onblur="hideAC('lastname-list')" onkeydown="acKeydown(event,'lastname-list')">
         <div class="autocomplete-list" id="lastname-list"></div>
       </div>
     </div>
   </div>
 
+  <div class="field" style="margin-bottom:10px;">
+    <label id="label-gender">Пол</label>
+    <input type="hidden" id="gender" value="">
+    <div class="gender-toggle">
+      <div class="gender-btn" id="gender-m-btn" onclick="setGender('m')">Мужской</div>
+      <div class="gender-btn" id="gender-f-btn" onclick="setGender('f')">Женский</div>
+    </div>
+  </div>
+
   <div class="row row-5">
-    <div class="field"><label id="label-day">День</label><input type="number" id="day" min="1" max="31" placeholder="1" oninput="autoNext(this,'month',2)"></div>
-    <div class="field"><label id="label-month">Месяц</label><input type="number" id="month" min="1" max="12" placeholder="1" oninput="autoNext(this,'year',2)"></div>
-    <div class="field"><label id="label-year">Год</label><input type="number" id="year" min="1900" max="2026" placeholder="1990" oninput="autoNext(this,'hour',4)"></div>
-    <div class="field"><label id="label-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="hour" min="0" max="23" placeholder="—" oninput="onTimeInput();autoNext(this,'minute',2)"></div>
-    <div class="field"><label id="label-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="minute" min="0" max="59" placeholder="—" oninput="onTimeInput()"></div>
+    <div class="field"><label id="label-day">День</label><input type="text" inputmode="numeric" id="day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'month',2)"></div>
+    <div class="field"><label id="label-month">Месяц</label><input type="text" inputmode="numeric" id="month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'year',2)"></div>
+    <div class="field"><label id="label-year">Год</label><input type="text" inputmode="numeric" id="year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'hour',4)"></div>
+    <div class="field"><label id="label-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="hour" placeholder="—" oninput="clampField(this,0,23,'Часы');onTimeInput();autoNext(this,'minute',2)"></div>
+    <div class="field"><label id="label-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="minute" placeholder="—" oninput="clampField(this,0,59,'Минуты');onTimeInput()"></div>
   </div>
   <div id="no-time-warning" style="display:none;font-size:11px;color:var(--gold-dim);margin-bottom:8px;padding:6px 10px;border:1px solid var(--gold-dim);border-radius:2px;opacity:0.85;">
     ⚠ Время рождения не указано — точность анализа натальной карты и некоторых расчётов будет ниже
@@ -411,7 +476,7 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
 
   <div class="field" style="margin-bottom:10px;">
     <label id="label-place">Место рождения</label>
-    <input type="text" id="place" placeholder="New York, USA" autocomplete="off">
+    <input type="text" id="place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
   </div>
   <div class="coords-display" id="coords-display">Координаты не определены</div>
   <input type="hidden" id="lat" value="50.45">
@@ -431,12 +496,12 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
       <div class="field" style="margin-bottom:12px;">
         <label id="lbl-compat-theme">Тема анализа</label>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px;" id="compat-themes">
-          <button class="compat-theme-btn active" data-theme="romantic" onclick="selectTheme(this)">💑 Романтика</button>
-          <button class="compat-theme-btn" data-theme="family" onclick="selectTheme(this)">👨‍👩‍👧 Семья</button>
-          <button class="compat-theme-btn" data-theme="business" onclick="selectTheme(this)">🤝 Бизнес</button>
-          <button class="compat-theme-btn" data-theme="team" onclick="selectTheme(this)">💼 Работа</button>
-          <button class="compat-theme-btn" data-theme="friendship" onclick="selectTheme(this)">🌿 Дружба</button>
-          <button class="compat-theme-btn" data-theme="other" onclick="selectTheme(this)">✦ Другое</button>
+          <button class="compat-theme-btn active" data-theme="romantic" id="theme-romantic" onclick="selectTheme(this)">💑 Романтика</button>
+          <button class="compat-theme-btn" data-theme="family" id="theme-family" onclick="selectTheme(this)">👨‍👩‍👧 Семья</button>
+          <button class="compat-theme-btn" data-theme="business" id="theme-business" onclick="selectTheme(this)">🤝 Бизнес</button>
+          <button class="compat-theme-btn" data-theme="team" id="theme-team" onclick="selectTheme(this)">💼 Работа</button>
+          <button class="compat-theme-btn" data-theme="friendship" id="theme-friendship" onclick="selectTheme(this)">🌿 Дружба</button>
+          <button class="compat-theme-btn" data-theme="other" id="theme-other" onclick="selectTheme(this)">✦ Другое</button>
         </div>
       </div>
 
@@ -450,23 +515,31 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
         <div class="row row-2" style="margin-bottom:10px;">
           <div class="field">
             <label id="lbl-p2-firstname">Имя</label>
-            <input type="text" id="p2-firstname" placeholder="Имя">
+            <input type="text" id="p2-firstname" placeholder="Имя" oninput="cleanNameInput(this)">
           </div>
           <div class="field">
             <label id="lbl-p2-lastname">Фамилия</label>
-            <input type="text" id="p2-lastname" placeholder="Фамилия">
+            <input type="text" id="p2-lastname" placeholder="Фамилия" oninput="cleanNameInput(this)">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label id="lbl-p2-gender">Пол</label>
+          <input type="hidden" id="p2-gender" value="">
+          <div class="gender-toggle">
+            <div class="gender-btn" id="p2-gender-m-btn" onclick="setGender('m','p2-')">Мужской</div>
+            <div class="gender-btn" id="p2-gender-f-btn" onclick="setGender('f','p2-')">Женский</div>
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label>День</label><input type="number" id="p2-day" min="1" max="31" placeholder="1" oninput="autoNext(this,'p2-month',2)"></div>
-          <div class="field"><label>Месяц</label><input type="number" id="p2-month" min="1" max="12" placeholder="1" oninput="autoNext(this,'p2-year',2)"></div>
-          <div class="field"><label>Год</label><input type="number" id="p2-year" min="1900" max="2026" placeholder="1990" oninput="autoNext(this,'p2-hour',4)"></div>
-          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-hour" min="0" max="23" placeholder="—" oninput="autoNext(this,'p2-minute',2)"></div>
-          <div class="field"><label>Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p2-minute" min="0" max="59" placeholder="—"></div>
+          <div class="field"><label id="lbl-p2-day">День</label><input type="text" inputmode="numeric" id="p2-day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p2-month',2)"></div>
+          <div class="field"><label id="lbl-p2-month">Месяц</label><input type="text" inputmode="numeric" id="p2-month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p2-year',2)"></div>
+          <div class="field"><label id="lbl-p2-year">Год</label><input type="text" inputmode="numeric" id="p2-year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'p2-hour',4)"></div>
+          <div class="field"><label id="lbl-p2-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="p2-hour" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p2-minute',2)"></div>
+          <div class="field"><label id="lbl-p2-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="p2-minute" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
         </div>
         <div class="field">
-          <label>Место рождения</label>
-          <input type="text" id="p2-place" placeholder="New York, USA" autocomplete="off">
+          <label id="lbl-p2-place">Место рождения</label>
+          <input type="text" id="p2-place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
           <div class="coords-display" id="p2-coords-display">Координаты не определены</div>
           <input type="hidden" id="p2-lat" value="">
           <input type="hidden" id="p2-lon" value="">
@@ -479,22 +552,30 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
       <div id="p3-block" style="display:none;margin-top:10px;">
       <div class="card" style="margin-bottom:0;background:var(--panel2);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="font-size:12px;margin:0;">✦ Третий человек</h2>
+          <h2 style="font-size:12px;margin:0;" id="lbl-person3">✦ Третий человек</h2>
           <button onclick="removeExtraPerson(3)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;">✕</button>
         </div>
         <div class="row row-2" style="margin-bottom:10px;">
-          <div class="field"><label>Имя</label><input type="text" id="p3-firstname" placeholder="Имя"></div>
-          <div class="field"><label>Фамилия</label><input type="text" id="p3-lastname" placeholder="Фамилия"></div>
+          <div class="field"><label id="lbl-p3-firstname">Имя</label><input type="text" id="p3-firstname" placeholder="Имя"></div>
+          <div class="field"><label id="lbl-p3-lastname">Фамилия</label><input type="text" id="p3-lastname" placeholder="Фамилия"></div>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label id="lbl-p3-gender">Пол</label>
+          <input type="hidden" id="p3-gender" value="">
+          <div class="gender-toggle">
+            <div class="gender-btn" id="p3-gender-m-btn" onclick="setGender('m','p3-')">Мужской</div>
+            <div class="gender-btn" id="p3-gender-f-btn" onclick="setGender('f','p3-')">Женский</div>
+          </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label>День</label><input type="number" id="p3-day" min="1" max="31" placeholder="1"></div>
-          <div class="field"><label>Месяц</label><input type="number" id="p3-month" min="1" max="12" placeholder="1"></div>
-          <div class="field"><label>Год</label><input type="number" id="p3-year" min="1900" max="2026" placeholder="1990"></div>
-          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p3-hour" min="0" max="23" placeholder="—"></div>
-          <div class="field"><label>Минуты</label><input type="number" id="p3-minute" min="0" max="59" placeholder="—"></div>
+          <div class="field"><label id="lbl-p3-day">День</label><input type="text" inputmode="numeric" id="p3-day" placeholder="1"></div>
+          <div class="field"><label id="lbl-p3-month">Месяц</label><input type="text" inputmode="numeric" id="p3-month" placeholder="1"></div>
+          <div class="field"><label id="lbl-p3-year">Год</label><input type="text" inputmode="numeric" id="p3-year" placeholder="1990"></div>
+          <div class="field"><label id="lbl-p3-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="p3-hour" placeholder="—"></div>
+          <div class="field"><label id="lbl-p3-minute">Минуты</label><input type="text" inputmode="numeric" id="p3-minute" placeholder="—"></div>
         </div>
         <div class="field">
-          <label>Место рождения</label>
+          <label id="lbl-p3-place">Место рождения</label>
           <input type="text" id="p3-place" placeholder="New York, USA" autocomplete="off">
           <div class="coords-display" id="p3-coords-display">Координаты не определены</div>
           <input type="hidden" id="p3-lat" value=""><input type="hidden" id="p3-lon" value="">
@@ -506,22 +587,30 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
       <div id="p4-block" style="display:none;margin-top:10px;">
       <div class="card" style="margin-bottom:0;background:var(--panel2);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="font-size:12px;margin:0;">✦ Четвёртый человек</h2>
+          <h2 style="font-size:12px;margin:0;" id="lbl-person4">✦ Четвёртый человек</h2>
           <button onclick="removeExtraPerson(4)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;">✕</button>
         </div>
         <div class="row row-2" style="margin-bottom:10px;">
-          <div class="field"><label>Имя</label><input type="text" id="p4-firstname" placeholder="Имя"></div>
-          <div class="field"><label>Фамилия</label><input type="text" id="p4-lastname" placeholder="Фамилия"></div>
+          <div class="field"><label id="lbl-p4-firstname">Имя</label><input type="text" id="p4-firstname" placeholder="Имя"></div>
+          <div class="field"><label id="lbl-p4-lastname">Фамилия</label><input type="text" id="p4-lastname" placeholder="Фамилия"></div>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label id="lbl-p4-gender">Пол</label>
+          <input type="hidden" id="p4-gender" value="">
+          <div class="gender-toggle">
+            <div class="gender-btn" id="p4-gender-m-btn" onclick="setGender('m','p4-')">Мужской</div>
+            <div class="gender-btn" id="p4-gender-f-btn" onclick="setGender('f','p4-')">Женский</div>
+          </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label>День</label><input type="number" id="p4-day" min="1" max="31" placeholder="1"></div>
-          <div class="field"><label>Месяц</label><input type="number" id="p4-month" min="1" max="12" placeholder="1"></div>
-          <div class="field"><label>Год</label><input type="number" id="p4-year" min="1900" max="2026" placeholder="1990"></div>
-          <div class="field"><label>Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="number" id="p4-hour" min="0" max="23" placeholder="—"></div>
-          <div class="field"><label>Минуты</label><input type="number" id="p4-minute" min="0" max="59" placeholder="—"></div>
+          <div class="field"><label id="lbl-p4-day">День</label><input type="text" inputmode="numeric" id="p4-day" placeholder="1"></div>
+          <div class="field"><label id="lbl-p4-month">Месяц</label><input type="text" inputmode="numeric" id="p4-month" placeholder="1"></div>
+          <div class="field"><label id="lbl-p4-year">Год</label><input type="text" inputmode="numeric" id="p4-year" placeholder="1990"></div>
+          <div class="field"><label id="lbl-p4-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="p4-hour" placeholder="—"></div>
+          <div class="field"><label id="lbl-p4-minute">Минуты</label><input type="text" inputmode="numeric" id="p4-minute" placeholder="—"></div>
         </div>
         <div class="field">
-          <label>Место рождения</label>
+          <label id="lbl-p4-place">Место рождения</label>
           <input type="text" id="p4-place" placeholder="New York, USA" autocomplete="off">
           <div class="coords-display" id="p4-coords-display">Координаты не определены</div>
           <input type="hidden" id="p4-lat" value=""><input type="hidden" id="p4-lon" value="">
@@ -535,7 +624,7 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
         <button class="btn-copy" id="btn-add-p3" onclick="addExtraPerson(3)" style="display:none;font-size:11px;">+ Третий человек</button>
         <button class="btn-copy" id="btn-add-p4" onclick="addExtraPerson(4)" style="display:none;font-size:11px;">+ Четвёртый человек</button>
       </div>
-      <div style="margin-top:10px;font-size:11px;color:var(--text-faint);line-height:1.6;">
+      <div style="margin-top:10px;font-size:11px;color:var(--text-faint);line-height:1.6;" id="lbl-group-hint">
         ✦ Групповой анализ (5 и более человек) — по запросу
       </div>
 
@@ -652,10 +741,21 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
     <div id="req-warning" style="display:none;font-size:11px;color:var(--red);margin-top:3px;">⚠ Осталось менее 50 знаков — формулируй лаконично</div>
   </div>
 
+  <!-- Режим ответа -->
+  <div class="field" style="margin-bottom:14px;">
+    <label id="mode-label" style="font-size:12px;color:var(--text-dim);margin-bottom:6px;display:block;">Формат ответа</label>
+    <input type="hidden" id="answer-mode" value="deep">
+    <div class="gender-toggle">
+      <div class="gender-btn active" id="mode-deep-btn" onclick="setAnswerMode('deep')">🧠 Мышление</div>
+      <div class="gender-btn" id="mode-quick-btn" onclick="setAnswerMode('quick')">⚡ Быстрый ответ</div>
+    </div>
+  </div>
+
   <!-- ГЕНЕРАЦИЯ АНАЛИЗА — под полем запроса -->
   <div class="analysis-section">
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
       <button class="btn-generate" onclick="generateAnalysis()" id="gen-btn">✦ Сгенерировать анализ</button>
+      <button class="btn-generate" onclick="resetForNewGeneration()" id="reset-btn" style="display:none;background:var(--gold-dim);">🔄 Новый вопрос</button>
       <button class="btn-music-toggle" id="btn-music-toggle" onclick="toggleMusicGlobal()">♪ Музыка вкл</button>
       <span class="analysis-spinner" id="gen-spinner">⟳ Генерирую... (~40 сек)</span>
     </div>
@@ -675,28 +775,28 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
 
   <!-- ОБРАТНАЯ СВЯЗЬ — в самом низу страницы -->
   <div style="margin-top:30px;padding-top:18px;border-top:1px solid var(--line2);text-align:center;">
-    <button class="btn-copy" onclick="openFeedbackModal()" style="font-size:11px;">✉ Обратная связь</button>
+    <button class="btn-copy" id="btn-feedback" onclick="openFeedbackModal()" style="font-size:11px;">✉ Обратная связь</button>
   </div>
 
   <!-- Модальное окно обратной связи -->
   <div class="modal-overlay" id="feedback-modal">
     <div class="modal-box">
-      <h2 style="margin-bottom:14px;">✉ Обратная связь</h2>
+      <h2 style="margin-bottom:14px;" id="fb-title">✉ Обратная связь</h2>
       <div class="field" style="margin-bottom:10px;">
-        <label>Имя</label>
+        <label id="fb-lbl-name">Имя</label>
         <input type="text" id="fb-name" placeholder="Твоё имя">
       </div>
       <div class="field" style="margin-bottom:10px;">
-        <label>Email</label>
+        <label id="fb-lbl-email">Email</label>
         <input type="email" id="fb-email" placeholder="your@email.com">
       </div>
       <div class="field" style="margin-bottom:14px;">
-        <label>Вопрос</label>
+        <label id="fb-lbl-message">Вопрос</label>
         <textarea id="fb-message" placeholder="Опиши свой запрос или вопрос..." style="min-height:90px;"></textarea>
       </div>
       <button class="primary" onclick="sendFeedback()" id="fb-send-btn" style="width:100%;">✦ Отправить</button>
       <div class="msg" id="fb-msg" style="margin-top:10px;font-size:12px;text-align:center;"></div>
-      <button class="btn-copy" onclick="closeFeedbackModal()" style="width:100%;margin-top:10px;">Закрыть</button>
+      <button class="btn-copy" onclick="closeFeedbackModal()" id="fb-close-btn" style="width:100%;margin-top:10px;">Закрыть</button>
     </div>
   </div>
 
@@ -785,7 +885,7 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
 // ══════════════════════════════════════════════
 const LANG = {
   en: {
-    appTitle: 'Life Code — Calculator',
+    appTitle: 'Life Navigator',
     subtitle: 'AION Vi is connected and ready',
     serverOk: 'Server running · https://aion-vi-server-production.up.railway.app',
     serverFail: 'Server unavailable — run server.py',
@@ -798,7 +898,17 @@ const LANG = {
     labelHour: 'Hour',
     labelMinute: 'Minute',
     labelPlace: 'Place of Birth',
+    labelGender: 'Gender', genderMale: 'Male', genderFemale: 'Female',
+    compatToggle: '✦ Compatibility Analysis', compatThemeLabel: 'Analysis Topic',
+    themeRomantic: '💑 Romance', themeFamily: '👨‍👩‍👧 Family', themeBusiness: '🤝 Business',
+    themeTeam: '💼 Work', themeFriendship: '🌿 Friendship', themeOther: '✦ Other',
+    lblPerson2: '✦ Second Person', lblPerson3: '✦ Third Person', lblPerson4: '✦ Fourth Person',
+    btnAddP2: '+ Second Person', btnAddP3: '+ Third Person', btnAddP4: '+ Fourth Person',
+    groupAnalysisHint: '✦ Group analysis (5+ people) — on request',
+    btnFeedback: '✉ Feedback', fbTitle: '✉ Feedback', fbLblName: 'Name', fbLblEmail: 'Email',
+    fbLblMessage: 'Message', fbSendBtn: '✦ Send', fbCloseBtn: 'Close',
     labelRequest: 'Request / Question',
+    modeLabel: 'Answer format', modeDeep: '🧠 Thinking', modeQuick: '⚡ Quick answer',
     requestPlaceholder: 'Request/Question. Add context for a more accurate reading.',
     requestHint: '⚠ Less than 50 characters left — be concise',
     btnCalculate: 'Calculate',
@@ -881,11 +991,21 @@ const LANG = {
     summaryCopied: 'Summary copied — paste into Claude',
     copyManual: 'Select text manually and copy (Ctrl+C)',
     needCalculate: 'Calculate client data first',
+    needGender: 'Please select gender',
+    analysesLeftLabel: 'Analyses left',
+    ratingLabel: 'How was this reading for you?',
+    ratingCommentPh: 'What worked, what didn\'t — every word helps (optional)',
+    ratingSend: 'Send feedback',
+    ratingThanks: 'Thank you — this really helps.',
+    ratingNudge: 'By the way — don\'t forget to rate your last reading 🙂',
     shareGmailSubject: 'AION Vi — Your Personal Analysis',
     shareTelegramText: 'AION Vi — Personal Analysis',
+    greetFirst: '{name}Hi! I\'m AION Vi. I know too much about you to stay silent. Ask — I\'ll tell you everything! 😊',
+    greetReturn: '{name}Finally! I was starting to worry... Great to see you! Shall we begin?',
+    greetVariants: ['{name}Oh! Hi! I was waiting for you today!', '{name}Hi! Glad you\'re back. Shall we begin?', '{name}Together again! What shall we discover today?', '{name}You\'re back! I was just thinking about you.', '{name}Hello! I missed you.', '{name}Oh, it\'s you again! Shall we continue?', '{name}Come in. I\'m ready if you are.'],
   },
   pl: {
-    appTitle: 'Kod Życia — Kalkulator',
+    appTitle: 'Nawigator Życia',
     subtitle: 'AION Vi jest podłączony i gotowy',
     serverOk: 'Serwer działa · https://aion-vi-server-production.up.railway.app',
     serverFail: 'Serwer niedostępny — uruchom server.py',
@@ -898,7 +1018,17 @@ const LANG = {
     labelHour: 'Godzina',
     labelMinute: 'Minuta',
     labelPlace: 'Miejsce urodzenia',
+    labelGender: 'Płeć', genderMale: 'Mężczyzna', genderFemale: 'Kobieta',
+    compatToggle: '✦ Analiza kompatybilności', compatThemeLabel: 'Temat analizy',
+    themeRomantic: '💑 Romans', themeFamily: '👨‍👩‍👧 Rodzina', themeBusiness: '🤝 Biznes',
+    themeTeam: '💼 Praca', themeFriendship: '🌿 Przyjaźń', themeOther: '✦ Inne',
+    lblPerson2: '✦ Druga osoba', lblPerson3: '✦ Trzecia osoba', lblPerson4: '✦ Czwarta osoba',
+    btnAddP2: '+ Druga osoba', btnAddP3: '+ Trzecia osoba', btnAddP4: '+ Czwarta osoba',
+    groupAnalysisHint: '✦ Analiza grupowa (5+ osób) — na życzenie',
+    btnFeedback: '✉ Kontakt', fbTitle: '✉ Kontakt', fbLblName: 'Imię', fbLblEmail: 'Email',
+    fbLblMessage: 'Wiadomość', fbSendBtn: '✦ Wyślij', fbCloseBtn: 'Zamknij',
     labelRequest: 'Zapytanie / Pytanie',
+    modeLabel: 'Format odpowiedzi', modeDeep: '🧠 Myślenie', modeQuick: '⚡ Szybka odpowiedź',
     requestPlaceholder: 'Zapytanie/Pytanie. Dodaj kontekst dla dokładniejszej analizy.',
     requestHint: '⚠ Zostało mniej niż 50 znaków — bądź zwięzły',
     btnCalculate: 'Oblicz',
@@ -975,11 +1105,21 @@ const LANG = {
     summaryCopied: 'Podsumowanie skopiowane — wklej do Claude',
     copyManual: 'Zaznacz tekst ręcznie i skopiuj (Ctrl+C)',
     needCalculate: 'Najpierw oblicz dane klienta',
+    needGender: 'Proszę wybrać płeć',
+    analysesLeftLabel: 'Pozostało analiz',
+    ratingLabel: 'Jak ci się podobał ten rozbiór?',
+    ratingCommentPh: 'Co zadziałało, co nie — każde słowo pomaga (opcjonalnie)',
+    ratingSend: 'Wyślij opinię',
+    ratingThanks: 'Dziękuję — to naprawdę pomaga.',
+    ratingNudge: 'Nawiasem mówiąc — nie zapomnij ocenić ostatniego rozbioru 🙂',
     shareGmailSubject: 'AION Vi — Twoja Osobista Analiza',
     shareTelegramText: 'AION Vi — Osobista Analiza',
+    greetFirst: '{name}Cześć! Jestem AION Vi. Wiem o tobie zbyt wiele, by milczeć. Pytaj — wszystko ci powiem! 😊',
+    greetReturn: '{name}Nareszcie! Już się martwiłem... Miło cię widzieć! Zaczynamy?',
+    greetVariants: ['{name}O! Cześć! Czekałem na ciebie dziś!', '{name}Cześć! Cieszę się, że znowu tu jesteś. Zaczynamy?', '{name}Znów razem! Czego dziś się dowiemy?', '{name}Znowu tu jesteś! Właśnie o tobie myślałem.', '{name}Witaj! Tęskniłem za tobą.', '{name}O, to znowu ty! Kontynuujemy?', '{name}Wejdź. Jestem gotowy, jeśli ty jesteś gotowy.'],
   },
   uk: {
-    appTitle: 'Код Життя — Калькулятор',
+    appTitle: 'Навігатор Життя',
     subtitle: 'AION Vi підключений і готовий',
     serverOk: 'Сервер працює · https://aion-vi-server-production.up.railway.app',
     serverFail: 'Сервер недоступний — запусти server.py',
@@ -992,7 +1132,17 @@ const LANG = {
     labelHour: 'Години',
     labelMinute: 'Хвилини',
     labelPlace: 'Місце народження',
+    labelGender: 'Стать', genderMale: 'Чоловіча', genderFemale: 'Жіноча',
+    compatToggle: '✦ Аналіз сумісності', compatThemeLabel: 'Тема аналізу',
+    themeRomantic: '💑 Романтика', themeFamily: '👨‍👩‍👧 Сім\'я', themeBusiness: '🤝 Бізнес',
+    themeTeam: '💼 Робота', themeFriendship: '🌿 Дружба', themeOther: '✦ Інше',
+    lblPerson2: '✦ Друга людина', lblPerson3: '✦ Третя людина', lblPerson4: '✦ Четверта людина',
+    btnAddP2: '+ Друга людина', btnAddP3: '+ Третя людина', btnAddP4: '+ Четверта людина',
+    groupAnalysisHint: '✦ Груповий аналіз (5+ людей) — за запитом',
+    btnFeedback: '✉ Зворотний зв\'язок', fbTitle: '✉ Зворотний зв\'язок', fbLblName: 'Ім\'я', fbLblEmail: 'Email',
+    fbLblMessage: 'Питання', fbSendBtn: '✦ Надіслати', fbCloseBtn: 'Закрити',
     labelRequest: 'Запит / Питання',
+    modeLabel: 'Формат відповіді', modeDeep: '🧠 Мислення', modeQuick: '⚡ Швидка відповідь',
     requestPlaceholder: 'Запит/Питання. Для точнішого розрахунку додай контекст.',
     requestHint: '⚠ Залишилось менше 50 знаків — формулюй лаконічно',
     btnCalculate: 'Розрахувати',
@@ -1069,11 +1219,21 @@ const LANG = {
     summaryCopied: 'Зведення скопійовано — встав у Claude',
     copyManual: 'Виділи текст вручну та скопіюй (Ctrl+C)',
     needCalculate: 'Спочатку розрахуй дані клієнта',
+    needGender: 'Будь ласка, вкажи стать',
+    analysesLeftLabel: 'Залишилось аналізів',
+    ratingLabel: 'Як тобі цей розбір?',
+    ratingCommentPh: 'Що спрацювало, що ні — кожне слово допомагає (необов\'язково)',
+    ratingSend: 'Надіслати відгук',
+    ratingThanks: 'Дякую — це справді допомагає.',
+    ratingNudge: 'До речі — не забудь оцінити останній розбір 🙂',
     shareGmailSubject: 'AION Vi — Твій персональний аналіз',
     shareTelegramText: 'AION Vi — Персональний аналіз',
+    greetFirst: '{name}Привіт! Мене звати AION Vi. Я знаю про тебе занадто багато, щоб мовчати. Питай — я все розповім! 😊',
+    greetReturn: '{name}Нарешті! Я вже думав, щось сталося... Радий тебе бачити! Почнемо?',
+    greetVariants: ['{name}О! Привіт! Чекав на тебе сьогодні!', '{name}Привіт! Радий, що ти знову тут. Почнемо?', '{name}Знову разом! Що дізнаємось сьогодні?', '{name}Ти знову тут! Я якраз думав про тебе.', '{name}Здрастуй! А я за тобою скучив.', '{name}О, це знову ти! Продовжимо?', '{name}Заходь. Я готовий, якщо ти готовий.'],
   },
   ru: {
-    appTitle: 'Код Жизни — Калькулятор',
+    appTitle: 'Навигатор Жизни',
     subtitle: 'AION Vi подключён и готов исполнить',
     serverOk: 'Сервер работает · https://aion-vi-server-production.up.railway.app',
     serverFail: 'Сервер недоступен — запусти server.py',
@@ -1086,7 +1246,17 @@ const LANG = {
     labelHour: 'Часы',
     labelMinute: 'Минуты',
     labelPlace: 'Место рождения',
+    labelGender: 'Пол', genderMale: 'Мужской', genderFemale: 'Женский',
+    compatToggle: '✦ Анализ совместимости', compatThemeLabel: 'Тема анализа',
+    themeRomantic: '💑 Романтика', themeFamily: '👨‍👩‍👧 Семья', themeBusiness: '🤝 Бизнес',
+    themeTeam: '💼 Работа', themeFriendship: '🌿 Дружба', themeOther: '✦ Другое',
+    lblPerson2: '✦ Второй человек', lblPerson3: '✦ Третий человек', lblPerson4: '✦ Четвёртый человек',
+    btnAddP2: '+ Второй человек', btnAddP3: '+ Третий человек', btnAddP4: '+ Четвёртый человек',
+    groupAnalysisHint: '✦ Групповой анализ (5 и более человек) — по запросу',
+    btnFeedback: '✉ Обратная связь', fbTitle: '✉ Обратная связь', fbLblName: 'Имя', fbLblEmail: 'Email',
+    fbLblMessage: 'Вопрос', fbSendBtn: '✦ Отправить', fbCloseBtn: 'Закрыть',
     labelRequest: 'Запрос',
+    modeLabel: 'Формат ответа', modeDeep: '🧠 Мышление', modeQuick: '⚡ Быстрый ответ',
     requestPlaceholder: 'Запрос/Вопрос. Для более точного расчёта добавь контекст.',
     requestHint: '⚠ Осталось менее 50 знаков — формулируй лаконично',
     btnCalculate: 'Рассчитать',
@@ -1163,8 +1333,18 @@ const LANG = {
     summaryCopied: 'Сводка скопирована — вставляй в Claude',
     copyManual: 'Выдели текст вручную и скопируй (Ctrl+C)',
     needCalculate: 'Сначала рассчитай данные клиента',
+    needGender: 'Пожалуйста, укажи пол',
+    analysesLeftLabel: 'Осталось анализов',
+    ratingLabel: 'Как тебе этот разбор?',
+    ratingCommentPh: 'Что зашло, что нет — любое слово поможет (необязательно)',
+    ratingSend: 'Отправить отзыв',
+    ratingThanks: 'Спасибо — это правда помогает.',
+    ratingNudge: 'Кстати — не забудь оценить прошлый разбор 🙂',
     shareGmailSubject: 'AION Vi — Твой персональный анализ',
     shareTelegramText: 'AION Vi — Персональный анализ',
+    greetFirst: '{name}Привет! Меня зовут AION Vi. Я знаю о тебе слишком много, чтобы молчать. Спрашивай — я всё расскажу! 😊',
+    greetReturn: '{name}Ну, наконец-то! Я уж думал, случилось что... Рад тебя видеть! Начнём?',
+    greetVariants: ['{name}О! Привет! Ждал тебя сегодня!', '{name}Привет! Рад, что снова здесь. Начнём?', '{name}Снова вместе! Что узнаем сегодня?', '{name}Ты снова здесь! Я как раз думал о тебе.', '{name}Здравствуй! А я по тебе соскучился.', '{name}О, это снова ты! Продолжим?', '{name}Заходи. Я готов, если ты готов.'],
   },
 };
 
@@ -1173,6 +1353,23 @@ let currentLang = 'en';
 function t(key) {
   return (LANG[currentLang] && LANG[currentLang][key]) || (LANG.ru[key]) || key;
 }
+
+// Регулятор размера текста — свойство zoom масштабирует всё разом,
+// поддерживается в Safari (iOS) и Chrome (Android) в 2026 году.
+const FONT_SCALES = [1, 1.15, 1.3, 1.45];
+function applyFontScale(idx) {
+  idx = Math.max(0, Math.min(FONT_SCALES.length - 1, idx));
+  document.body.style.zoom = FONT_SCALES[idx];
+  localStorage.setItem('aion_font_scale_idx', idx);
+}
+function adjustFontScale(direction) {
+  let idx = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
+  applyFontScale(idx + direction);
+}
+(function() {
+  const saved = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
+  if (saved > 0) applyFontScale(saved);
+})();
 
 function setLanguage(lang) {
   currentLang = lang;
@@ -1199,7 +1396,63 @@ function applyTranslations() {
   setText('label-hour', L.labelHour);
   setText('label-minute', L.labelMinute);
   setText('label-place', L.labelPlace);
+  setText('analyses-counter-label', L.analysesLeftLabel);
+  setText('label-gender', L.labelGender);
+  setText('gender-m-btn', L.genderMale);
+  setText('gender-f-btn', L.genderFemale);
+
+  // Блок совместимости
+  setText('lbl-compat-toggle', L.compatToggle);
+  setText('lbl-compat-theme', L.compatThemeLabel);
+  setText('theme-romantic', L.themeRomantic);
+  setText('theme-family', L.themeFamily);
+  setText('theme-business', L.themeBusiness);
+  setText('theme-team', L.themeTeam);
+  setText('theme-friendship', L.themeFriendship);
+  setText('theme-other', L.themeOther);
+  setText('lbl-group-hint', L.groupAnalysisHint);
+
+  // Второй/третий/четвёртый человек — переиспользуем метки основного человека
+  ['p2','p3','p4'].forEach(p => {
+    setText(`lbl-${p}-firstname`, L.labelFirstname);
+    setText(`lbl-${p}-lastname`, L.labelLastname);
+    setPlaceholder(`${p}-firstname`, L.labelFirstname);
+    setPlaceholder(`${p}-lastname`, L.labelLastname);
+    setText(`lbl-${p}-gender`, L.labelGender);
+    setText(`${p}-gender-m-btn`, L.genderMale);
+    setText(`${p}-gender-f-btn`, L.genderFemale);
+    setText(`lbl-${p}-day`, L.labelDay);
+    setText(`lbl-${p}-month`, L.labelMonth);
+    setText(`lbl-${p}-year`, L.labelYear);
+    setText(`lbl-${p}-hour`, L.labelHour);
+    setText(`lbl-${p}-minute`, L.labelMinute);
+    setText(`lbl-${p}-place`, L.labelPlace);
+    // Координаты — только если ещё не найдены (не затираем уже найденный результат)
+    const coordsEl = el(`${p}-coords-display`);
+    if (coordsEl && !document.getElementById(`${p}-lat`)?.value) {
+      coordsEl.textContent = L.coordsDefault;
+    }
+  });
+  setText('lbl-person2', L.lblPerson2);
+  setText('lbl-person3', L.lblPerson3);
+  setText('lbl-person4', L.lblPerson4);
+  setText('btn-add-p2', L.btnAddP2);
+  setText('btn-add-p3', L.btnAddP3);
+  setText('btn-add-p4', L.btnAddP4);
+
+  // Обратная связь
+  setText('btn-feedback', L.btnFeedback);
+  setText('fb-title', L.fbTitle);
+  setText('fb-lbl-name', L.fbLblName);
+  setText('fb-lbl-email', L.fbLblEmail);
+  setText('fb-lbl-message', L.fbLblMessage);
+  setText('fb-send-btn', L.fbSendBtn);
+  setText('fb-close-btn', L.fbCloseBtn);
+
   setText('label-request', L.labelRequest);
+  setText('mode-label', L.modeLabel);
+  setText('mode-deep-btn', L.modeDeep);
+  setText('mode-quick-btn', L.modeQuick);
   setPlaceholder('request', L.requestPlaceholder);
   setText('req-warning', L.requestHint);
   setText('calc-btn', L.btnCalculate);
@@ -1270,11 +1523,11 @@ let db = null;
 async function initFirebase() {
   try {
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const { getFirestore, collection, addDoc, getDocs, query, orderBy, limit } =
+    const { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where } =
       await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const app = initializeApp(FIREBASE_CONFIG);
     db = getFirestore(app);
-    window._fs = { collection, addDoc, getDocs, query, orderBy, limit };
+    window._fs = { collection, addDoc, getDocs, query, orderBy, limit, where };
     console.log('Firebase OK');
   } catch(e) {
     console.warn('Firebase недоступен:', e.message);
@@ -1285,8 +1538,74 @@ async function initFirebase() {
 // СЕРВЕР И СОСТОЯНИЕ
 // ══════════════════════════════════════════════
 const SERVER = 'https://aion-vi-server-production.up.railway.app';
+// ⚠️ Когда подключишь свой домен вместо Firebase-адреса — замени строку ниже
+const SITE_URL = 'https://aion-vi.web.app';
 let currentSummary = '';
 let currentAnalysis = '';
+let currentRating = 0;
+let pendingRatingNudge = false;
+
+// Мягкий тост-напоминание — не блокирует, просто появляется и гаснет
+function showRatingNudge() {
+  const existing = document.getElementById('rating-nudge-toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'rating-nudge-toast';
+  toast.textContent = t('ratingNudge');
+  toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--gold);color:var(--gold);padding:10px 18px;border-radius:2px;font-size:12px;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.4);opacity:0;transition:opacity .3s;';
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => { toast.style.opacity = '1'; });
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// Напоминание при возврате в приложение (свернул/переключился и вернулся)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    if (currentAnalysis && currentRating === 0) pendingRatingNudge = true;
+  } else if (document.visibilityState === 'visible') {
+    if (pendingRatingNudge && currentRating === 0) {
+      showRatingNudge();
+      pendingRatingNudge = false;
+    }
+  }
+});
+
+// ══════════════════════════════════════════════
+// РЕЙТИНГ АНАЛИЗА — приватная обратная связь, видна только нам
+// ══════════════════════════════════════════════
+function selectRating(n) {
+  currentRating = n;
+  document.querySelectorAll('.rating-star').forEach(el => {
+    el.style.color = parseInt(el.dataset.val) <= n ? 'var(--gold)' : 'var(--text-faint)';
+  });
+  document.getElementById('rating-comment-wrap').style.display = 'block';
+}
+
+async function submitRating() {
+  if (!currentRating) return;
+  const comment = document.getElementById('rating-comment').value.trim();
+  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  try {
+    await fetch(`${SERVER}/rate`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: user?.email || '',
+        rating: currentRating,
+        comment: comment,
+        compat: !!compatEnabled,
+        theme: compatEnabled ? (document.querySelector('.compat-theme-btn.active')?.dataset.theme || '') : ''
+      })
+    });
+  } catch(e) {}
+  document.getElementById('rating-stars').style.display = 'none';
+  document.getElementById('rating-comment-wrap').style.display = 'none';
+  document.getElementById('rating-label').style.display = 'none';
+  document.getElementById('rating-thanks').style.display = 'block';
+}
 let currentClientData = {};
 let generatedPdfBlob = null;
 
@@ -1390,6 +1709,7 @@ function onLastnameInput(val) {
       document.getElementById('lat').value = p.lat;
       document.getElementById('lon').value = p.lon;
       document.getElementById('coords-display').textContent = `${parseFloat(p.lat).toFixed(4)}° с.ш. / ${parseFloat(p.lon).toFixed(4)}° в.д.`;
+      if (p.gender === 'm' || p.gender === 'f') setGender(p.gender);
       list.innerHTML = '';
       // Фокус на запрос
       document.getElementById('request').focus();
@@ -1429,31 +1749,30 @@ function acKeydown(e, listId) {
 // МУЗЫКА
 // ══════════════════════════════════════════════
 const TRACKS_MAGIC = [
-  { file: 'Music/track1.wav', name: 'AION Vi — I' },
-  { file: 'Music/track2.wav', name: 'AION Vi — II' },
-  { file: 'Music/track3.wav', name: 'AION Vi — III' },
-  { file: 'Music/track4.wav', name: 'AION Vi — IV' },
-  { file: 'Music/track5.wav', name: 'AION Vi — V' },
-  { file: 'Music/track6.wav', name: 'AION Vi — VI' },
+  { file: 'Music/track1.mp3', name: 'AION Vi — I' },
+  { file: 'Music/track2.mp3', name: 'AION Vi — II' },
+  { file: 'Music/track3.mp3', name: 'AION Vi — III' },
+  { file: 'Music/track4.mp3', name: 'AION Vi — IV' },
+  { file: 'Music/track5.mp3', name: 'AION Vi — V' },
+  { file: 'Music/track6.mp3', name: 'AION Vi — VI' },
 ];
 const TRACKS_PIANO = [
-  { file: 'Music_Piano/piano1.wav', name: 'AION Vi · Piano I' },
-  { file: 'Music_Piano/piano2.wav', name: 'AION Vi · Piano II' },
-  { file: 'Music_Piano/piano3.wav', name: 'AION Vi · Piano III' },
-  { file: 'Music_Piano/piano4.wav', name: 'AION Vi · Piano IV' },
-  { file: 'Music_Piano/piano5.wav', name: 'AION Vi · Piano V' },
-  { file: 'Music_Piano/piano6.wav', name: 'AION Vi · Piano VI' },
-  { file: 'Music_Piano/piano7.wav', name: 'AION Vi · Piano VII' },
-  { file: 'Music_Piano/piano8.wav', name: 'AION Vi · Piano VIII' },
-  { file: 'Music_Piano/piano9.wav', name: 'AION Vi · Piano IX' },
+  { file: 'Music_Piano/piano1.mp3', name: 'AION Vi · Piano I' },
+  { file: 'Music_Piano/piano2.mp3', name: 'AION Vi · Piano II' },
+  { file: 'Music_Piano/piano3.mp3', name: 'AION Vi · Piano III' },
+  { file: 'Music_Piano/piano4.mp3', name: 'AION Vi · Piano IV' },
+  { file: 'Music_Piano/piano5.mp3', name: 'AION Vi · Piano V' },
+  { file: 'Music_Piano/piano6.mp3', name: 'AION Vi · Piano VI' },
+  { file: 'Music_Piano/piano7.mp3', name: 'AION Vi · Piano VII' },
+  { file: 'Music_Piano/piano8.mp3', name: 'AION Vi · Piano VIII' },
+  { file: 'Music_Piano/piano9.mp3', name: 'AION Vi · Piano IX' },
 ];
 
 let audioPlayer = null;
 let musicEnabled = true;
 let currentTrackIdx = -1;
-let currentPlaylist = [];
-let currentShuffled = [];  // перемешанная очередь без повторов
-let shufflePos = 0;
+let playlistStates = new Map(); // отдельная память очереди для каждого плейлиста
+let currentPlaylist = [];       // какой плейлист сейчас активен (для обработчика 'ended')
 let fadeInterval = null;
 
 // Fisher-Yates shuffle — честное перемешивание
@@ -1486,26 +1805,25 @@ function fadeOutAndStop(cb) {
 function playFromPlaylist(playlist, volume) {
   if (!musicEnabled) return;
 
-  // Если это новый плейлист — создаём новую перемешанную очередь
-  if (playlist !== currentPlaylist) {
-    currentPlaylist = playlist;
-    currentShuffled = shuffleArray(playlist);
-    shufflePos = 0;
+  // У каждого плейлиста — своя независимая память очереди
+  let state = playlistStates.get(playlist);
+  if (!state) {
+    state = { shuffled: shuffleArray(playlist), pos: 0 };
+    playlistStates.set(playlist, state);
   }
 
-  // Берём следующий трек из перемешанной очереди
-  if (shufflePos >= currentShuffled.length) {
-    // Очередь закончилась — перемешиваем заново, избегая повтора первого трека
-    const lastIdx = currentShuffled[currentShuffled.length - 1];
-    currentShuffled = shuffleArray(playlist);
-    // Если первый совпадает с последним — меняем местами с вторым
-    if (currentShuffled[0] === lastIdx && currentShuffled.length > 1) {
-      [currentShuffled[0], currentShuffled[1]] = [currentShuffled[1], currentShuffled[0]];
+  // Очередь этого конкретного плейлиста закончилась — перемешиваем заново
+  if (state.pos >= state.shuffled.length) {
+    const lastIdx = state.shuffled[state.shuffled.length - 1];
+    state.shuffled = shuffleArray(playlist);
+    if (state.shuffled[0] === lastIdx && state.shuffled.length > 1) {
+      [state.shuffled[0], state.shuffled[1]] = [state.shuffled[1], state.shuffled[0]];
     }
-    shufflePos = 0;
+    state.pos = 0;
   }
 
-  const idx = currentShuffled[shufflePos++];
+  const idx = state.shuffled[state.pos++];
+  currentPlaylist = playlist; // для обработчика 'ended' — знать, какой плейлист продолжать
   currentTrackIdx = idx;
   const track = playlist[idx];
 
@@ -1762,30 +2080,40 @@ async function geocodeP2() {
 // ══════════════════════════════════════════════
 // ЖИВОЕ ПРИВЕТСТВИЕ AION Vi
 // ══════════════════════════════════════════════
+function renderAnalysesCounter() {
+  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const box = document.getElementById('analyses-counter');
+  if (!user || typeof user.analysesLeft !== 'number') { box.style.display = 'none'; return; }
+  const total = Math.max(user.analysesTotal || 5, user.analysesLeft, 1);
+  const pct = Math.round((user.analysesLeft / total) * 100);
+  document.getElementById('analyses-counter-numbers').textContent = `${user.analysesLeft} / ${total}`;
+  document.getElementById('analyses-counter-bar').style.width = pct + '%';
+  if (pct <= 20) document.getElementById('analyses-counter-bar').style.background = 'var(--red, #c46a4a)';
+  box.style.display = 'block';
+}
+
 function initGreeting() {
   const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
   const nickname = user?.nickname || '';
-  const lastVisit = localStorage.getItem('aion_last_visit');
+  const emailKey = user?.email ? user.email.replace(/\./g,'_').replace(/@/g,'__at__') : 'anon';
+  const lastVisit = localStorage.getItem(`aion_last_visit_${emailKey}`);
   const now = Date.now();
-  const isFirstEver = !localStorage.getItem('aion_visited_calc');
+  const isFirstEver = !localStorage.getItem(`aion_visited_calc_${emailKey}`);
   const daysSince = lastVisit ? (now - parseInt(lastVisit)) / (1000*60*60*24) : 0;
 
-  localStorage.setItem('aion_last_visit', now);
-  localStorage.setItem('aion_visited_calc', '1');
+  localStorage.setItem(`aion_last_visit_${emailKey}`, now);
+  localStorage.setItem(`aion_visited_calc_${emailKey}`, '1');
 
   let greeting = '';
+  const namePart = nickname ? nickname + ', ' : '';
   if (isFirstEver) {
-    greeting = `Привет${nickname ? ', ' + nickname : ''}! Меня зовут AION Vi. Я знаю о тебе слишком много, чтобы молчать. Спрашивай — я всё расскажу! 😊`;
+    greeting = t('greetFirst').replace('{name}', namePart);
   } else if (daysSince >= 5) {
-    greeting = `Ну, наконец-то${nickname ? ', ' + nickname : ''}! Я уж думал, случилось что... Рад тебя видеть! Начнём?`;
+    greeting = t('greetReturn').replace('{name}', namePart);
   } else {
-    const variants = [
-      `О! Привет${nickname ? ', ' + nickname : ''}! Ждал тебя сегодня!`,
-      `${nickname ? nickname + ', п' : 'П'}ривет! Рад, что снова здесь. Начнём?`,
-      `${nickname ? 'Привет, ' + nickname + '!' : 'Снова вместе!'} Что узнаем сегодня?`,
-      `${nickname ? nickname + ', ты!' : 'Ты!'} Как раз думал о тебе. Готов?`,
-    ];
-    greeting = variants[Math.floor(Math.random() * variants.length)];
+    const variants = t('greetVariants');
+    const list = Array.isArray(variants) ? variants : [variants];
+    greeting = list[Math.floor(Math.random() * list.length)].replace('{name}', namePart);
   }
 
   typeText('greeting-text', greeting, 76);
@@ -2003,6 +2331,7 @@ async function calculate(silent) {
     place: document.getElementById('place').value.trim(),
     firstname: document.getElementById('firstname').value.trim(),
     lastname: document.getElementById('lastname').value.trim(),
+    gender: document.getElementById('gender').value,
     request: document.getElementById('request').value.trim(),
   };
 
@@ -2086,6 +2415,38 @@ function showError(msg) {
 // ГЕНЕРАЦИЯ АНАЛИЗА
 // ══════════════════════════════════════════════
 async function generateAnalysis() {
+  // Мягкое напоминание — не блокирует, просто подсказка (вариант B)
+  if (currentAnalysis && currentRating === 0) {
+    showRatingNudge();
+  }
+
+  // Проверка остатка анализов ДО любых расходов на API
+  try {
+    const u = JSON.parse(localStorage.getItem('aion_user') || 'null');
+    if (u && typeof u.analysesLeft === 'number' && u.analysesLeft <= 0) {
+      const box = document.getElementById('analysis-box');
+      box.innerHTML = `
+        <div style="text-align:center;padding:20px 10px;">
+          <div style="font-size:15px;color:var(--gold);margin-bottom:12px;">Твои анализы на этом пакете закончились</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px;">
+            Мы разобрали лишь малую часть того, что скрыто в твоём коде. Впереди — ответы о твоём пути, отношениях, решениях. Я готов продолжить, как только ты будешь готов.
+          </div>
+          <button class="btn-generate" onclick="location.href='index.html'" style="max-width:280px;margin:0 auto;">Продолжить с новым пакетом</button>
+        </div>`;
+      box.classList.add('show');
+      box.scrollIntoView({behavior:'smooth', block:'start'});
+      return;
+    }
+  } catch(e) {}
+
+  if (!document.getElementById('gender').value) {
+    document.getElementById('gender-m-btn').classList.add('field-error');
+    document.getElementById('gender-f-btn').classList.add('field-error');
+    document.getElementById('gender-m-btn').scrollIntoView({behavior:'smooth', block:'center'});
+    alert(t('needGender'));
+    return;
+  }
+
   if (!currentSummary) {
     // Блок "О тебе" заморожен — считаем данные автоматически в фоне
     const ok = await calculate(true);
@@ -2112,6 +2473,7 @@ async function generateAnalysis() {
     if (compatEnabled) {
       const p2fn = document.getElementById('p2-firstname').value.trim();
       const p2ln = document.getElementById('p2-lastname').value.trim();
+      const p2gender = document.getElementById('p2-gender').value;
       const p2day = document.getElementById('p2-day').value;
       const p2month = document.getElementById('p2-month').value;
       const p2year = document.getElementById('p2-year').value;
@@ -2128,12 +2490,36 @@ async function generateAnalysis() {
               day: parseInt(p2day), month: parseInt(p2month), year: parseInt(p2year),
               hour: parseInt(p2hour), minute: parseInt(p2min),
               lat: parseFloat(p2lat), lon: parseFloat(p2lon),
-              firstname: p2fn, lastname: p2ln
+              firstname: p2fn, lastname: p2ln, gender: p2gender
             })
           });
           const d2 = await r2.json();
-          if (d2.summary) compatSummary = d2.summary;
-        } catch(e) {}
+          if (d2.summary) {
+            compatSummary = d2.summary;
+          } else {
+            // Расчёт второго человека не удался — не отправляем пустую
+            // совместимость к API (это дало бы бессмысленный результат)
+            stopMusic(false);
+            box.innerHTML = `<div style="text-align:center;padding:16px;color:var(--gold);">
+              Не получилось рассчитать данные второго человека.<br>
+              <span style="color:var(--text);font-size:13px;">${d2.message || 'Проверь дату рождения и попробуй ещё раз.'}</span>
+            </div>`;
+            box.classList.add('show');
+            btn.disabled = false;
+            spinner.classList.remove('show');
+            return;
+          }
+        } catch(e) {
+          stopMusic(false);
+          box.innerHTML = `<div style="text-align:center;padding:16px;color:var(--gold);">
+            Не удалось связаться с сервером для расчёта второго человека.<br>
+            <span style="color:var(--text);font-size:13px;">Проверь соединение и попробуй ещё раз.</span>
+          </div>`;
+          box.classList.add('show');
+          btn.disabled = false;
+          spinner.classList.remove('show');
+          return;
+        }
       }
     }
 
@@ -2150,7 +2536,11 @@ async function generateAnalysis() {
         compat_enabled: compatEnabled,
         compat_theme: themeLabel,
         compat_summary: compatSummary,
-        no_time: currentClientData.no_time || false
+        no_time: currentClientData.no_time || false,
+        client_info: { firstname: currentClientData.firstname || '', lastname: currentClientData.lastname || '' },
+        answer_mode: document.getElementById('answer-mode').value,
+        nickname: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).nickname || '',
+        email: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || ''
       })
     });
     const data = await r.json();
@@ -2180,7 +2570,7 @@ async function generateAnalysis() {
     }
 
     // Сохраняем в Firebase
-    saveToFirebase(currentAnalysis, currentClientData, document.getElementById('request').value.trim());
+    // История сохраняется сервером автоматически при генерации — клиенту писать не нужно
 
     // Заполняем PDF-блок
     fillPdfBlock(currentAnalysis, currentClientData);
@@ -2188,22 +2578,39 @@ async function generateAnalysis() {
     box.innerHTML = data.analysis.replace(/\n/g, '<br>') +
       `<div class="analysis-meta">${t('analysisTokens')}: ${data.tokens_used || '—'}</div>`;
 
+    // Шлюз: одна генерация — один анализ. Дальше только через явный сброс.
+    document.getElementById('gen-btn').style.display = 'none';
+    document.getElementById('reset-btn').style.display = 'inline-block';
+
     // Кнопки действий
     box.insertAdjacentHTML('afterend', `
-      <div class="action-buttons" id="action-buttons" style="justify-content:space-between;">
+      <div class="action-buttons" id="action-buttons" style="justify-content:center;">
         <button class="btn-download" id="action-btn-download" onclick="downloadPDF()">${t('btnDownload')}</button>
-        <button class="btn-copy-analysis" id="action-btn-copy" onclick="copyAnalysis()" style="margin:0 auto;">${t('btnCopy')}</button>
+        <button class="btn-copy-analysis" id="action-btn-copy" onclick="copyAnalysis()">${t('btnCopy')}</button>
         <button class="btn-gift" id="action-btn-gift" onclick="openGiftModal()">${t('btnShare')}</button>
       </div>
+      <div id="rating-block" style="margin-top:20px;padding:16px;border:1px solid var(--line2);border-radius:2px;text-align:center;">
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;" id="rating-label">${t('ratingLabel')}</div>
+        <div id="rating-stars" style="font-size:26px;letter-spacing:6px;cursor:pointer;">
+          ${[1,2,3,4,5].map(n => `<span class="rating-star" data-val="${n}" onclick="selectRating(${n})" style="color:var(--text-faint);">★</span>`).join('')}
+        </div>
+        <div id="rating-comment-wrap" style="display:none;margin-top:12px;">
+          <textarea id="rating-comment" placeholder="${t('ratingCommentPh')}" style="width:100%;min-height:60px;font-family:inherit;font-size:12px;"></textarea>
+          <button class="btn-copy" onclick="submitRating()" style="margin-top:8px;font-size:11px;">${t('ratingSend')}</button>
+        </div>
+        <div id="rating-thanks" style="display:none;font-size:12px;color:var(--gold);margin-top:8px;">${t('ratingThanks')}</div>
+      </div>
     `);
+    currentRating = 0;
 
-    // Списываем -1 анализ из счётчика
+    // Синхронизируем счётчик с сервером — сервер единственный, кто реально
+    // списывает анализ, браузер только отображает актуальное число
     try {
       const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
-      if (user && typeof user.analysesLeft === 'number' && user.analysesLeft > 0) {
-        user.analysesLeft -= 1;
+      if (user && typeof data.analyses_left === 'number') {
+        user.analysesLeft = data.analyses_left;
         localStorage.setItem('aion_user', JSON.stringify(user));
-        // Показываем остаток если мало
+        renderAnalysesCounter();
         if (user.analysesLeft <= 2) {
           const warn = user.analysesLeft === 0
             ? '⚠ Анализы закончились. Для продолжения нужен новый промокод или подписка.'
@@ -2321,6 +2728,7 @@ async function downloadPDF() {
     win.document.close();
     win.focus();
     setTimeout(() => { win.print(); }, 600);
+    }
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = t('btnDownload'); }
   }
@@ -2345,14 +2753,46 @@ ${name ? '👤 ' + name + '\n' : ''}\n${currentAnalysis}`;
 // ══════════════════════════════════════════════
 // МОДАЛЬНОЕ ОКНО "ПОДАРИТЬ"
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// ТАРИФЫ — Lemon Squeezy
+// ══════════════════════════════════════════════
+// ВАЖНО: замени плейсхолдеры ниже на реальные ссылки чекаута после
+// создания продуктов в Lemon Squeezy (Store → Products → Share → Copy link).
+const LEMONSQUEEZY_LINKS = {
+  start: 'https://ЗАМЕНИ-НА-СВОЙ-МАГАЗИН.lemonsqueezy.com/buy/ЗАМЕНИ-ID-СТАРТ',
+  basic: 'https://ЗАМЕНИ-НА-СВОЙ-МАГАЗИН.lemonsqueezy.com/buy/ЗАМЕНИ-ID-БАЗОВЫЙ',
+  pro:   'https://ЗАМЕНИ-НА-СВОЙ-МАГАЗИН.lemonsqueezy.com/buy/ЗАМЕНИ-ID-ПРО',
+};
+
+function openPricingModal() {
+  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const email = user?.email || '';
+  // Передаём email как custom data — вебхук на сервере получит его обратно
+  // и поймёт, кому именно начислять пакет после оплаты.
+  document.getElementById('checkout-start').href = `${LEMONSQUEEZY_LINKS.start}?checkout[email]=${encodeURIComponent(email)}`;
+  document.getElementById('checkout-basic').href = `${LEMONSQUEEZY_LINKS.basic}?checkout[email]=${encodeURIComponent(email)}`;
+  document.getElementById('checkout-pro').href = `${LEMONSQUEEZY_LINKS.pro}?checkout[email]=${encodeURIComponent(email)}`;
+  document.getElementById('pricing-modal').classList.add('show');
+}
+function closePricingModal() {
+  document.getElementById('pricing-modal').classList.remove('show');
+}
+
 function openGiftModal() {
   if (!currentAnalysis) return;
   const client = currentClientData;
   const name = [client.firstname, client.lastname].filter(Boolean).join(' ') || '';
-  const preview = `✦ AION Vi — Персональный анализ${name ? ' для ' + name : ''}\n\n${currentAnalysis.substring(0,300)}...`;
+
+  // Метка отправителя для будущей реферальной программы —
+  // берём промокод пользователя, а если его нет (соц-вход) — nickname
+  const senderUser = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const refTag = senderUser?.promo || senderUser?.nickname || 'friend';
+  const shareUrl = `${SITE_URL}/?ref=${encodeURIComponent(refTag)}`;
+
+  const preview = `✦ AION Vi — Персональный анализ${name ? ' для ' + name : ''}\n\n${currentAnalysis.substring(0,300)}...\n\n${shareUrl}`;
   const text = encodeURIComponent(preview);
 
-  document.getElementById('share-telegram').href = `https://t.me/share/url?text=${text}`;
+  document.getElementById('share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${text}`;
   document.getElementById('share-whatsapp').href = `https://wa.me/?text=${text}`;
   document.getElementById('share-viber').href = `viber://forward?text=${text}`;
   document.getElementById('share-gmail').href = `https://mail.google.com/mail/?view=cm&body=${text}&su=${encodeURIComponent('AION Vi — Твой персональный анализ')}`;
@@ -2387,10 +2827,13 @@ async function saveToFirebase(analysis, client, request) {
   if (!db) return;
   try {
     const { collection, addDoc } = window._fs;
+    const owner = (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || '';
     await addDoc(collection(db, 'analyses'), {
+      ownerEmail: owner,
       createdAt: new Date().toISOString(),
       firstname: client.firstname || '',
       lastname: client.lastname || '',
+      gender: client.gender || '',
       day: client.day || '',
       month: client.month || '',
       year: client.year || '',
@@ -2412,24 +2855,29 @@ async function openHistory() {
   itemsEl.innerHTML = '<div class="history-empty">Загружаю...</div>';
   overlay.classList.add('show');
 
-  if (!db) {
-    itemsEl.innerHTML = '<div class="history-empty">Firebase не подключён. История недоступна.</div>';
+  const myEmail = (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || '';
+  if (!myEmail) {
+    itemsEl.innerHTML = '<div class="history-empty">Войди в аккаунт, чтобы видеть свою историю.</div>';
     return;
   }
 
   try {
-    const { collection, getDocs, query, orderBy, limit } = window._fs;
-    const q = query(collection(db, 'analyses'), orderBy('createdAt', 'desc'), limit(50));
-    const snapshot = await getDocs(q);
+    // История хранится на сервере в закрытом разделе — клиент получает ТОЛЬКО свою
+    const resp = await fetch(`${SERVER}/history`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ email: myEmail })
+    });
+    const result = await resp.json();
+    const docs = result.items || [];
 
-    if (snapshot.empty) {
+    if (!docs.length) {
       itemsEl.innerHTML = '<div class="history-empty">История пуста — анализы появятся здесь после генерации</div>';
       return;
     }
 
     itemsEl.innerHTML = '';
-    snapshot.forEach(doc => {
-      const d = doc.data();
+    docs.forEach(d => {
       const dateStr = d.createdAt ? new Date(d.createdAt).toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
       const name = [d.firstname, d.lastname].filter(Boolean).join(' ') || 'Без имени';
       const preview = (d.analysis || '').substring(0, 120).replace(/\n/g,' ') + '...';
@@ -2619,6 +3067,85 @@ function onRequestInput(el) {
 }
 
 // ── Автопереход между полями дат ──
+// Фильтр текстовых полей (имя/фамилия/город): буквы, пробел, дефис, апостроф, точка
+function resetForNewGeneration() {
+  // Очищаем результат прошлой генерации
+  document.getElementById('analysis-box').innerHTML = '';
+  const actionButtons = document.getElementById('action-buttons');
+  if (actionButtons) actionButtons.remove();
+  const ratingBlock = document.getElementById('rating-block');
+  if (ratingBlock) ratingBlock.remove();
+  currentAnalysis = '';
+  currentRating = 0;
+
+  // Очищаем поле запроса — новый вопрос печатается с чистого листа
+  document.getElementById('request').value = '';
+  onRequestInput(document.getElementById('request'));
+
+  // Данные клиента (имя, дата, место, пол) НЕ трогаем — currentClientData/currentSummary остаются
+
+  // Возвращаем кнопку генерации
+  document.getElementById('reset-btn').style.display = 'none';
+  document.getElementById('gen-btn').style.display = 'inline-block';
+
+  document.getElementById('request').focus();
+  document.getElementById('request-block').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function setAnswerMode(mode) {
+  document.getElementById('answer-mode').value = mode;
+  document.getElementById('mode-deep-btn').classList.toggle('active', mode === 'deep');
+  document.getElementById('mode-quick-btn').classList.toggle('active', mode === 'quick');
+}
+
+function setGender(value, prefix) {
+  prefix = prefix || '';
+  document.getElementById(prefix + 'gender').value = value;
+  document.getElementById(prefix + 'gender-m-btn').classList.toggle('active', value === 'm');
+  document.getElementById(prefix + 'gender-f-btn').classList.toggle('active', value === 'f');
+  document.getElementById(prefix + 'gender-m-btn').classList.remove('field-error');
+  document.getElementById(prefix + 'gender-f-btn').classList.remove('field-error');
+}
+
+function cleanNameInput(el) {
+  const cleaned = el.value.replace(/[^\p{L}\s'.\-]/gu, '');
+  if (cleaned !== el.value) {
+    const pos = el.selectionStart - (el.value.length - cleaned.length);
+    el.value = cleaned;
+    try { el.setSelectionRange(pos, pos); } catch(e) {}
+  }
+}
+
+// Обрезка значения по границам + подсветка ошибки
+function clampField(el, min, max, label) {
+  let v = el.value.replace(/[^\d]/g, ''); // только цифры
+  el.value = v;
+  clearFieldError(el);
+  if (v === '') return; // пустое — не ошибка на этом этапе
+  const n = parseInt(v);
+  if (n > max) { el.value = String(max); }      // не даём превысить максимум
+  if (v.length >= String(max).length && n < min && min > 0) {
+    setFieldError(el, `${label}: от ${min} до ${max}`);
+  }
+}
+
+function setFieldError(el, msg) {
+  el.classList.add('field-error');
+  let hint = el.parentElement.querySelector('.field-hint');
+  if (!hint) {
+    hint = document.createElement('div');
+    hint.className = 'field-hint';
+    el.parentElement.appendChild(hint);
+  }
+  hint.textContent = msg;
+}
+
+function clearFieldError(el) {
+  el.classList.remove('field-error');
+  const hint = el.parentElement.querySelector('.field-hint');
+  if (hint) hint.textContent = '';
+}
+
 function autoNext(el, nextId, maxLen) {
   if (String(el.value).length >= maxLen) {
     const next = document.getElementById(nextId);
@@ -2636,19 +3163,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lang-select').value = savedLang;
   applyTranslations();
 
-  // Подставляем nickname из регистрации в поле firstname
-  try {
-    const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
-    if (user?.nickname) {
-      const firstnameEl = document.getElementById('firstname');
-      if (firstnameEl && !firstnameEl.value) {
-        firstnameEl.value = user.nickname;
-      }
-    }
-  } catch(e) {}
+  // Nickname из регистрации намеренно НЕ подставляется в "Данные клиента" —
+  // для нумерологии нужно полное имя, а не короткое "как зовут друзья".
+  // Nickname используется отдельно — см. передачу в /generate ниже.
 
   // Живое приветствие AION Vi
   initGreeting();
+  renderAnalysesCounter();
 
   checkServer();
   setInterval(checkServer, 10000);
@@ -2668,6 +3189,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') { e.preventDefault(); geocode(); }
   });
 });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
 </script>
 </body>
 </html>
