@@ -464,11 +464,11 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   </div>
 
   <div class="row row-5">
-    <div class="field"><label id="label-day">День</label><input type="text" inputmode="numeric" id="day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'month',2)"></div>
-    <div class="field"><label id="label-month">Месяц</label><input type="text" inputmode="numeric" id="month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'year',2)"></div>
-    <div class="field"><label id="label-year">Год</label><input type="text" inputmode="numeric" id="year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'hour',4)"></div>
-    <div class="field"><label id="label-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="hour" placeholder="—" oninput="clampField(this,0,23,'Часы');onTimeInput();autoNext(this,'minute',2)"></div>
-    <div class="field"><label id="label-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="minute" placeholder="—" oninput="clampField(this,0,59,'Минуты');onTimeInput()"></div>
+    <div class="field"><label id="label-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'month',2)"></div>
+    <div class="field"><label id="label-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'year',2)"></div>
+    <div class="field"><label id="label-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'hour',4)"></div>
+    <div class="field"><label id="label-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="hour" placeholder="—" oninput="clampField(this,0,23,'Часы');onTimeInput();autoNext(this,'minute',2)"></div>
+    <div class="field"><label id="label-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="minute" placeholder="—" oninput="clampField(this,0,59,'Минуты');onTimeInput()"></div>
   </div>
   <div id="no-time-warning" style="display:none;font-size:11px;color:var(--gold-dim);margin-bottom:8px;padding:6px 10px;border:1px solid var(--gold-dim);border-radius:2px;opacity:0.85;">
     ⚠ Время рождения не указано — точность анализа натальной карты и некоторых расчётов будет ниже
@@ -531,11 +531,11 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p2-day">День</label><input type="text" inputmode="numeric" id="p2-day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p2-month',2)"></div>
-          <div class="field"><label id="lbl-p2-month">Месяц</label><input type="text" inputmode="numeric" id="p2-month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p2-year',2)"></div>
-          <div class="field"><label id="lbl-p2-year">Год</label><input type="text" inputmode="numeric" id="p2-year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'p2-hour',4)"></div>
-          <div class="field"><label id="lbl-p2-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="p2-hour" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p2-minute',2)"></div>
-          <div class="field"><label id="lbl-p2-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="p2-minute" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
+          <div class="field"><label id="lbl-p2-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p2-day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p2-month',2)"></div>
+          <div class="field"><label id="lbl-p2-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p2-month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p2-year',2)"></div>
+          <div class="field"><label id="lbl-p2-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p2-year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'p2-hour',4)"></div>
+          <div class="field"><label id="lbl-p2-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p2-hour" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p2-minute',2)"></div>
+          <div class="field"><label id="lbl-p2-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p2-minute" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
         </div>
         <div class="field">
           <label id="lbl-p2-place">Место рождения</label>
@@ -568,11 +568,11 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p3-day">День</label><input type="text" inputmode="numeric" id="p3-day" placeholder="1"></div>
-          <div class="field"><label id="lbl-p3-month">Месяц</label><input type="text" inputmode="numeric" id="p3-month" placeholder="1"></div>
-          <div class="field"><label id="lbl-p3-year">Год</label><input type="text" inputmode="numeric" id="p3-year" placeholder="1990"></div>
-          <div class="field"><label id="lbl-p3-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="p3-hour" placeholder="—"></div>
-          <div class="field"><label id="lbl-p3-minute">Минуты</label><input type="text" inputmode="numeric" id="p3-minute" placeholder="—"></div>
+          <div class="field"><label id="lbl-p3-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-day" placeholder="1"></div>
+          <div class="field"><label id="lbl-p3-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-month" placeholder="1"></div>
+          <div class="field"><label id="lbl-p3-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-year" placeholder="1990"></div>
+          <div class="field"><label id="lbl-p3-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p3-hour" placeholder="—"></div>
+          <div class="field"><label id="lbl-p3-minute">Минуты</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-minute" placeholder="—"></div>
         </div>
         <div class="field">
           <label id="lbl-p3-place">Место рождения</label>
@@ -603,11 +603,11 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p4-day">День</label><input type="text" inputmode="numeric" id="p4-day" placeholder="1"></div>
-          <div class="field"><label id="lbl-p4-month">Месяц</label><input type="text" inputmode="numeric" id="p4-month" placeholder="1"></div>
-          <div class="field"><label id="lbl-p4-year">Год</label><input type="text" inputmode="numeric" id="p4-year" placeholder="1990"></div>
-          <div class="field"><label id="lbl-p4-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" id="p4-hour" placeholder="—"></div>
-          <div class="field"><label id="lbl-p4-minute">Минуты</label><input type="text" inputmode="numeric" id="p4-minute" placeholder="—"></div>
+          <div class="field"><label id="lbl-p4-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-day" placeholder="1"></div>
+          <div class="field"><label id="lbl-p4-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-month" placeholder="1"></div>
+          <div class="field"><label id="lbl-p4-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-year" placeholder="1990"></div>
+          <div class="field"><label id="lbl-p4-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p4-hour" placeholder="—"></div>
+          <div class="field"><label id="lbl-p4-minute">Минуты</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-minute" placeholder="—"></div>
         </div>
         <div class="field">
           <label id="lbl-p4-place">Место рождения</label>
