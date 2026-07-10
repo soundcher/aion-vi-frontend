@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AION Vi</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0d1525">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -213,6 +217,8 @@
     .logo-img { width: 240px; }
     .lang-btn { font-size: 20px; }
   }
+.input-error{border-color:var(--error) !important;animation:shake .3s;}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -228,6 +234,8 @@
 
 <!-- Языки -->
 <div class="lang-bar">
+  <button onclick="adjustFontScale(-1)" class="lang-btn" style="font-size:12px;" title="Меньше текст">A−</button>
+  <button onclick="adjustFontScale(1)" class="lang-btn" style="font-size:16px;" title="Больше текст">A+</button>
   <button class="lang-btn active" onclick="setLang('en')" title="English">🇬🇧</button>
   <button class="lang-btn" onclick="setLang('uk')" title="Українська">🇺🇦</button>
   <button class="lang-btn" onclick="setLang('pl')" title="Polski">🇵🇱</button>
@@ -332,6 +340,7 @@ const TRANSLATIONS = {
     errEmail: 'Enter a valid email',
     errPromo: 'Enter your promo code',
     errNotFound: 'Promo code not found. Check spelling.',
+    errConnection: 'Connection error. Check your internet and try again.',
     errUsed: 'This promo code has already been used.',
     welcome: (n) => `Welcome back, ${n}`,
     subWelcome: 'AION Vi is glad to see you',
@@ -357,6 +366,7 @@ const TRANSLATIONS = {
     errEmail: 'Введи коректний email',
     errPromo: 'Введи промокод',
     errNotFound: 'Промокод не знайдено. Перевір правильність.',
+    errConnection: 'Помилка з\'єднання. Перевір інтернет і спробуй ще раз.',
     errUsed: 'Цей промокод вже використано.',
     welcome: (n) => `З поверненням, ${n}`,
     subWelcome: 'AION Vi радий бачити тебе знову',
@@ -382,6 +392,7 @@ const TRANSLATIONS = {
     errEmail: 'Podaj prawidłowy email',
     errPromo: 'Wpisz kod promocyjny',
     errNotFound: 'Kod promocyjny nie znaleziony. Sprawdź pisownię.',
+    errConnection: 'Błąd połączenia. Sprawdź internet i spróbuj ponownie.',
     errUsed: 'Ten kod promocyjny został już wykorzystany.',
     welcome: (n) => `Witaj z powrotem, ${n}`,
     subWelcome: 'AION Vi jest rad cię widzieć',
@@ -407,6 +418,7 @@ const TRANSLATIONS = {
     errEmail: 'Введи корректный email',
     errPromo: 'Введи промокод',
     errNotFound: 'Промокод не найден. Проверь правильность ввода.',
+    errConnection: 'Ошибка соединения. Проверь интернет и попробуй снова.',
     errUsed: 'Этот промокод уже был использован.',
     welcome: (n) => `С возвращением, ${n}`,
     subWelcome: 'AION Vi рад видеть тебя снова',
@@ -418,7 +430,19 @@ const TRANSLATIONS = {
   }
 };
 
+const SERVER = 'https://aion-vi-server-production.up.railway.app';
 let currentLang = 'en';
+
+const FONT_SCALES = [1, 1.15, 1.3, 1.45];
+function applyFontScale(idx) {
+  idx = Math.max(0, Math.min(FONT_SCALES.length - 1, idx));
+  document.body.style.zoom = FONT_SCALES[idx];
+  localStorage.setItem('aion_font_scale_idx', idx);
+}
+function adjustFontScale(direction) {
+  let idx = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
+  applyFontScale(idx + direction);
+}
 
 function setLang(lang) {
   currentLang = lang;
@@ -481,18 +505,7 @@ function initFirebaseApp() {
 // ══════════════════════════════════════════════
 // ПРОМОКОДЫ
 // ══════════════════════════════════════════════
-const VALID_CODES = [
-  'AION-GXV-2080','AION-JGQ-0832','AION-SDR-9002','AION-PLJ-2148','AION-MWM-1423',
-  'AION-WZQ-3123','AION-VUR-3083','AION-NML-6099','AION-QSG-1716','AION-GUW-6887',
-  'AION-GDA-0293','AION-XXX-2791','AION-EHF-0821','AION-LXW-9440','AION-BXP-6304',
-  'AION-IZH-8028','AION-MPW-3485','AION-VHT-0181','AION-PBL-5301','AION-JLE-2324',
-  'AION-KSQ-6406','AION-PMY-4592','AION-ALU-3105','AION-VVS-7597','AION-OIU-5848',
-  'AION-ILD-8534','AION-WVJ-0006','AION-MPL-1905','AION-KKU-9413','AION-ZAD-2600',
-  'AION-XTV-7917','AION-VTT-1197','AION-FEY-7893','AION-SKN-0009','AION-JTA-8187',
-  'AION-BNA-2831','AION-QTN-8910','AION-IZU-9276','AION-EWV-2766','AION-RTY-6131',
-  'AION-DYJ-8051','AION-AUH-6315','AION-PVW-0891','AION-CDZ-9473','AION-JCL-5503',
-  'AION-MIC-7411','AION-IMH-6949','AION-RVX-8930','AION-BQY-1478','AION-CDG-4810'
-];
+// Промокоды теперь проверяются на сервере (/redeem) — список тут больше не хранится
 const ANALYSES_PER_CODE = 5;
 
 // Локальное хранилище
@@ -533,7 +546,25 @@ async function getUserFromFirebase(email) {
 // ══════════════════════════════════════════════
 // ВХОД ЧЕРЕЗ GOOGLE
 // ══════════════════════════════════════════════
+// Проверка имени ПЕРЕД входом через соцсети —
+// без неё Google/Facebook дают только формальное имя из профиля, а не то,
+// как человека называют друзья
+function checkGateBeforeSocial() {
+  const T = TRANSLATIONS[currentLang];
+  const nickEl = document.getElementById('inp-nickname');
+  nickEl.classList.remove('input-error');
+
+  if (!nickEl.value.trim()) {
+    showMsg(T.errName, 'error');
+    nickEl.classList.add('input-error');
+    nickEl.focus();
+    return false;
+  }
+  return true;
+}
+
 async function signInWithGoogle() {
+  if (!checkGateBeforeSocial()) return;
   try {
     const result = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
     await handleSocialLogin(result.user, 'google');
@@ -544,6 +575,7 @@ async function signInWithGoogle() {
 // ВХОД ЧЕРЕЗ FACEBOOK
 // ══════════════════════════════════════════════
 async function signInWithFacebook() {
+  if (!checkGateBeforeSocial()) return;
   try {
     const result = await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
     await handleSocialLogin(result.user, 'facebook');
@@ -556,13 +588,14 @@ async function signInWithFacebook() {
 
 async function handleSocialLogin(firebaseUser, method) {
   const email = firebaseUser.email;
-  const nickname = (firebaseUser.displayName || email).split(' ')[0];
+  // Берём то, что человек сам ввёл в форму — не гадаем по гугл-профилю
+  const nickname = document.getElementById('inp-nickname').value.trim() || (firebaseUser.displayName || email).split(' ')[0];
   let existing = await getUserFromFirebase(email);
   if (existing) {
     saveUser({ ...existing, email });
     showMsg(`С возвращением, ${existing.nickname || nickname}!`, 'success');
   } else {
-    const user = { nickname, email, promo: 'social-' + method, analysesLeft: ANALYSES_PER_CODE,
+    const user = { nickname, email, promo: 'social-' + method, analysesLeft: ANALYSES_PER_CODE, analysesTotal: ANALYSES_PER_CODE,
       registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: method };
     saveUser(user);
     await saveUserToFirebase(user);
@@ -575,6 +608,8 @@ async function handleSocialLogin(firebaseUser, method) {
 // ИНИЦИАЛИЗАЦИЯ
 // ══════════════════════════════════════════════
 window.onload = function() {
+  const savedScale = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
+  if (savedScale > 0) applyFontScale(savedScale);
   initFirebaseApp();
   const savedLang = localStorage.getItem('aion_lang') || 'en';
   setLang(savedLang);
@@ -607,21 +642,29 @@ async function enterApp() {
   if (!email || !email.includes('@')) { showMsg(T.errEmail, 'error'); return; }
   if (!promo)                        { showMsg(T.errPromo, 'error'); return; }
   btn.classList.add('loading'); btn.disabled = true;
-  await new Promise(r => setTimeout(r, 700));
-  if (!VALID_CODES.includes(promo)) {
-    showMsg(T.errNotFound, 'error'); btn.classList.remove('loading'); btn.disabled = false; return;
-  }
+
+  let redeemResult;
   try {
-    const snap = await db.ref('used_codes/' + promo).once('value');
-    if (snap.val()) { showMsg(T.errUsed, 'error'); btn.classList.remove('loading'); btn.disabled = false; return; }
+    const r = await fetch(`${SERVER}/redeem`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ code: promo })
+    });
+    redeemResult = await r.json();
   } catch(e) {
-    if (getUsedCodes().includes(promo)) { showMsg(T.errUsed, 'error'); btn.classList.remove('loading'); btn.disabled = false; return; }
+    showMsg(T.errConnection || 'Ошибка соединения с сервером', 'error');
+    btn.classList.remove('loading'); btn.disabled = false; return;
   }
-  const user = { nickname, email, promo, analysesLeft: ANALYSES_PER_CODE,
+
+  if (!redeemResult.valid) {
+    const msg = redeemResult.reason === 'used' ? T.errUsed : T.errNotFound;
+    showMsg(msg, 'error'); btn.classList.remove('loading'); btn.disabled = false; return;
+  }
+
+  const user = { nickname, email, promo, analysesLeft: ANALYSES_PER_CODE, analysesTotal: ANALYSES_PER_CODE,
     registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: 'promo' };
   saveUser(user); markCodeUsed(promo);
   await saveUserToFirebase(user);
-  try { await db.ref('used_codes/' + promo).set(true); } catch(e) {}
   showMsg(T.entering(nickname), 'success');
   setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
 }
@@ -640,6 +683,11 @@ function logout() {
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Enter') enterApp(); });
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').catch(() => {});
+}
 </script>
 </body>
 </html>
