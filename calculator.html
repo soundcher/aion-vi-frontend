@@ -568,11 +568,11 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p3-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-day" placeholder="1"></div>
-          <div class="field"><label id="lbl-p3-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-month" placeholder="1"></div>
-          <div class="field"><label id="lbl-p3-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-year" placeholder="1990"></div>
-          <div class="field"><label id="lbl-p3-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p3-hour" placeholder="—"></div>
-          <div class="field"><label id="lbl-p3-minute">Минуты</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-minute" placeholder="—"></div>
+          <div class="field"><label id="lbl-p3-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p3-month',2)"></div>
+          <div class="field"><label id="lbl-p3-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p3-year',2)"></div>
+          <div class="field"><label id="lbl-p3-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'p3-hour',4)"></div>
+          <div class="field"><label id="lbl-p3-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p3-hour" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p3-minute',2)"></div>
+          <div class="field"><label id="lbl-p3-minute">Минуты</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-minute" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
         </div>
         <div class="field">
           <label id="lbl-p3-place">Место рождения</label>
@@ -603,11 +603,11 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
           </div>
         </div>
         <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p4-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-day" placeholder="1"></div>
-          <div class="field"><label id="lbl-p4-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-month" placeholder="1"></div>
-          <div class="field"><label id="lbl-p4-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-year" placeholder="1990"></div>
-          <div class="field"><label id="lbl-p4-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p4-hour" placeholder="—"></div>
-          <div class="field"><label id="lbl-p4-minute">Минуты</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-minute" placeholder="—"></div>
+          <div class="field"><label id="lbl-p4-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p4-month',2)"></div>
+          <div class="field"><label id="lbl-p4-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p4-year',2)"></div>
+          <div class="field"><label id="lbl-p4-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'p4-hour',4)"></div>
+          <div class="field"><label id="lbl-p4-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p4-hour" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p4-minute',2)"></div>
+          <div class="field"><label id="lbl-p4-minute">Минуты</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-minute" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
         </div>
         <div class="field">
           <label id="lbl-p4-place">Место рождения</label>
@@ -620,7 +620,6 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
       <!-- Кнопки добавить -->
       <div style="margin-top:10px;display:flex;gap:8px;">
-        <button class="btn-copy" id="btn-add-p2" onclick="addExtraPerson(2)" style="font-size:11px;">+ Второй человек</button>
         <button class="btn-copy" id="btn-add-p3" onclick="addExtraPerson(3)" style="display:none;font-size:11px;">+ Третий человек</button>
         <button class="btn-copy" id="btn-add-p4" onclick="addExtraPerson(4)" style="display:none;font-size:11px;">+ Четвёртый человек</button>
       </div>
@@ -1439,7 +1438,6 @@ function applyTranslations() {
   setText('lbl-person2', L.lblPerson2);
   setText('lbl-person3', L.lblPerson3);
   setText('lbl-person4', L.lblPerson4);
-  setText('btn-add-p2', L.btnAddP2);
   setText('btn-add-p3', L.btnAddP3);
   setText('btn-add-p4', L.btnAddP4);
 
@@ -1974,15 +1972,19 @@ function addExtraPerson(n) {
   if (n === 3) document.getElementById('btn-add-p4').style.display = 'inline-block';
 }
 function removeExtraPerson(n) {
+  if (n === 2) {
+    // Второй человек теперь управляется галочкой "Совместимость" — просто снимаем её
+    document.getElementById('compat-toggle').checked = false;
+    toggleCompat(false);
+    ['firstname','lastname','day','month','year','hour','minute','place','lat','lon'].forEach(f => {
+      const el = document.getElementById(`p2-${f}`);
+      if (el) el.value = '';
+    });
+    return;
+  }
   document.getElementById(`p${n}-block`).style.display = 'none';
   document.getElementById(`btn-add-p${n}`).style.display = 'inline-block';
   // При удалении человека N скрываем и убираем всех "выше" по цепочке
-  if (n === 2) {
-    document.getElementById('p3-block').style.display = 'none';
-    document.getElementById('btn-add-p3').style.display = 'none';
-    document.getElementById('p4-block').style.display = 'none';
-    document.getElementById('btn-add-p4').style.display = 'none';
-  }
   if (n === 3) {
     document.getElementById('p4-block').style.display = 'none';
     document.getElementById('btn-add-p4').style.display = 'none';
@@ -2049,6 +2051,16 @@ const THEME_NAMES = {
 function toggleCompat(enabled) {
   compatEnabled = enabled;
   document.getElementById('compat-form').style.display = enabled ? 'block' : 'none';
+  document.getElementById('p2-block').style.display = enabled ? 'block' : 'none';
+  if (!enabled) {
+    // Сброс третьего/четвёртого при выключении совместимости
+    document.getElementById('p3-block').style.display = 'none';
+    document.getElementById('p4-block').style.display = 'none';
+    document.getElementById('btn-add-p3').style.display = 'none';
+    document.getElementById('btn-add-p4').style.display = 'none';
+  } else {
+    document.getElementById('btn-add-p3').style.display = 'inline-block';
+  }
   // Меняем лимит поля запроса
   const req = document.getElementById('request');
   const counter = document.getElementById('req-counter');
