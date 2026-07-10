@@ -755,7 +755,6 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <div class="analysis-section">
     <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
       <button class="btn-generate" onclick="generateAnalysis()" id="gen-btn">✦ Сгенерировать анализ</button>
-      <button class="btn-generate" onclick="resetForNewGeneration()" id="reset-btn" style="display:none;background:var(--gold-dim);">🔄 Новый вопрос</button>
       <button class="btn-music-toggle" id="btn-music-toggle" onclick="toggleMusicGlobal()">♪ Музыка вкл</button>
       <span class="analysis-spinner" id="gen-spinner">⟳ Генерирую... (~40 сек)</span>
     </div>
@@ -767,6 +766,10 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
     </div>
 
     <div class="analysis-box" id="analysis-box"></div>
+
+    <div style="text-align:center;margin-top:18px;">
+      <button class="btn-generate" onclick="resetForNewGeneration()" id="reset-btn" style="display:none;background:var(--gold-dim);">🔄 Новый вопрос</button>
+    </div>
   </div>
 
   <div class="copy-section">
