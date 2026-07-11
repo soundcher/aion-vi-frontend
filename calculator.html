@@ -769,8 +769,9 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
     <div class="analysis-box" id="analysis-box"></div>
 
-    <div style="text-align:center;margin-top:18px;">
-      <button class="btn-generate" onclick="resetForNewGeneration()" id="reset-btn" style="display:none;background:var(--gold-dim);">🔄 Новый вопрос</button>
+    <div style="text-align:center;margin-top:18px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-generate" onclick="continueDialog()" id="continue-btn" style="display:none;background:transparent;border:1px solid var(--accent-dim);color:var(--accent);">◂ Продолжить</button>
+      <button class="btn-generate" onclick="resetForNewGeneration()" id="reset-btn" style="display:none;background:var(--gold-dim);">🔄 Начать новую тему</button>
     </div>
   </div>
 
@@ -1547,6 +1548,7 @@ const SITE_URL = 'https://aion-vi.web.app';
 let currentSummary = '';
 let currentAnalysis = '';
 let currentRating = 0;
+let conversationHistory = []; // {question, answer} — копится при "Продолжить диалог", обнуляется при "Новый вопрос"
 let pendingRatingNudge = false;
 
 // Мягкий тост-напоминание — не блокирует, просто появляется и гаснет
@@ -2560,6 +2562,7 @@ async function generateAnalysis() {
         no_time: currentClientData.no_time || false,
         client_info: { firstname: currentClientData.firstname || '', lastname: currentClientData.lastname || '' },
         answer_mode: document.getElementById('answer-mode').value,
+        conversation_history: conversationHistory,
         nickname: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).nickname || '',
         email: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || ''
       })
@@ -2580,6 +2583,11 @@ async function generateAnalysis() {
 
     currentAnalysis = data.analysis;
 
+    // Копим историю этой сессии — пригодится, если пользователь нажмёт "Продолжить диалог"
+    if (requestText) {
+      conversationHistory.push({ question: requestText, answer: currentAnalysis });
+    }
+
     // Запускаем фортепианную музыку для чтения (тихо)
     setTimeout(() => { 
       if (musicEnabled) playFromPlaylist(TRACKS_PIANO, 0.25); 
@@ -2599,8 +2607,9 @@ async function generateAnalysis() {
     box.innerHTML = data.analysis.replace(/\n/g, '<br>') +
       `<div class="analysis-meta">${t('analysisTokens')}: ${data.tokens_used || '—'}</div>`;
 
-    // Шлюз: одна генерация — один анализ. Дальше только через явный сброс.
+    // Шлюз: одна генерация — один анализ. Дальше только через явный выбор.
     document.getElementById('gen-btn').style.display = 'none';
+    document.getElementById('continue-btn').style.display = 'inline-block';
     document.getElementById('reset-btn').style.display = 'inline-block';
 
     // Кнопки действий
@@ -3100,6 +3109,9 @@ function resetForNewGeneration() {
   currentAnalysis = '';
   currentRating = 0;
 
+  // Новый вопрос — чистый лист, история разговора обнуляется
+  conversationHistory = [];
+
   // Очищаем поле запроса — новый вопрос печатается с чистого листа
   document.getElementById('request').value = '';
   onRequestInput(document.getElementById('request'));
@@ -3107,6 +3119,31 @@ function resetForNewGeneration() {
   // Данные клиента (имя, дата, место, пол) НЕ трогаем — currentClientData/currentSummary остаются
 
   // Возвращаем кнопку генерации
+  document.getElementById('continue-btn').style.display = 'none';
+  document.getElementById('reset-btn').style.display = 'none';
+  document.getElementById('gen-btn').style.display = 'inline-block';
+
+  document.getElementById('request').focus();
+  document.getElementById('request-block').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function continueDialog() {
+  // Очищаем результат прошлой генерации, НО историю разговора сохраняем —
+  // следующий вопрос уйдёт на сервер вместе с контекстом всех прошлых пар
+  document.getElementById('analysis-box').innerHTML = '';
+  const actionButtons = document.getElementById('action-buttons');
+  if (actionButtons) actionButtons.remove();
+  const ratingBlock = document.getElementById('rating-block');
+  if (ratingBlock) ratingBlock.remove();
+  currentAnalysis = '';
+  currentRating = 0;
+
+  // conversationHistory НЕ трогаем — в этом весь смысл кнопки
+
+  document.getElementById('request').value = '';
+  onRequestInput(document.getElementById('request'));
+
+  document.getElementById('continue-btn').style.display = 'none';
   document.getElementById('reset-btn').style.display = 'none';
   document.getElementById('gen-btn').style.display = 'inline-block';
 
