@@ -262,6 +262,8 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
 .analysis-box.show{display:block;}
 .analysis-spinner{display:none;color:var(--text-faint);font-size:12px;margin-left:12px;}
 .analysis-spinner.show{display:inline;}
+.spinner-circle{width:14px;height:14px;border:2px solid rgba(255,255,255,.25);border-top-color:currentColor;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:8px;animation:aion-spin .7s linear infinite;}
+@keyframes aion-spin{to{transform:rotate(360deg);}}
 .analysis-meta{font-size:10px;color:var(--text-faint);margin-top:10px;border-top:1px solid var(--line);padding-top:8px;}
 .btn-copy-analysis{background:transparent;border:1px solid var(--gold-dim);color:var(--gold-dim);padding:6px 12px;font-size:11px;text-transform:uppercase;cursor:pointer;border-radius:2px;font-family:inherit;margin-top:8px;}
 .btn-copy-analysis:hover{color:var(--gold);}
@@ -2472,11 +2474,14 @@ async function generateAnalysis() {
   const spinner = document.getElementById('gen-spinner');
   const box = document.getElementById('analysis-box');
 
+  const btnOriginalText = btn.textContent;
   btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-circle"></span>' + t('spinnerGen');
   spinner.classList.add('show');
   box.classList.remove('show');
   box.textContent = '';
   currentAnalysis = '';
+  btn.scrollIntoView({behavior:'smooth', block:'center'});
 
   // Запускаем магическую музыку
   playFromPlaylist(TRACKS_MAGIC, 0.4);
@@ -2645,6 +2650,7 @@ async function generateAnalysis() {
     box.classList.add('show');
   } finally {
     btn.disabled = false;
+    btn.innerHTML = btnOriginalText;
     spinner.classList.remove('show');
   }
 }
