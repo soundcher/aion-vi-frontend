@@ -366,22 +366,23 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <img src="logo_FINAL_v30.png" alt="AION Vi" class="app-logo">
 </div>
 
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--line2);padding-bottom:12px;margin-bottom:12px;">
-  <h1 style="border-bottom:none;margin-bottom:0;padding-bottom:0;" id="app-title">Навигатор Жизни</h1>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <div style="display:flex;align-items:center;gap:4px;border:1px solid var(--line2);border-radius:2px;padding:2px;">
-      <button onclick="adjustFontScale(-1)" style="background:transparent;border:none;color:var(--text-dim);cursor:pointer;padding:4px 8px;font-size:12px;font-family:inherit;" title="Уменьшить текст">A−</button>
-      <button onclick="adjustFontScale(1)" style="background:transparent;border:none;color:var(--gold);cursor:pointer;padding:4px 8px;font-size:16px;font-family:inherit;" title="Увеличить текст">A+</button>
-    </div>
-    <div class="lang-select-wrap">
-      <select class="lang-select" id="lang-select" onchange="setLanguage(this.value)">
-        <option value="en" selected>🌐 English</option>
-        <option value="pl">🌐 Polski</option>
-        <option value="uk">🌐 Українська</option>
-        <option value="ru">🌐 Русский</option>
-      </select>
-    </div>
-    <button class="btn-history" id="btn-history" onclick="openHistory()">📋 История</button>
+<div style="text-align:center;padding-bottom:8px;">
+  <h1 style="border-bottom:none;margin:0;padding:0;" id="app-title">Навигатор Жизни</h1>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;border-bottom:1px solid var(--line2);padding-bottom:12px;margin-bottom:12px;">
+  <div style="display:flex;align-items:center;gap:4px;border:1px solid var(--line2);border-radius:2px;padding:2px;justify-self:start;">
+    <button onclick="adjustFontScale(-1)" style="background:transparent;border:none;color:var(--text-dim);cursor:pointer;padding:4px 8px;font-size:12px;font-family:inherit;" title="Уменьшить текст">A−</button>
+    <button onclick="adjustFontScale(1)" style="background:transparent;border:none;color:var(--gold);cursor:pointer;padding:4px 8px;font-size:16px;font-family:inherit;" title="Увеличить текст">A+</button>
+  </div>
+  <button class="btn-history" id="btn-history" onclick="openHistory()" style="justify-self:center;">📋 История</button>
+  <div class="lang-select-wrap" style="justify-self:end;">
+    <select class="lang-select" id="lang-select" onchange="setLanguage(this.value)">
+      <option value="en" selected>🌐 English</option>
+      <option value="pl">🌐 Polski</option>
+      <option value="uk">🌐 Українська</option>
+      <option value="ru">🌐 Русский</option>
+    </select>
   </div>
 </div>
 
@@ -407,6 +408,11 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <div style="text-align:right;margin-top:4px;">
     <span onclick="openPricingModal()" style="font-size:11px;color:var(--gold);cursor:pointer;text-decoration:underline;" id="pricing-link">Пополнить пакет</span>
   </div>
+</div>
+
+<!-- Баннер "Обзор месяца" -->
+<div id="monthly-digest-banner" onclick="openMonthlyDigestBanner()" style="display:none;margin-bottom:14px;padding:12px 14px;border:1px solid var(--gold);border-radius:2px;cursor:pointer;text-align:center;font-size:12px;color:var(--gold);">
+  ✦ Готов обзор месяца — нажми, чтобы прочитать
 </div>
 
 <!-- Модальное окно тарифов -->
@@ -2598,6 +2604,25 @@ async function generateAnalysis() {
       saveProfile({...currentClientData});
     }
 
+    // Сохраняем данные первого человека как "свои" — используется для
+    // персональных функций (обзор месяца и т.п.). Это данные person1,
+    // а не person2/3/4 из блока совместимости.
+    try {
+      const ownUser = JSON.parse(localStorage.getItem('aion_user') || 'null');
+      if (ownUser) {
+        ownUser.ownBirth = {
+          day: currentClientData.day,
+          month: currentClientData.month,
+          year: currentClientData.year,
+          hour: currentClientData.hour,
+          minute: currentClientData.minute,
+          lat: currentClientData.lat,
+          lon: currentClientData.lon
+        };
+        localStorage.setItem('aion_user', JSON.stringify(ownUser));
+      }
+    } catch(e) {}
+
     // Сохраняем в Firebase
     // История сохраняется сервером автоматически при генерации — клиенту писать не нужно
 
@@ -2948,6 +2973,56 @@ function closeHistory() {
 }
 
 // ══════════════════════════════════════════════
+// ОБЗОР МЕСЯЦА — ленивая проверка при заходе
+// ══════════════════════════════════════════════
+let _monthlyDigestText = '';
+
+function openMonthlyDigestBanner() {
+  document.getElementById('monthly-digest-banner').style.display = 'none';
+  document.getElementById('history-overlay').classList.add('show');
+  document.getElementById('history-list-view').style.display = 'none';
+  document.getElementById('history-detail-view').classList.add('show');
+  document.getElementById('history-detail-name').textContent = '✦ Обзор месяца';
+  document.getElementById('history-detail-meta').textContent = '';
+  document.getElementById('history-detail-request').textContent = '';
+  document.getElementById('history-detail-text').textContent = _monthlyDigestText;
+}
+
+async function checkMonthlyDigest() {
+  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  if (!user || !user.email || !user.ownBirth) return;
+  const b = user.ownBirth;
+  if (!b.day || !b.month || !b.year) return;
+
+  try {
+    const r = await fetch(`${SERVER}/monthly-digest`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: user.email,
+        day: b.day,
+        month: b.month,
+        year: b.year,
+        hour: b.hour,
+        minute: b.minute,
+        lat: b.lat,
+        lon: b.lon,
+        lang_instruction: t('generatePromptLang')
+      })
+    });
+    const data = await r.json();
+    if (data.status === 'ok' && data.analysis) {
+      _monthlyDigestText = data.analysis;
+      if (data.isNew) {
+        document.getElementById('monthly-digest-banner').style.display = 'block';
+      }
+    }
+  } catch(e) {
+    // Тихо игнорируем — это фоновая проверка, не должна мешать основному потоку
+  }
+}
+
+// ══════════════════════════════════════════════
 // РЕНДЕР РЕЗУЛЬТАТОВ
 // ══════════════════════════════════════════════
 function renderResults(data) {
@@ -3229,6 +3304,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Живое приветствие AION Vi
   initGreeting();
   renderAnalysesCounter();
+
+  // Тихая фоновая проверка "Обзора месяца" — не блокирует остальную загрузку
+  checkMonthlyDigest();
 
   checkServer();
   setInterval(checkServer, 10000);
