@@ -227,6 +227,39 @@
 </head>
 <body>
 
+<!-- Кастомный сплэш-экран: тёмно-синий фон, логотип плавно проявляется 2 сек, держится 1 сек, затем уходит -->
+<div id="splash-screen" style="position:fixed;inset:0;background:#0d1525;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity 0.8s ease;">
+  <img src="logo_FINAL_v41.png" alt="AION Vi" id="splash-logo" style="width:320px;max-width:60vw;opacity:0;transition:opacity 2s ease;">
+</div>
+<script>
+(function() {
+  var overlay = document.getElementById('splash-screen');
+  var logo = document.getElementById('splash-logo');
+  var audio;
+  try {
+    audio = new Audio('splash-sound.mp3');
+  } catch(e) {}
+
+  window.addEventListener('load', function() {
+    // Появление логотипа (2 сек, CSS transition)
+    requestAnimationFrame(function() {
+      logo.style.opacity = '1';
+    });
+    // Пробуем звук синхронно — если браузер заблокирует автовоспроизведение, просто тихо игнорируем
+    if (audio) {
+      audio.play().catch(function(){});
+    }
+    // 2 сек появление + 1 сек пауза = 3 сек, затем уходим
+    setTimeout(function() {
+      overlay.style.opacity = '0';
+      setTimeout(function() {
+        overlay.style.display = 'none';
+      }, 800);
+    }, 4000);
+  });
+})();
+</script>
+
 <div class="fog fog-1"></div>
 <div class="fog fog-2"></div>
 <div class="fog fog-3"></div>
