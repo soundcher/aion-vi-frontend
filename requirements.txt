@@ -6,3 +6,5 @@ pytz
 requests
 geopy
 weasyprint
+gunicorn
+firebase-admin
