@@ -19,7 +19,7 @@
 @keyframes drift3{from{transform:translate(0,0);}to{transform:translate(15px,-20px);}}
 
 /* Логотип */
-.app-logo{display:block;width:280px;max-width:82vw;margin:0 auto 8px;
+.app-logo{display:block;width:700px;max-width:82vw;margin:0 auto 8px;
   mask-image:radial-gradient(ellipse 60% 55% at 50% 50%,black 25%,transparent 72%);
   -webkit-mask-image:radial-gradient(ellipse 60% 55% at 50% 50%,black 25%,transparent 72%);
   filter:drop-shadow(0 0 20px rgba(94,139,118,0.18));
@@ -255,12 +255,12 @@ button.primary:disabled{background:var(--gold-dim);cursor:not-allowed;}
   letter-spacing: 1px;
 }
 
-.btn-generate{background:var(--accent);color:#fff;border:none;padding:11px 28px;font-family:inherit;font-size:13px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-radius:2px;font-weight:bold;margin-bottom:12px;}
+.btn-generate{background:var(--accent);color:#fff;border:none;padding:11px 28px;font-family:inherit;font-size:13px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-radius:2px;font-weight:bold;margin-bottom:12px;height:46px;box-sizing:border-box;}
 .btn-generate:hover{background:#4a7a66;}
 .btn-generate:disabled{background:var(--accent-dim);cursor:not-allowed;}
 .analysis-box{display:none;background:var(--panel2);border:1px solid var(--gold-dim);border-radius:2px;padding:20px 22px;line-height:1.8;font-size:14px;color:var(--text);white-space:pre-wrap;width:100%;box-sizing:border-box;word-wrap:break-word;}
 .analysis-box.show{display:block;}
-.analysis-spinner{display:none;color:var(--text-faint);font-size:12px;margin-left:12px;}
+.analysis-spinner{display:none;color:var(--text-faint);font-size:12px;margin-top:8px;}
 .analysis-spinner.show{display:inline;}
 .spinner-circle{width:14px;height:14px;border:2px solid rgba(255,255,255,.25);border-top-color:currentColor;border-radius:50%;display:inline-block;vertical-align:middle;margin-right:8px;animation:aion-spin .7s linear infinite;}
 @keyframes aion-spin{to{transform:rotate(360deg);}}
@@ -305,9 +305,10 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 #music-bar .track-name{flex:1;font-style:italic;color:var(--gold-dim);}
 .btn-mute{background:transparent;border:1px solid var(--line2);color:var(--text-faint);padding:4px 10px;font-size:11px;cursor:pointer;border-radius:2px;font-family:inherit;}
 .btn-mute:hover{border-color:var(--gold-dim);color:var(--text);}
-.btn-music-toggle{background:transparent;border:1px solid var(--accent-dim);color:var(--accent);padding:8px 16px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;cursor:pointer;border-radius:2px;font-family:inherit;}
+.btn-music-toggle{background:transparent;border:1px solid var(--accent-dim);color:var(--accent);cursor:pointer;border-radius:2px;font-family:inherit;height:46px;width:50px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0;margin-bottom:12px;}
 .btn-music-toggle:hover{border-color:var(--accent);color:var(--text);}
 .btn-music-toggle.off{border-color:var(--line2);color:var(--text-faint);}
+.btn-music-toggle .music-status-text{font-size:8px;letter-spacing:0.4px;text-transform:uppercase;line-height:1;}
 .compat-theme-btn{background:var(--panel2);border:1px solid var(--line2);color:var(--text-dim);padding:8px 6px;font-size:11px;cursor:pointer;border-radius:2px;font-family:inherit;text-align:center;transition:all .2s;}
 .compat-theme-btn:hover{border-color:var(--gold-dim);color:var(--text);}
 .compat-theme-btn.active{background:var(--panel);border-color:var(--gold);color:var(--gold);}
@@ -761,9 +762,23 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
   <!-- ГЕНЕРАЦИЯ АНАЛИЗА — под полем запроса -->
   <div class="analysis-section">
-    <div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;">
+      <div></div>
       <button class="btn-generate" onclick="generateAnalysis()" id="gen-btn">✦ Сгенерировать анализ</button>
-      <button class="btn-music-toggle" id="btn-music-toggle" onclick="toggleMusicGlobal()">♪ Музыка вкл</button>
+      <button class="btn-music-toggle" id="btn-music-toggle" onclick="toggleMusicGlobal()" title="Музыка" style="justify-self:end;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <line x1="7" y1="6" x2="7" y2="18" stroke="currentColor" stroke-width="1.6"/>
+          <line x1="13" y1="6" x2="13" y2="18" stroke="currentColor" stroke-width="1.6"/>
+          <line x1="19" y1="6" x2="19" y2="18" stroke="currentColor" stroke-width="1.6"/>
+          <line x1="7" y1="6" x2="19" y2="6" stroke="currentColor" stroke-width="1.8"/>
+          <ellipse cx="6" cy="19" rx="2.3" ry="1.8" fill="currentColor" transform="rotate(-15 6 19)"/>
+          <ellipse cx="12" cy="19" rx="2.3" ry="1.8" fill="currentColor" transform="rotate(-15 12 19)"/>
+          <ellipse cx="18" cy="19" rx="2.3" ry="1.8" fill="currentColor" transform="rotate(-15 18 19)"/>
+        </svg>
+        <span class="music-status-text" id="music-status-text">ВКЛ</span>
+      </button>
+    </div>
+    <div style="text-align:center;">
       <span class="analysis-spinner" id="gen-spinner">⟳ Генерирую... (~40 сек)</span>
     </div>
 
@@ -925,8 +940,8 @@ const LANG = {
     requestHint: '⚠ Less than 50 characters left — be concise',
     btnCalculate: 'Calculate',
     btnGenerate: '✦ Generate Analysis',
-    btnMusicOn: '♪ Music on',
-    btnMusicOff: '♪ Music off',
+    btnMusicOn: 'On',
+    btnMusicOff: 'Off',
     btnHistory: '📋 History',
     btnDownload: '⬇ Download PDF',
     btnGift: '🎁 Gift',
@@ -1045,8 +1060,8 @@ const LANG = {
     requestHint: '⚠ Zostało mniej niż 50 znaków — bądź zwięzły',
     btnCalculate: 'Oblicz',
     btnGenerate: '✦ Generuj analizę',
-    btnMusicOn: '♪ Muzyka wł.',
-    btnMusicOff: '♪ Muzyka wył.',
+    btnMusicOn: 'Wł.',
+    btnMusicOff: 'Wył.',
     btnHistory: '📋 Historia',
     btnDownload: '⬇ Pobierz PDF',
     btnGift: '🎁 Podaruj',
@@ -1159,8 +1174,8 @@ const LANG = {
     requestHint: '⚠ Залишилось менше 50 знаків — формулюй лаконічно',
     btnCalculate: 'Розрахувати',
     btnGenerate: '✦ Згенерувати аналіз',
-    btnMusicOn: '♪ Музика увімк.',
-    btnMusicOff: '♪ Музика вимк.',
+    btnMusicOn: 'Увімк.',
+    btnMusicOff: 'Вимк.',
     btnHistory: '📋 Історія',
     btnDownload: '⬇ Завантажити PDF',
     btnGift: '🎁 Подарувати',
@@ -1273,8 +1288,8 @@ const LANG = {
     requestHint: '⚠ Осталось менее 50 знаков — формулируй лаконично',
     btnCalculate: 'Рассчитать',
     btnGenerate: '✦ Сгенерировать анализ',
-    btnMusicOn: '♪ Музыка вкл',
-    btnMusicOff: '♪ Музыка выкл',
+    btnMusicOn: 'Вкл',
+    btnMusicOff: 'Выкл',
     btnHistory: '📋 История',
     btnDownload: '⬇ Загрузить PDF',
     btnGift: '🎁 Подарить',
@@ -1468,7 +1483,7 @@ function applyTranslations() {
   setText('req-warning', L.requestHint);
   setText('calc-btn', L.btnCalculate);
   setText('gen-btn', L.btnGenerate);
-  setText('btn-music-toggle', musicEnabled ? L.btnMusicOn : L.btnMusicOff);
+  setText('music-status-text', musicEnabled ? L.btnMusicOn : L.btnMusicOff);
   setText('btn-history', L.btnHistory);
   setText('spinner', L.spinnerCalc);
   setText('gen-spinner', L.spinnerGen);
@@ -1876,11 +1891,13 @@ function stopMusic(withFade, cb) {
 function toggleMusicGlobal() {
   musicEnabled = !musicEnabled;
   const btn = document.getElementById('btn-music-toggle');
+  const statusEl = document.getElementById('music-status-text');
+  const L = LANG[currentLang] || LANG.ru;
   if (musicEnabled) {
-    btn.textContent = '♪ Музыка вкл';
+    statusEl.textContent = L.btnMusicOn;
     btn.classList.remove('off');
   } else {
-    btn.textContent = '♪ Музыка выкл';
+    statusEl.textContent = L.btnMusicOff;
     btn.classList.add('off');
     stopMusic(true);
   }
