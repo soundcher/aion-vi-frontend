@@ -249,7 +249,7 @@
     });
     // Пробуем звук синхронно — если браузер заблокирует автовоспроизведение, просто тихо игнорируем
     if (audio) {
-      audio.play().catch(function(){});
+      audio.play().catch(function(err){ console.log('Джингл не заиграл:', err.message); });
     }
     // 2 сек появление + 1 сек пауза = 3 сек, затем уходим
     setTimeout(function() {
