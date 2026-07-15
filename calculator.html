@@ -2504,41 +2504,47 @@ async function generateAnalysis() {
   try {
     const langInstruction = t('generatePromptLang');
 
-    // Собираем данные второго человека если включена совместимость
-    let compatSummary = '';
+    // Собираем данные всех участников совместимости (от 2 до 4 человек)
+    let compatPeople = [];
     if (compatEnabled) {
-      const p2fn = document.getElementById('p2-firstname').value.trim();
-      const p2ln = document.getElementById('p2-lastname').value.trim();
-      const p2gender = document.getElementById('p2-gender').value;
-      const p2day = document.getElementById('p2-day').value;
-      const p2month = document.getElementById('p2-month').value;
-      const p2year = document.getElementById('p2-year').value;
-      const p2hour = document.getElementById('p2-hour').value || '12';
-      const p2min = document.getElementById('p2-minute').value || '0';
-      const p2lat = document.getElementById('p2-lat').value || '50.45';
-      const p2lon = document.getElementById('p2-lon').value || '30.52';
+      const personPrefixes = ['p2'];
+      if (document.getElementById('p3-block').style.display !== 'none') personPrefixes.push('p3');
+      if (document.getElementById('p4-block').style.display !== 'none') personPrefixes.push('p4');
 
-      if (p2day && p2month && p2year) {
+      for (const prefix of personPrefixes) {
+        const pfn = document.getElementById(`${prefix}-firstname`).value.trim();
+        const pln = document.getElementById(`${prefix}-lastname`).value.trim();
+        const pgender = document.getElementById(`${prefix}-gender`).value;
+        const pday = document.getElementById(`${prefix}-day`).value;
+        const pmonth = document.getElementById(`${prefix}-month`).value;
+        const pyear = document.getElementById(`${prefix}-year`).value;
+        const phour = document.getElementById(`${prefix}-hour`).value || '12';
+        const pmin = document.getElementById(`${prefix}-minute`).value || '0';
+        const plat = document.getElementById(`${prefix}-lat`).value || '50.45';
+        const plon = document.getElementById(`${prefix}-lon`).value || '30.52';
+
+        // Пустой блок (добавили кнопкой, но не заполнили) — молча пропускаем,
+        // так же вело себя поведение раньше для person2
+        if (!pday || !pmonth || !pyear) continue;
+
         try {
-          const r2 = await fetch(`${SERVER}/summary`, {
+          const rN = await fetch(`${SERVER}/summary`, {
             method:'POST', headers:{'Content-Type':'application/json'},
             body: JSON.stringify({
-              day: parseInt(p2day), month: parseInt(p2month), year: parseInt(p2year),
-              hour: parseInt(p2hour), minute: parseInt(p2min),
-              lat: parseFloat(p2lat), lon: parseFloat(p2lon),
-              firstname: p2fn, lastname: p2ln, gender: p2gender
+              day: parseInt(pday), month: parseInt(pmonth), year: parseInt(pyear),
+              hour: parseInt(phour), minute: parseInt(pmin),
+              lat: parseFloat(plat), lon: parseFloat(plon),
+              firstname: pfn, lastname: pln, gender: pgender
             })
           });
-          const d2 = await r2.json();
-          if (d2.summary) {
-            compatSummary = d2.summary;
+          const dN = await rN.json();
+          if (dN.summary) {
+            compatPeople.push({ name: pfn || 'Человек', summary: dN.summary });
           } else {
-            // Расчёт второго человека не удался — не отправляем пустую
-            // совместимость к API (это дало бы бессмысленный результат)
             stopMusic(false);
             box.innerHTML = `<div style="text-align:center;padding:16px;color:var(--gold);">
-              Не получилось рассчитать данные второго человека.<br>
-              <span style="color:var(--text);font-size:13px;">${d2.message || 'Проверь дату рождения и попробуй ещё раз.'}</span>
+              Не получилось рассчитать данные для «${pfn || 'одного из участников'}».<br>
+              <span style="color:var(--text);font-size:13px;">${dN.message || 'Проверь дату рождения и попробуй ещё раз.'}</span>
             </div>`;
             box.classList.add('show');
             btn.disabled = false;
@@ -2548,7 +2554,7 @@ async function generateAnalysis() {
         } catch(e) {
           stopMusic(false);
           box.innerHTML = `<div style="text-align:center;padding:16px;color:var(--gold);">
-            Не удалось связаться с сервером для расчёта второго человека.<br>
+            Не удалось связаться с сервером для расчёта данных участника «${pfn || ''}».<br>
             <span style="color:var(--text);font-size:13px;">Проверь соединение и попробуй ещё раз.</span>
           </div>`;
           box.classList.add('show');
@@ -2571,7 +2577,7 @@ async function generateAnalysis() {
         lang_instruction: langInstruction,
         compat_enabled: compatEnabled,
         compat_theme: themeLabel,
-        compat_summary: compatSummary,
+        compat_summaries: compatPeople,
         no_time: currentClientData.no_time || false,
         client_info: { firstname: currentClientData.firstname || '', lastname: currentClientData.lastname || '' },
         answer_mode: document.getElementById('answer-mode').value,
