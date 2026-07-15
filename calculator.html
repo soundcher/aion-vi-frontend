@@ -3333,6 +3333,15 @@ function autoNext(el, nextId, maxLen) {
 // ИНИЦИАЛИЗАЦИЯ
 // ══════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+  // Проверка входа СРАЗУ при загрузке — если сессия потеряна (например,
+  // после очистки данных сайта в браузере), не даём человеку тратить время
+  // на заполнение формы, чтобы споткнуться только в конце на сервере.
+  const loggedInUser = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  if (!loggedInUser || !loggedInUser.email) {
+    window.location.href = 'index.html';
+    return;
+  }
+
   // Загружаем сохранённый язык
   const savedLang = localStorage.getItem('aion_lang') || 'en';
   currentLang = savedLang;
