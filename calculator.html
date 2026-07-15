@@ -1920,22 +1920,28 @@ async function autoGeocodeAll() {
     } catch(e) {}
   }
   if (compatEnabled) {
-    const place2 = document.getElementById('p2-place').value.trim();
-    const lat2 = document.getElementById('p2-lat').value;
-    if (place2 && !lat2) {
-      try {
-        const r = await fetch(`${SERVER}/geocode`, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({place: place2})
-        });
-        const d = await r.json();
-        if (d.lat) {
-          document.getElementById('p2-lat').value = d.lat;
-          document.getElementById('p2-lon').value = d.lon;
-          document.getElementById('p2-coords-display').textContent =
-            `${parseFloat(d.lat).toFixed(4)}° с.ш. / ${parseFloat(d.lon).toFixed(4)}° в.д. — ${d.display.split(',').slice(0,2).join(',')}`;
-        }
-      } catch(e) {}
+    const prefixes = ['p2'];
+    if (document.getElementById('p3-block').style.display !== 'none') prefixes.push('p3');
+    if (document.getElementById('p4-block').style.display !== 'none') prefixes.push('p4');
+
+    for (const prefix of prefixes) {
+      const placeN = document.getElementById(`${prefix}-place`).value.trim();
+      const latN = document.getElementById(`${prefix}-lat`).value;
+      if (placeN && !latN) {
+        try {
+          const r = await fetch(`${SERVER}/geocode`, {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({place: placeN})
+          });
+          const d = await r.json();
+          if (d.lat) {
+            document.getElementById(`${prefix}-lat`).value = d.lat;
+            document.getElementById(`${prefix}-lon`).value = d.lon;
+            document.getElementById(`${prefix}-coords-display`).textContent =
+              `${parseFloat(d.lat).toFixed(4)}° с.ш. / ${parseFloat(d.lon).toFixed(4)}° в.д. — ${d.display.split(',').slice(0,2).join(',')}`;
+          }
+        } catch(e) {}
+      }
     }
   }
 }
@@ -2520,12 +2526,35 @@ async function generateAnalysis() {
         const pyear = document.getElementById(`${prefix}-year`).value;
         const phour = document.getElementById(`${prefix}-hour`).value || '12';
         const pmin = document.getElementById(`${prefix}-minute`).value || '0';
-        const plat = document.getElementById(`${prefix}-lat`).value || '50.45';
-        const plon = document.getElementById(`${prefix}-lon`).value || '30.52';
+        const pplace = document.getElementById(`${prefix}-place`).value.trim();
+        let plat = document.getElementById(`${prefix}-lat`).value;
+        let plon = document.getElementById(`${prefix}-lon`).value;
 
         // Пустой блок (добавили кнопкой, но не заполнили) — молча пропускаем,
         // так же вело себя поведение раньше для person2
         if (!pday || !pmonth || !pyear) continue;
+
+        // Подстраховка: если место указано, а координаты почему-то ещё не
+        // определены (autoGeocodeAll мог не успеть сработать для этого блока,
+        // например если человека добавили уже после фокуса на поле "Запрос") —
+        // геокодируем прямо здесь, а не тихо подставляем Киев по умолчанию.
+        if (pplace && !plat) {
+          try {
+            const geoR = await fetch(`${SERVER}/geocode`, {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({place: pplace})
+            });
+            const geoD = await geoR.json();
+            if (geoD.lat) {
+              plat = geoD.lat;
+              plon = geoD.lon;
+              document.getElementById(`${prefix}-lat`).value = geoD.lat;
+              document.getElementById(`${prefix}-lon`).value = geoD.lon;
+            }
+          } catch(e) {}
+        }
+        plat = plat || '50.45';
+        plon = plon || '30.52';
 
         try {
           const rN = await fetch(`${SERVER}/summary`, {
