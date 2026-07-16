@@ -419,6 +419,15 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   ✦ Готов обзор месяца — нажми, чтобы прочитать
 </div>
 
+<!-- Баннер push-уведомлений -->
+<div id="push-banner" style="display:none;margin-bottom:14px;padding:12px 14px;border:1px solid var(--accent-dim);border-radius:2px;font-size:12px;color:var(--text-dim);text-align:center;">
+  <span id="push-banner-text"></span>
+  <div style="margin-top:8px;">
+    <span onclick="enablePush()" style="color:var(--accent);cursor:pointer;text-decoration:underline;margin-right:16px;">Включить</span>
+    <span onclick="dismissPushBanner()" style="color:var(--text-faint);cursor:pointer;">Не сейчас</span>
+  </div>
+</div>
+
 <!-- Модальное окно тарифов -->
 <div class="modal-overlay" id="pricing-modal">
   <div class="modal-box" style="max-width:420px;">
@@ -3071,6 +3080,93 @@ async function checkMonthlyDigest() {
 }
 
 // ══════════════════════════════════════════════
+// PUSH-УВЕДОМЛЕНИЯ
+// ══════════════════════════════════════════════
+const VAPID_PUBLIC_KEY = 'BBrZZ_eCehxcXrlGYBMMnue6o2iM6OIGVCfUEcR_2V6zRb4rff0CnIvpGQtGjt0FlIRjR5rK8Lw3Gs8DKhyYOi8';
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+
+function isIOSDevice() {
+  return /iP(hone|ad|od)/.test(navigator.userAgent);
+}
+
+function isStandaloneApp() {
+  return window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
+}
+
+function dismissPushBanner() {
+  document.getElementById('push-banner').style.display = 'none';
+  // Не спрашиваем повторно в этой же сессии браузера
+  sessionStorage.setItem('push_banner_dismissed', '1');
+}
+
+async function initPushBanner() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (sessionStorage.getItem('push_banner_dismissed')) return;
+  if (Notification.permission === 'denied') return; // человек явно отказал — не пристаём
+
+  if (Notification.permission === 'granted') {
+    subscribeToPush(); // уже разрешено — просто освежаем подписку на сервере
+    return;
+  }
+
+  const textEl = document.getElementById('push-banner-text');
+  if (isIOSDevice() && !isStandaloneApp()) {
+    textEl.textContent = 'Чтобы получать уведомления на iPhone — сначала добавь AION Vi на главный экран (кнопка "Поделиться" → "На экран «Домой»"), затем включи их здесь.';
+  } else {
+    textEl.textContent = '✦ Включить уведомления — не пропустишь обзор месяца и важные окна';
+  }
+  document.getElementById('push-banner').style.display = 'block';
+}
+
+async function enablePush() {
+  document.getElementById('push-banner').style.display = 'none';
+
+  if (isIOSDevice() && !isStandaloneApp()) {
+    // На iPhone вне установленного приложения подписка технически невозможна —
+    // баннер выше уже объяснил, что делать. Тут просто выходим.
+    return;
+  }
+
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return;
+    await subscribeToPush();
+  } catch(e) {
+    console.log('Не удалось включить уведомления:', e.message);
+  }
+}
+
+async function subscribeToPush() {
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+    const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+    if (user && user.email) {
+      await fetch(`${SERVER}/push/subscribe`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ email: user.email, subscription: sub.toJSON() })
+      });
+    }
+  } catch(e) {
+    console.log('Не удалось подписаться на push:', e.message);
+  }
+}
+
+// ══════════════════════════════════════════════
 // РЕНДЕР РЕЗУЛЬТАТОВ
 // ══════════════════════════════════════════════
 function renderResults(data) {
@@ -3367,6 +3463,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Тихая фоновая проверка "Обзора месяца" — не блокирует остальную загрузку
   checkMonthlyDigest();
+
+  // Баннер push-уведомлений — с небольшой задержкой, чтобы не наваливать
+  // всё сразу в первую секунду захода
+  setTimeout(initPushBanner, 3000);
 
   checkServer();
   setInterval(checkServer, 10000);
