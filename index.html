@@ -564,6 +564,7 @@ async function saveUserToFirebase(user) {
       email: user.email,
       promo: user.promo || 'social',
       analysesLeft: user.analysesLeft,
+      analysesTotal: user.analysesTotal || user.analysesLeft,
       registeredAt: user.registeredAt,
       lang: user.lang || 'ru',
       loginMethod: user.loginMethod || 'promo'
@@ -675,8 +676,30 @@ async function enterApp() {
   showMsg('', '');
   if (!nickname)                     { showMsg(T.errName, 'error'); return; }
   if (!email || !email.includes('@')) { showMsg(T.errEmail, 'error'); return; }
-  if (!promo)                        { showMsg(T.errPromo, 'error'); return; }
   btn.classList.add('loading'); btn.disabled = true;
+
+  // Сначала проверяем — может, этот email уже зарегистрирован (человек
+  // просто потерял локальную сессию: почистил кэш, сменил устройство,
+  // переустановил приложение). Тогда пускаем обратно с их текущим
+  // остатком анализов — промокод для этого не нужен вообще, свой они
+  // уже потратили при первой регистрации.
+  let existing;
+  try {
+    existing = await getUserFromFirebase(email);
+  } catch(e) { existing = null; }
+
+  if (existing) {
+    saveUser({ ...existing, email });
+    showMsg(`С возвращением, ${existing.nickname || nickname}!`, 'success');
+    setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
+    return;
+  }
+
+  // Новый email — тут промокод уже обязателен
+  if (!promo) {
+    showMsg(T.errPromo, 'error');
+    btn.classList.remove('loading'); btn.disabled = false; return;
+  }
 
   let redeemResult;
   try {
