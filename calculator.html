@@ -3468,6 +3468,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // всё сразу в первую секунду захода
   setTimeout(initPushBanner, 3000);
 
+  // Фиксируем, что человек реально был — нужно для push "по неактивности"
+  (function sendHeartbeat() {
+    const u = JSON.parse(localStorage.getItem('aion_user') || 'null');
+    if (u && u.email) {
+      fetch(`${SERVER}/user/heartbeat`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ email: u.email })
+      }).catch(() => {});
+    }
+  })();
+
   checkServer();
   setInterval(checkServer, 10000);
   initFirebase();
