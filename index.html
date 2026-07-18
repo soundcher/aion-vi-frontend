@@ -635,6 +635,7 @@ async function handleSocialLogin(firebaseUser, method) {
       registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: method };
     saveUser(user);
     await saveUserToFirebase(user);
+    await applyReferralIfAny(email);
     showMsg(TRANSLATIONS[currentLang].entering(nickname), 'success');
   }
   setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
@@ -649,6 +650,15 @@ window.onload = function() {
   initFirebaseApp();
   const savedLang = localStorage.getItem('aion_lang') || 'en';
   setLang(savedLang);
+
+  // Реферальная метка из ссылки (?ref=...) — запоминаем, кто пригласил.
+  // Начислим бонус после успешной регистрации нового человека.
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) localStorage.setItem('aion_ref', ref);
+  } catch(e) {}
+
   const user = getUser();
   if (user && user.email && user.analysesLeft > 0) {
     getUserFromFirebase(user.email).then(fb => {
@@ -656,6 +666,20 @@ window.onload = function() {
     }).catch(() => showAlreadyIn(user));
   }
 };
+
+// Вызов реферального бонуса после регистрации нового пользователя
+async function applyReferralIfAny(email) {
+  try {
+    const ref = localStorage.getItem('aion_ref');
+    if (!ref) return;
+    await fetch(`${SERVER}/referral`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ ref, email })
+    });
+    localStorage.removeItem('aion_ref'); // одноразово
+  } catch(e) {}
+}
 
 function showAlreadyIn(user) {
   document.getElementById('login-form').style.display = 'none';
@@ -723,6 +747,7 @@ async function enterApp() {
     registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: 'promo' };
   saveUser(user); markCodeUsed(promo);
   await saveUserToFirebase(user);
+  await applyReferralIfAny(email);
   showMsg(T.entering(nickname), 'success');
   setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
 }
