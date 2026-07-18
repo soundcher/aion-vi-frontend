@@ -856,7 +856,13 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 <div class="modal-overlay" id="gift-modal">
   <div class="modal-box">
     <h3 id="modal-gift-title">🎁 Поделиться анализом</h3>
-    <p id="modal-gift-sub">Анализ будет открыт для сохранения или отправки</p>
+    <p id="modal-gift-sub">Пригласи друга по своей ссылке — и вы оба получите по 5 бесплатных анализов ✦</p>
+
+    <button class="share-btn" onclick="downloadShareCard()" style="width:100%;justify-content:center;border-color:var(--gold-dim);background:#2d2820;margin-bottom:14px;padding:12px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Скачать картинку для Stories
+    </button>
+
     <div class="share-buttons">
       <a class="share-btn" id="share-telegram" href="#" target="_blank">
         <svg viewBox="0 0 24 24" fill="#2AABEE"><path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.94 8.19l-2.02 9.52c-.15.67-.54.84-1.09.52l-3-2.21-1.45 1.39c-.16.16-.3.3-.61.3l.22-3.08 5.6-5.06c.24-.22-.05-.34-.38-.12L6.9 13.7 4 12.83c-.65-.2-.66-.65.14-.96l11.62-4.48c.54-.2 1.01.13.18.8z"/></svg>
@@ -2902,7 +2908,7 @@ function openGiftModal() {
   const refTag = senderUser?.promo || senderUser?.nickname || 'friend';
   const shareUrl = `${SITE_URL}/?ref=${encodeURIComponent(refTag)}`;
 
-  const preview = `✦ AION Vi — Персональный анализ${name ? ' для ' + name : ''}\n\n${currentAnalysis.substring(0,300)}...\n\n${shareUrl}`;
+  const preview = `✦ AION Vi — Персональный анализ${name ? ' для ' + name : ''}\n\n${currentAnalysis.substring(0,300)}...\n\nПопробуй и ты — а мы оба получим по 5 бесплатных анализов:\n${shareUrl}`;
   const text = encodeURIComponent(preview);
 
   document.getElementById('share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${text}`;
@@ -2925,6 +2931,117 @@ function openGiftModal() {
 
 function closeGiftModal() {
   document.getElementById('gift-modal').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════
+// КАРТОЧКА ДЛЯ STORIES — рисуем картинку из анализа прямо в браузере
+// ══════════════════════════════════════════════
+function downloadShareCard() {
+  if (!currentAnalysis) return;
+
+  // Достаём короткую ёмкую цитату из анализа: первое законченное
+  // предложение подходящей длины (не обрывок, не слишком длинное)
+  function pickQuote(text) {
+    const clean = text.replace(/\s+/g, ' ').trim();
+    const sentences = clean.split(/(?<=[.!?…])\s+/);
+    for (const s of sentences) {
+      const t = s.trim();
+      if (t.length >= 40 && t.length <= 160) return t;
+    }
+    // Если не нашли идеального — берём начало и аккуратно обрезаем
+    return clean.substring(0, 150).replace(/\s\S*$/, '') + '…';
+  }
+
+  const quote = pickQuote(currentAnalysis);
+
+  // Формат Stories 1080×1920
+  const W = 1080, H = 1920;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Фон — тёмно-синий градиент в тон приложению
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#0d1525');
+  grad.addColorStop(0.5, '#111a2e');
+  grad.addColorStop(1, '#0a0f1c');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Мягкое свечение по центру
+  const glow = ctx.createRadialGradient(W/2, H*0.42, 100, W/2, H*0.42, 700);
+  glow.addColorStop(0, 'rgba(94,139,118,0.12)');
+  glow.addColorStop(1, 'rgba(94,139,118,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // Логотип сверху (если успел загрузиться) — иначе просто текст AION Vi
+  const drawTextAndSave = () => {
+    // Заголовок бренда
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#c9a563';
+    ctx.font = '600 52px Georgia, serif';
+    ctx.letterSpacing = '8px';
+    ctx.fillText('AION Vi', W/2, 360);
+
+    // Цитата — перенос по словам
+    ctx.fillStyle = '#e8e0d0';
+    ctx.font = '400 62px Georgia, serif';
+    ctx.letterSpacing = '0px';
+    const maxWidth = W - 200;
+    const words = quote.split(' ');
+    let line = '', lines = [];
+    for (const word of words) {
+      const test = line + word + ' ';
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line.trim());
+        line = word + ' ';
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line.trim());
+
+    const lineHeight = 88;
+    let y = H/2 - (lines.length * lineHeight)/2 + 40;
+    ctx.fillText('«', W/2, y - 100);
+    for (const l of lines) {
+      ctx.fillText(l, W/2, y);
+      y += lineHeight;
+    }
+    ctx.fillText('»', W/2, y + 20);
+
+    // Подпись снизу — призыв
+    ctx.fillStyle = '#9a9080';
+    ctx.font = '400 38px Georgia, serif';
+    ctx.fillText('Твій персональний навігатор', W/2, H - 280);
+    ctx.fillStyle = '#5E8B76';
+    ctx.font = '500 42px Georgia, serif';
+    ctx.fillText('aion-vi.web.app', W/2, H - 200);
+
+    // Скачиваем
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'aion-vi-card.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  };
+
+  // Пробуем нарисовать логотип, но не блокируемся, если он не загрузится
+  const logo = new Image();
+  logo.crossOrigin = 'anonymous';
+  logo.onload = () => {
+    const lw = 420, lh = lw * logo.height / logo.width;
+    ctx.drawImage(logo, (W - lw)/2, 120, lw, lh);
+    drawTextAndSave();
+  };
+  logo.onerror = () => drawTextAndSave();
+  logo.src = 'logo_FINAL_v41_prozrachnyj.png';
 }
 
 // Закрытие по клику на оверлей
