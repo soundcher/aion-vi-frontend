@@ -333,6 +333,9 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 .modal-box p{font-size:12px;color:var(--text-dim);margin-bottom:20px;}
 .share-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .share-btn{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:2px;border:1px solid var(--line2);background:var(--panel2);color:var(--text);font-size:12px;cursor:pointer;text-decoration:none;font-family:inherit;}
+.quick-q-btn{padding:6px 12px;border-radius:14px;border:1px solid var(--line2);background:transparent;color:var(--text-dim);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s;}
+.quick-q-btn:hover{border-color:var(--gold-dim);color:var(--gold);background:rgba(201,165,99,0.08);}
+.quick-q-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,165,99,0.12);}
 .share-btn:hover{border-color:var(--gold-dim);background:#2d2820;}
 .share-btn svg{width:18px;height:18px;flex-shrink:0;}
 .modal-close{margin-top:16px;width:100%;background:transparent;border:1px solid var(--line2);color:var(--text-dim);padding:8px;font-family:inherit;font-size:12px;cursor:pointer;border-radius:2px;text-transform:uppercase;letter-spacing:.6px;}
@@ -758,6 +761,13 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
       <span id="label-request" style="font-size:15px;font-weight:bold;color:var(--text);text-transform:none;letter-spacing:normal;">Запрос</span>
       <span id="req-counter" style="font-size:11px;color:var(--text-faint);font-weight:normal;">0 / 500</span>
     </label>
+    <div id="quick-questions" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Расскажи мне всю правду обо мне — какой я есть на самом деле, без прикрас.">✦ Правда обо мне</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне сейчас важно понять про свои финансы и как их улучшить?">💰 Финансы</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что происходит в моей личной жизни сейчас и на что обратить внимание?">💛 Личная жизнь</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="На чём мне сосредоточиться в работе и карьере прямо сейчас?">💼 Карьера</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне важно понять о себе именно в этот период жизни?">✦ Что важно сейчас</button>
+    </div>
     <textarea id="request" maxlength="1000" placeholder="Задай вопрос и подробно опиши контекст" oninput="onRequestInput(this)" onfocus="autoGeocodeAll()" style="min-height:80px;"></textarea>
     <div id="req-warning" style="display:none;font-size:11px;color:var(--red);margin-top:3px;">⚠ Осталось менее 50 знаков — формулируй лаконично</div>
   </div>
@@ -3417,9 +3427,25 @@ async function copySummary() {
   }
 }
 
+// ── Быстрые вопросы — подставляют готовый текст в поле запроса ──
+function fillQuickQuestion(btn) {
+  const textarea = document.getElementById('request');
+  textarea.value = btn.getAttribute('data-q');
+  onRequestInput(textarea); // обновит счётчик символов
+  document.querySelectorAll('.quick-q-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  textarea.focus();
+}
+
 // ── Счётчик символов запроса ──
 function onRequestInput(el) {
   el.classList.remove('submitted');
+  // Если человек начал редактировать текст руками — снимаем подсветку
+  // с кнопки быстрого вопроса, она больше не отражает реальный текст
+  const active = document.querySelector('.quick-q-btn.active');
+  if (active && el.value !== active.getAttribute('data-q')) {
+    active.classList.remove('active');
+  }
   const len = el.value.length;
   const limit = parseInt(el.maxLength) || (compatEnabled ? 1000 : 500);
   const counter = document.getElementById('req-counter');
