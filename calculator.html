@@ -398,7 +398,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <span id="greeting-text"></span><span class="typing-cursor" id="typing-cursor"></span>
 </div>
 
-<div class="server-status">
+<div class="server-status" style="display:none;">
   <div class="dot" id="server-dot"></div>
   <span id="server-label">Проверка сервера...</span>
 </div>
@@ -648,9 +648,6 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
         <button class="btn-copy" id="btn-add-p3" onclick="addExtraPerson(3)" style="display:none;font-size:11px;">+ Третий человек</button>
         <button class="btn-copy" id="btn-add-p4" onclick="addExtraPerson(4)" style="display:none;font-size:11px;">+ Четвёртый человек</button>
       </div>
-      <div style="margin-top:10px;font-size:11px;color:var(--text-faint);line-height:1.6;" id="lbl-group-hint">
-        ✦ Групповой анализ (5 и более человек) — по запросу
-      </div>
 
   </div><!-- /compat-form -->
   </div><!-- /compat-block -->
@@ -761,12 +758,12 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
       <span id="label-request" style="font-size:15px;font-weight:bold;color:var(--text);text-transform:none;letter-spacing:normal;">Запрос</span>
       <span id="req-counter" style="font-size:11px;color:var(--text-faint);font-weight:normal;">0 / 500</span>
     </label>
-    <div id="quick-questions" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Расскажи мне всю правду обо мне — какой я есть на самом деле, без прикрас.">✦ Правда обо мне</button>
-      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне сейчас важно понять про свои финансы и как их улучшить?">💰 Финансы</button>
-      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что происходит в моей личной жизни сейчас и на что обратить внимание?">💛 Личная жизнь</button>
-      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="На чём мне сосредоточиться в работе и карьере прямо сейчас?">💼 Карьера</button>
-      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне важно понять о себе именно в этот период жизни?">✦ Что важно сейчас</button>
+    <div id="quick-questions" style="display:flex;justify-content:center;margin-bottom:8px;">
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Расскажи обо мне правду. Как друг.">✦ Правда обо мне</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне сейчас важно понять про свои финансы и как их улучшить?" style="display:none;">💰 Финансы</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что происходит в моей личной жизни сейчас и на что обратить внимание?" style="display:none;">💛 Личная жизнь</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="На чём мне сосредоточиться в работе и карьере прямо сейчас?" style="display:none;">💼 Карьера</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне важно понять о себе именно в этот период жизни?" style="display:none;">✦ Что важно сейчас</button>
     </div>
     <textarea id="request" maxlength="1000" placeholder="Задай вопрос и подробно опиши контекст" oninput="onRequestInput(this)" onfocus="autoGeocodeAll()" style="min-height:80px;"></textarea>
     <div id="req-warning" style="display:none;font-size:11px;color:var(--red);margin-top:3px;">⚠ Осталось менее 50 знаков — формулируй лаконично</div>
@@ -1379,7 +1376,7 @@ const LANG = {
     needCalculate: 'Сначала рассчитай данные клиента',
     needGender: 'Пожалуйста, укажи пол',
     analysesLeftLabel: 'Осталось анализов',
-    ratingLabel: 'Как тебе этот разбор?',
+    ratingLabel: 'Как тебе мой ответ?',
     ratingCommentPh: 'Что зашло, что нет — любое слово поможет (необязательно)',
     ratingSend: 'Отправить отзыв',
     ratingThanks: 'Спасибо — это правда помогает.',
@@ -1419,6 +1416,7 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('aion_lang', lang);
   applyTranslations();
+  initGreeting(); // приветствие тоже должно звучать на новом языке, не оставаться на старом
 }
 
 function applyTranslations() {
@@ -2714,7 +2712,6 @@ async function generateAnalysis() {
     box.insertAdjacentHTML('afterend', `
       <div class="action-buttons" id="action-buttons" style="justify-content:center;">
         <button class="btn-download" id="action-btn-download" onclick="downloadPDF()">${t('btnDownload')}</button>
-        <button class="btn-copy-analysis" id="action-btn-copy" onclick="copyAnalysis()">${t('btnCopy')}</button>
         <button class="btn-gift" id="action-btn-gift" onclick="openGiftModal()">${t('btnShare')}</button>
       </div>
       <div id="rating-block" style="margin-top:20px;padding:16px;border:1px solid var(--line2);border-radius:2px;text-align:center;">
@@ -3229,13 +3226,10 @@ function isStandaloneApp() {
 
 function dismissPushBanner() {
   document.getElementById('push-banner').style.display = 'none';
-  // Не спрашиваем повторно в этой же сессии браузера
-  sessionStorage.setItem('push_banner_dismissed', '1');
 }
 
 async function initPushBanner() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  if (sessionStorage.getItem('push_banner_dismissed')) return;
   if (Notification.permission === 'denied') return; // человек явно отказал — не пристаём
 
   if (Notification.permission === 'granted') {
@@ -3243,13 +3237,35 @@ async function initPushBanner() {
     return;
   }
 
+  // Считаем визиты — баннер показываем только на 2-й, 5-й и 10-й раз,
+  // каждый раз на 5 секунд, затем сам скрывается
+  let visits = parseInt(localStorage.getItem('aion_visit_count') || '0');
+  if (![2, 5, 10].includes(visits)) return;
+
   const textEl = document.getElementById('push-banner-text');
   if (isIOSDevice() && !isStandaloneApp()) {
-    textEl.textContent = 'Чтобы получать уведомления на iPhone — сначала добавь AION Vi на главный экран (кнопка "Поделиться" → "На экран «Домой»"), затем включи их здесь.';
+    const iosHint = {
+      ru: 'Чтобы получать уведомления на iPhone — сначала добавь AION Vi на главный экран (кнопка "Поделиться" → "На экран «Домой»"), затем включи их здесь.',
+      uk: 'Щоб отримувати сповіщення на iPhone — спочатку додай AION Vi на головний екран (кнопка "Поділитися" → "На головний екран"), потім увімкни їх тут.',
+      en: 'To get notifications on iPhone — first add AION Vi to your Home Screen (Share button → "Add to Home Screen"), then enable them here.',
+      pl: 'Aby otrzymywać powiadomienia na iPhone — najpierw dodaj AION Vi do ekranu głównego (przycisk "Udostępnij" → "Do ekranu głównego"), a potem włącz je tutaj.'
+    };
+    textEl.textContent = iosHint[currentLang] || iosHint.ru;
   } else {
-    textEl.textContent = '✦ Включить уведомления — не пропустишь обзор месяца и важные окна';
+    const pushText = {
+      ru: 'Включи уведомления! И тогда не пропустишь обзор месяца и другие приятности',
+      uk: 'Вмикни повідомлення, аби не пропустити огляд місяця та інші смаколики',
+      en: 'Turn on notifications! That way you won\'t miss your monthly overview and other nice surprises',
+      pl: 'Włącz powiadomienia! Dzięki temu nie przegapisz przeglądu miesiąca i innych miłych niespodzianek'
+    };
+    textEl.textContent = pushText[currentLang] || pushText.ru;
   }
   document.getElementById('push-banner').style.display = 'block';
+
+  // Автоматически прячем через 5 секунд, если человек не кликнул сам
+  setTimeout(() => {
+    document.getElementById('push-banner').style.display = 'none';
+  }, 5000);
 }
 
 async function enablePush() {
@@ -3609,7 +3625,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Баннер push-уведомлений — с небольшой задержкой, чтобы не наваливать
   // всё сразу в первую секунду захода
-  setTimeout(initPushBanner, 3000);
+  // Счётчик визитов — для показа push-баннера на 2/5/10 раз
+  const visitCount = parseInt(localStorage.getItem('aion_visit_count') || '0') + 1;
+  localStorage.setItem('aion_visit_count', visitCount);
+  setTimeout(initPushBanner, 1500);
 
   // Фиксируем, что человек реально был — нужно для push "по неактивности"
   (function sendHeartbeat() {
