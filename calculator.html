@@ -426,8 +426,8 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 <div id="push-banner" style="display:none;margin-bottom:14px;padding:12px 14px;border:1px solid var(--accent-dim);border-radius:2px;font-size:12px;color:var(--text-dim);text-align:center;">
   <span id="push-banner-text"></span>
   <div style="margin-top:8px;">
-    <span onclick="enablePush()" style="color:var(--accent);cursor:pointer;text-decoration:underline;margin-right:16px;">Включить</span>
-    <span onclick="dismissPushBanner()" style="color:var(--text-faint);cursor:pointer;">Не сейчас</span>
+    <span onclick="enablePush()" id="push-enable-btn" style="color:var(--accent);cursor:pointer;text-decoration:underline;margin-right:16px;">Включить</span>
+    <span onclick="dismissPushBanner()" id="push-dismiss-btn" style="color:var(--text-faint);cursor:pointer;">Не сейчас</span>
   </div>
 </div>
 
@@ -437,24 +437,24 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
     <h2 style="margin-bottom:14px;" id="pricing-title">✦ Выбери пакет</h2>
 
     <div style="border:1px solid var(--line2);border-radius:2px;padding:14px;margin-bottom:10px;">
-      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">Старт — €9.99/мес</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">10 анализов + история</div>
+      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;" id="tier-start-name">Старт — €9.99/мес</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-start-desc">10 анализов + история</div>
       <a href="#" id="checkout-start" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
     </div>
 
     <div style="border:1px solid var(--gold);border-radius:2px;padding:14px;margin-bottom:10px;">
-      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">Базовый — €19.99/мес</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">23 анализа + совместимость</div>
+      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;" id="tier-basic-name">Базовый — €19.99/мес</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-basic-desc">23 анализа + совместимость</div>
       <a href="#" id="checkout-basic" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
     </div>
 
     <div style="border:1px solid var(--line2);border-radius:2px;padding:14px;margin-bottom:14px;">
-      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;">Про — €29.99/мес</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">40 анализов + транзиты + PDF с брендингом</div>
+      <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;" id="tier-pro-name">Про — €29.99/мес</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-pro-desc">40 анализов + транзиты + PDF с брендингом</div>
       <a href="#" id="checkout-pro" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
     </div>
 
-    <button class="btn-copy" onclick="closePricingModal()" style="width:100%;">Закрыть</button>
+    <button class="btn-copy" onclick="closePricingModal()" id="pricing-close-btn" style="width:100%;">Закрыть</button>
   </div>
 </div>
 
@@ -759,7 +759,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
       <span id="req-counter" style="font-size:11px;color:var(--text-faint);font-weight:normal;">0 / 500</span>
     </label>
     <div id="quick-questions" style="display:flex;justify-content:center;margin-bottom:8px;">
-      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Расскажи обо мне правду. Как друг.">✦ Правда обо мне</button>
+      <button type="button" class="quick-q-btn" id="quick-q-truth" onclick="fillQuickQuestion(this)" data-q="Расскажи обо мне правду. Как друг.">✦ Правда обо мне</button>
       <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне сейчас важно понять про свои финансы и как их улучшить?" style="display:none;">💰 Финансы</button>
       <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что происходит в моей личной жизни сейчас и на что обратить внимание?" style="display:none;">💛 Личная жизнь</button>
       <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="На чём мне сосредоточиться в работе и карьере прямо сейчас?" style="display:none;">💼 Карьера</button>
@@ -960,6 +960,15 @@ const LANG = {
     btnDownload: '⬇ Download PDF',
     btnGift: '🎁 Gift',
     btnShare: '↗ Share',
+    pricingLink: 'Top up package',
+    quickQTruth: '✦ Truth about me',
+    quickQTruthText: 'Tell me the truth about me. As a friend.',
+    pushEnableBtn: 'Enable', pushDismissBtn: 'Not now',
+    pricingTitle: '✦ Choose a package',
+    tierStartName: 'Start — €9.99/mo', tierStartDesc: '10 analyses + history',
+    tierBasicName: 'Basic — €19.99/mo', tierBasicDesc: '23 analyses + compatibility',
+    tierProName: 'Pro — €29.99/mo', tierProDesc: '40 analyses + transits + branded PDF',
+    btnCheckout: 'Get started', pricingCloseBtn: 'Close',
     btnCopy: 'Copy text',
     btnShowSummary: 'Show summary',
     btnCopySummary: 'Copy for Claude',
@@ -1080,6 +1089,15 @@ const LANG = {
     btnDownload: '⬇ Pobierz PDF',
     btnGift: '🎁 Podaruj',
     btnShare: '↗ Udostępnij',
+    pricingLink: 'Doładuj pakiet',
+    quickQTruth: '✦ Prawda o mnie',
+    quickQTruthText: 'Powiedz mi prawdę o mnie. Jak przyjaciel.',
+    pushEnableBtn: 'Włącz', pushDismissBtn: 'Nie teraz',
+    pricingTitle: '✦ Wybierz pakiet',
+    tierStartName: 'Start — €9.99/mies.', tierStartDesc: '10 analiz + historia',
+    tierBasicName: 'Podstawowy — €19.99/mies.', tierBasicDesc: '23 analizy + kompatybilność',
+    tierProName: 'Pro — €29.99/mies.', tierProDesc: '40 analiz + tranzyty + PDF z brandingiem',
+    btnCheckout: 'Zamów', pricingCloseBtn: 'Zamknij',
     btnCopy: 'Kopiuj tekst',
     btnShowSummary: 'Pokaż podsumowanie',
     btnCopySummary: 'Kopiuj dla Claude',
@@ -1194,6 +1212,15 @@ const LANG = {
     btnDownload: '⬇ Завантажити PDF',
     btnGift: '🎁 Подарувати',
     btnShare: '↗ Поділитися',
+    pricingLink: 'Поповнити пакет',
+    quickQTruth: '✦ Правда про мене',
+    quickQTruthText: 'Розкажи мені правду про мене. Як друг.',
+    pushEnableBtn: 'Увімкнути', pushDismissBtn: 'Не зараз',
+    pricingTitle: '✦ Обери пакет',
+    tierStartName: 'Старт — €9.99/міс.', tierStartDesc: '10 аналізів + історія',
+    tierBasicName: 'Базовий — €19.99/міс.', tierBasicDesc: '23 аналізи + сумісність',
+    tierProName: 'Про — €29.99/міс.', tierProDesc: '40 аналізів + транзити + PDF з брендингом',
+    btnCheckout: 'Оформити', pricingCloseBtn: 'Закрити',
     btnCopy: 'Скопіювати текст',
     btnShowSummary: 'Показати зведення',
     btnCopySummary: 'Скопіювати для Claude',
@@ -1308,6 +1335,15 @@ const LANG = {
     btnDownload: '⬇ Загрузить PDF',
     btnGift: '🎁 Подарить',
     btnShare: '↗ Поделиться',
+    pricingLink: 'Пополнить пакет',
+    quickQTruth: '✦ Правда обо мне',
+    quickQTruthText: 'Расскажи обо мне правду. Как друг.',
+    pushEnableBtn: 'Включить', pushDismissBtn: 'Не сейчас',
+    pricingTitle: '✦ Выбери пакет',
+    tierStartName: 'Старт — €9.99/мес', tierStartDesc: '10 анализов + история',
+    tierBasicName: 'Базовый — €19.99/мес', tierBasicDesc: '23 анализа + совместимость',
+    tierProName: 'Про — €29.99/мес', tierProDesc: '40 анализов + транзиты + PDF с брендированием',
+    btnCheckout: 'Оформить', pricingCloseBtn: 'Закрыть',
     btnCopy: 'Скопировать текст',
     btnShowSummary: 'Показать сводку',
     btnCopySummary: 'Скопировать для Claude',
@@ -1453,6 +1489,25 @@ function applyTranslations() {
   setText('theme-friendship', L.themeFriendship);
   setText('theme-other', L.themeOther);
   setText('lbl-group-hint', L.groupAnalysisHint);
+  setText('pricing-link', L.pricingLink);
+  const quickQBtn = el('quick-q-truth');
+  if (quickQBtn) {
+    quickQBtn.textContent = L.quickQTruth;
+    quickQBtn.setAttribute('data-q', L.quickQTruthText);
+  }
+  setText('push-enable-btn', L.pushEnableBtn);
+  setText('push-dismiss-btn', L.pushDismissBtn);
+  setText('pricing-title', L.pricingTitle);
+  setText('tier-start-name', L.tierStartName);
+  setText('tier-start-desc', L.tierStartDesc);
+  setText('tier-basic-name', L.tierBasicName);
+  setText('tier-basic-desc', L.tierBasicDesc);
+  setText('tier-pro-name', L.tierProName);
+  setText('tier-pro-desc', L.tierProDesc);
+  setText('checkout-start', L.btnCheckout);
+  setText('checkout-basic', L.btnCheckout);
+  setText('checkout-pro', L.btnCheckout);
+  setText('pricing-close-btn', L.pricingCloseBtn);
 
   // Второй/третий/четвёртый человек — переиспользуем метки основного человека
   ['p2','p3','p4'].forEach(p => {
