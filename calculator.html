@@ -2969,7 +2969,7 @@ function openGiftModal() {
   const refTag = senderUser?.promo || senderUser?.nickname || 'friend';
   const shareUrl = `${SITE_URL}/?ref=${encodeURIComponent(refTag)}`;
 
-  const preview = `✦ AION Vi — Персональный анализ${name ? ' для ' + name : ''}\n\n${currentAnalysis.substring(0,300)}...\n\nПопробуй и ты — а мы оба получим по 5 бесплатных анализов:\n${shareUrl}`;
+  const preview = `✦ AION Vi — Персональный навигатор\n\nЯ пользуюсь AION Vi — он отвечает на мои вопросы, опираясь на мои личные данные, а не общими фразами. Попробуй и ты — а мы оба получим по 5 бесплатных анализов:\n${shareUrl}`;
   const text = encodeURIComponent(preview);
 
   document.getElementById('share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${text}`;
