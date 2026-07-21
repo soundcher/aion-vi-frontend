@@ -2750,8 +2750,7 @@ async function generateAnalysis() {
     // Заполняем PDF-блок
     fillPdfBlock(currentAnalysis, currentClientData);
 
-    box.innerHTML = data.analysis.replace(/\n/g, '<br>') +
-      `<div class="analysis-meta">${t('analysisTokens')}: ${data.tokens_used || '—'}</div>`;
+    box.innerHTML = data.analysis.replace(/\n/g, '<br>');
 
     // Визуально помечаем запрос как "отработанный" — серый текст, но поле
     // остаётся активным для правок (если захочешь перегенерировать с
