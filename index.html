@@ -306,6 +306,16 @@
       <input type="text" id="inp-promo" maxlength="14" oninput="this.value=this.value.toUpperCase()">
     </div>
 
+    <div class="field" style="display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;">
+      <input type="checkbox" id="inp-consent" style="width:16px;height:16px;margin-top:2px;flex-shrink:0;">
+      <label for="inp-consent" style="font-size:11px;line-height:1.5;color:var(--text-dim);text-transform:none;letter-spacing:normal;cursor:pointer;">
+        <span id="t-consent-text">Я согласен(на) с</span>
+        <a href="privacy.html" target="_blank" id="t-consent-privacy" style="color:var(--gold);">Политикой конфиденциальности</a>
+        <span id="t-consent-and">и</span>
+        <a href="terms.html" target="_blank" id="t-consent-terms" style="color:var(--gold);">Условиями использования</a>
+      </label>
+    </div>
+
     <button class="btn" id="btn-enter" onclick="enterApp()">
       <span class="lbl" id="t-btn-enter">✦ Enter</span>
       <span class="spin">⟳</span>
@@ -372,6 +382,8 @@ const TRANSLATIONS = {
     betaNote: 'Closed beta · Promo code from the organizer',
     orSignIn: 'or sign in with',
     errName: 'Enter the name your friends use',
+    errConsent: 'Please agree to the Privacy Policy and Terms of Use',
+    consentText: 'I agree to the', consentPrivacy: 'Privacy Policy', consentAnd: 'and', consentTerms: 'Terms of Use',
     errEmail: 'Enter a valid email',
     errPromo: 'Enter your promo code',
     errNotFound: 'Promo code not found. Check spelling.',
@@ -398,6 +410,8 @@ const TRANSLATIONS = {
     betaNote: 'Закрите тестування · Промокод у організатора',
     orSignIn: 'або увійди через',
     errName: 'Введи імʼя — як тебе називають друзі',
+    errConsent: 'Погодься з Політикою конфіденційності та Умовами використання',
+    consentText: 'Я погоджуюсь з', consentPrivacy: 'Політикою конфіденційності', consentAnd: 'та', consentTerms: 'Умовами використання',
     errEmail: 'Введи коректний email',
     errPromo: 'Введи промокод',
     errNotFound: 'Промокод не знайдено. Перевір правильність.',
@@ -424,6 +438,8 @@ const TRANSLATIONS = {
     betaNote: 'Zamknięte testy · Kod promocyjny od organizatora',
     orSignIn: 'lub zaloguj przez',
     errName: 'Podaj imię, którym zwracają się do ciebie przyjaciele',
+    errConsent: 'Zaakceptuj Politykę prywatności i Warunki korzystania',
+    consentText: 'Akceptuję', consentPrivacy: 'Politykę prywatności', consentAnd: 'i', consentTerms: 'Warunki korzystania',
     errEmail: 'Podaj prawidłowy email',
     errPromo: 'Wpisz kod promocyjny',
     errNotFound: 'Kod promocyjny nie znaleziony. Sprawdź pisownię.',
@@ -450,6 +466,8 @@ const TRANSLATIONS = {
     betaNote: 'Закрытое тестирование · Промокод у организатора',
     orSignIn: 'или войди через',
     errName: 'Введи имя — как тебя называют друзья',
+    errConsent: 'Согласись с Политикой конфиденциальности и Условиями использования',
+    consentText: 'Я согласен(на) с', consentPrivacy: 'Политикой конфиденциальности', consentAnd: 'и', consentTerms: 'Условиями использования',
     errEmail: 'Введи корректный email',
     errPromo: 'Введи промокод',
     errNotFound: 'Промокод не найден. Проверь правильность ввода.',
@@ -496,6 +514,10 @@ function setLang(lang) {
   document.getElementById('t-lbl-email').textContent = T.lblEmail;
   document.getElementById('inp-email').placeholder = T.phEmail;
   document.getElementById('t-lbl-promo').textContent = T.lblPromo;
+  document.getElementById('t-consent-text').textContent = T.consentText;
+  document.getElementById('t-consent-privacy').textContent = T.consentPrivacy;
+  document.getElementById('t-consent-and').textContent = T.consentAnd;
+  document.getElementById('t-consent-terms').textContent = T.consentTerms;
   document.getElementById('inp-promo').placeholder = T.phPromo;
   document.getElementById('t-btn-enter').textContent = T.btnEnter;
   document.getElementById('t-beta-note').textContent = T.betaNote;
@@ -594,6 +616,10 @@ function checkGateBeforeSocial() {
     showMsg(T.errName, 'error');
     nickEl.classList.add('input-error');
     nickEl.focus();
+    return false;
+  }
+  if (!document.getElementById('inp-consent').checked) {
+    showMsg(T.errConsent, 'error');
     return false;
   }
   return true;
@@ -700,6 +726,7 @@ async function enterApp() {
   showMsg('', '');
   if (!nickname)                     { showMsg(T.errName, 'error'); return; }
   if (!email || !email.includes('@')) { showMsg(T.errEmail, 'error'); return; }
+  if (!document.getElementById('inp-consent').checked) { showMsg(T.errConsent, 'error'); return; }
   btn.classList.add('loading'); btn.disabled = true;
 
   // Сначала проверяем — может, этот email уже зарегистрирован (человек
