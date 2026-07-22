@@ -281,7 +281,7 @@
 
   <!-- Логотип -->
   <div class="logo-wrap">
-    <img src="logo_FINAL_v30.png" alt="AION Vi" class="logo-img">
+    <img src="logo_FINAL_v41_prozrachnyj.png" alt="AION Vi" class="logo-img">
   </div>
 
   <!-- Подзаголовок -->
@@ -294,7 +294,16 @@
     </div>
     <div class="form-title" id="t-form-title">Access to AION Vi</div>
 
-    <div class="field">
+    <!-- Переключатель: войти / создать аккаунт -->
+    <div style="display:flex;gap:0;margin-bottom:18px;border:1px solid var(--line);border-radius:2px;overflow:hidden;">
+      <button type="button" id="tab-signin" onclick="setMode('signin')"
+        style="flex:1;padding:9px;background:rgba(255,255,255,0.08);border:none;color:var(--text);font-family:inherit;font-size:11px;letter-spacing:1px;cursor:pointer;transition:background .2s;">Sign in</button>
+      <button type="button" id="tab-signup" onclick="setMode('signup')"
+        style="flex:1;padding:9px;background:none;border:none;color:var(--text-faint);font-family:inherit;font-size:11px;letter-spacing:1px;cursor:pointer;transition:background .2s;">Create account</button>
+    </div>
+
+    <!-- Имя — только при регистрации -->
+    <div class="field" id="row-nickname" style="display:none;">
       <label id="t-lbl-nickname">Friends call me</label>
       <input type="text" id="inp-nickname" autocomplete="nickname">
     </div>
@@ -305,11 +314,18 @@
     </div>
 
     <div class="field">
+      <label id="t-lbl-password">Password</label>
+      <input type="password" id="inp-password" autocomplete="current-password">
+    </div>
+
+    <!-- Промокод — только при регистрации, необязателен -->
+    <div class="field" id="row-promo" style="display:none;">
       <label id="t-lbl-promo">Promo code</label>
       <input type="text" id="inp-promo" maxlength="14" oninput="this.value=this.value.toUpperCase()">
     </div>
 
-    <div class="field" style="display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;">
+    <!-- Согласие — только при регистрации -->
+    <div class="field" id="row-consent" style="display:none;align-items:flex-start;gap:8px;margin-bottom:14px;">
       <input type="checkbox" id="inp-consent" style="width:16px;height:16px;margin-top:2px;flex-shrink:0;">
       <label for="inp-consent" style="font-size:11px;line-height:1.5;color:var(--text-dim);text-transform:none;letter-spacing:normal;cursor:pointer;">
         <span id="t-consent-text">Я согласен(на) с</span>
@@ -319,18 +335,22 @@
       </label>
     </div>
 
-    <button class="btn" id="btn-enter" onclick="enterApp()">
-      <span class="lbl" id="t-btn-enter">✦ Enter</span>
+    <button class="btn" id="btn-enter" onclick="submitAuth()">
+      <span class="lbl" id="t-btn-enter">✦ Sign in</span>
       <span class="spin">⟳</span>
     </button>
+
+    <div style="text-align:center;margin-top:10px;" id="row-forgot">
+      <button type="button" onclick="resetPassword()" id="t-forgot-pw"
+        style="background:none;border:none;color:var(--text-faint);font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:0.5px;text-decoration:underline;">Forgot password?</button>
+    </div>
 
     <div class="msg" id="msg"></div>
 
     <div class="divider" style="margin:16px 0 12px;"></div>
 
-    <!-- Вход через соцсети -->
-    <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-faint);text-align:center;margin-bottom:10px;" id="t-or-signin">or sign in with</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-faint);text-align:center;margin-bottom:10px;" id="t-or-signin">or continue with</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
       <button onclick="signInWithGoogle()" style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid var(--line);border-radius:2px;color:var(--text);font-family:inherit;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
         <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         Google
@@ -341,8 +361,32 @@
       </button>
     </div>
 
+    <!-- Telegram: виджет подставляет сюда свою кнопку сам -->
+    <div id="tg-login-wrap" style="display:flex;justify-content:center;margin-bottom:16px;min-height:1px;"></div>
+
     <div class="divider"></div>
-    <div class="beta-note" id="t-beta-note">Closed beta · Promo code from the organizer</div>
+
+    <!-- Гостевой путь: равноценная альтернатива, а не мелкая сноска -->
+    <div style="text-align:center;margin-top:6px;">
+      <a href="calculator.html" id="t-guest-link" onclick="enterAsGuest()"
+        style="color:var(--gold);font-size:12px;text-decoration:none;letter-spacing:0.5px;border-bottom:1px solid rgba(201,165,99,0.4);padding-bottom:2px;">Try free, no account →</a>
+      <div id="t-guest-note" style="font-size:10px;color:var(--text-faint);margin-top:8px;letter-spacing:0.5px;">You can try one analysis without an account.</div>
+    </div>
+  </div>
+
+  <!-- Придумай пароль: для тех, кто регистрировался по промокоду до появления входа -->
+  <div class="form-box" id="setpw-box" style="display:none;">
+    <div class="form-title" id="t-setpw-title">Set a password</div>
+    <div id="t-setpw-intro" style="font-size:12px;line-height:1.6;color:var(--text-dim);margin-bottom:18px;text-align:center;"></div>
+    <div class="field">
+      <label id="t-lbl-password2">Password</label>
+      <input type="password" id="inp-password2" autocomplete="new-password">
+    </div>
+    <button class="btn" id="btn-setpw" onclick="claimExistingAccount()">
+      <span class="lbl" id="t-btn-setpw">✦ Save password</span>
+      <span class="spin">⟳</span>
+    </button>
+    <div class="msg" id="msg2"></div>
   </div>
 
   <!-- Уже вошёл -->
@@ -373,6 +417,27 @@
 // ══════════════════════════════════════════════
 const TRANSLATIONS = {
   en: {
+    authTitle: 'Access to AION Vi',
+    tabSignin: 'Sign in',
+    tabSignup: 'Create account',
+    lblPassword: 'Password',
+    phPassword: 'At least 6 characters',
+    btnSignin: '✦ Sign in',
+    btnSignup: '✦ Create account',
+    orContinue: 'or continue with',
+    guestLink: 'Try free, no account →',
+    forgotPw: 'Forgot password?',
+    pwSent: 'Password reset link sent to your email.',
+    errPassword: 'Password must be at least 6 characters',
+    errWrongPw: 'Wrong email or password.',
+    errNoAccount: 'No account with this email. Create one below.',
+    errEmailTaken: 'This email is already registered. Sign in instead.',
+    needEmailTg: 'Almost there — enter your email so we can save your analyses',
+    setPwTitle: 'Set a password',
+    setPwIntro: 'Your account already exists. Create a password so you can always get back in — your analyses and history stay with you.',
+    btnSetPw: '✦ Save password',
+    tgTaken: 'This email is already registered. Sign in your usual way first.',
+    guestNote: 'You can try one analysis without an account.',
     tagline: 'Your personal navigator',
     formTitle: 'Access to AION Vi',
     lblNickname: 'Friends call me',
@@ -402,6 +467,27 @@ const TRANSLATIONS = {
     refBonusMsg: (b) => `✦ Welcome! You got +${b} free questions for accepting a friend's invite.`,
   },
   uk: {
+    authTitle: 'Вхід до AION Vi',
+    tabSignin: 'Увійти',
+    tabSignup: 'Створити акаунт',
+    lblPassword: 'Пароль',
+    phPassword: 'Мінімум 6 символів',
+    btnSignin: '✦ Увійти',
+    btnSignup: '✦ Створити акаунт',
+    orContinue: 'або продовжити через',
+    guestLink: 'Спробувати безкоштовно, без реєстрації →',
+    forgotPw: 'Забув пароль?',
+    pwSent: 'Лист для відновлення пароля надіслано на пошту.',
+    errPassword: 'Пароль має бути щонайменше 6 символів',
+    errWrongPw: 'Невірна пошта або пароль.',
+    errNoAccount: 'Акаунта з такою поштою немає. Створи новий нижче.',
+    errEmailTaken: 'Ця пошта вже зареєстрована. Увійди замість реєстрації.',
+    needEmailTg: 'Майже все — вкажи пошту, щоб ми зберегли твої аналізи',
+    setPwTitle: 'Придумай пароль',
+    setPwIntro: 'Твій акаунт уже існує. Створи пароль, щоб завжди могти повернутися — аналізи та історія залишаться з тобою.',
+    btnSetPw: '✦ Зберегти пароль',
+    tgTaken: 'Ця пошта вже зареєстрована. Спершу увійди звичним способом.',
+    guestNote: 'Можна спробувати один аналіз без акаунта.',
     tagline: 'Твій персональний навігатор',
     formTitle: 'Доступ до AION Vi',
     lblNickname: 'Як тебе називають друзі?',
@@ -431,6 +517,27 @@ const TRANSLATIONS = {
     refBonusMsg: (b) => `✦ Ласкаво просимо! Ти отримав(-ла) +${b} безкоштовних запитань за запрошення друга.`,
   },
   pl: {
+    authTitle: 'Dostęp do AION Vi',
+    tabSignin: 'Zaloguj się',
+    tabSignup: 'Załóż konto',
+    lblPassword: 'Hasło',
+    phPassword: 'Minimum 6 znaków',
+    btnSignin: '✦ Zaloguj się',
+    btnSignup: '✦ Załóż konto',
+    orContinue: 'lub kontynuuj przez',
+    guestLink: 'Wypróbuj za darmo, bez konta →',
+    forgotPw: 'Nie pamiętasz hasła?',
+    pwSent: 'Link do zresetowania hasła wysłany na e-mail.',
+    errPassword: 'Hasło musi mieć co najmniej 6 znaków',
+    errWrongPw: 'Błędny e-mail lub hasło.',
+    errNoAccount: 'Nie ma konta z tym e-mailem. Załóż je poniżej.',
+    errEmailTaken: 'Ten e-mail jest już zarejestrowany. Zaloguj się.',
+    needEmailTg: 'Prawie gotowe — podaj e-mail, żebyśmy zapisali twoje analizy',
+    setPwTitle: 'Ustaw hasło',
+    setPwIntro: 'Twoje konto już istnieje. Ustaw hasło, żeby zawsze móc wrócić — analizy i historia zostają z tobą.',
+    btnSetPw: '✦ Zapisz hasło',
+    tgTaken: 'Ten e-mail jest już zarejestrowany. Najpierw zaloguj się swoim zwykłym sposobem.',
+    guestNote: 'Możesz wypróbować jedną analizę bez konta.',
     tagline: 'Twój osobisty nawigator',
     formTitle: 'Dostęp do AION Vi',
     lblNickname: 'Jak nazywają cię przyjaciele?',
@@ -460,6 +567,27 @@ const TRANSLATIONS = {
     refBonusMsg: (b) => `✦ Witaj! Otrzymałeś(-aś) +${b} darmowych pytań za przyjęcie zaproszenia.`,
   },
   ru: {
+    authTitle: 'Вход в AION Vi',
+    tabSignin: 'Войти',
+    tabSignup: 'Создать аккаунт',
+    lblPassword: 'Пароль',
+    phPassword: 'Минимум 6 символов',
+    btnSignin: '✦ Войти',
+    btnSignup: '✦ Создать аккаунт',
+    orContinue: 'или продолжить через',
+    guestLink: 'Попробовать бесплатно, без регистрации →',
+    forgotPw: 'Забыл пароль?',
+    pwSent: 'Письмо для восстановления пароля отправлено на почту.',
+    errPassword: 'Пароль должен быть не короче 6 символов',
+    errWrongPw: 'Неверная почта или пароль.',
+    errNoAccount: 'Аккаунта с такой почтой нет. Создай новый ниже.',
+    errEmailTaken: 'Эта почта уже зарегистрирована. Войди вместо регистрации.',
+    needEmailTg: 'Почти всё — укажи почту, чтобы мы сохранили твои анализы',
+    setPwTitle: 'Придумай пароль',
+    setPwIntro: 'Твой аккаунт уже существует. Создай пароль, чтобы всегда мочь вернуться — анализы и история останутся с тобой.',
+    btnSetPw: '✦ Сохранить пароль',
+    tgTaken: 'Эта почта уже зарегистрирована. Сначала войди привычным способом.',
+    guestNote: 'Можно попробовать один анализ без аккаунта.',
     tagline: 'Твой персональный навигатор',
     formTitle: 'Доступ к AION Vi',
     lblNickname: 'Как к тебе обращаются друзья?',
@@ -528,10 +656,25 @@ function setLang(lang) {
   const refBannerEl = document.getElementById('t-ref-banner');
   if (refBannerEl) refBannerEl.textContent = T.refBanner;
   document.getElementById('inp-promo').placeholder = T.phPromo;
-  document.getElementById('t-btn-enter').textContent = T.btnEnter;
-  document.getElementById('t-beta-note').textContent = T.betaNote;
-  const orEl = document.getElementById('t-or-signin');
-  if (orEl) orEl.textContent = T.orSignIn;
+  // Надписи новой формы входа. set() не падает, если элемента нет —
+  // раньше одна отсутствующая строка роняла переключение языка целиком.
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const ph  = (id, val) => { const el = document.getElementById(id); if (el) el.placeholder = val; };
+
+  set('tab-signin', T.tabSignin);
+  set('tab-signup', T.tabSignup);
+  set('t-lbl-password', T.lblPassword);
+  ph ('inp-password', T.phPassword);
+  set('t-forgot-pw', T.forgotPw);
+  set('t-or-signin', T.orContinue);
+  set('t-guest-link', T.guestLink);
+  set('t-guest-note', T.guestNote);
+  set('t-setpw-title', T.setPwTitle);
+  set('t-lbl-password2', T.lblPassword);
+  ph ('inp-password2', T.phPassword);
+  set('t-btn-setpw', T.btnSetPw);
+  set('t-form-title', T.authTitle);
+  set('t-btn-enter', currentMode === 'signup' ? T.btnSignup : T.btnSignin);
   document.getElementById('t-sub-welcome').textContent = T.subWelcome;
   document.getElementById('t-count-label').textContent = T.countLabel;
   document.getElementById('t-btn-open').textContent = T.btnOpen;
@@ -589,99 +732,265 @@ function markCodeUsed(code) {
 // ══════════════════════════════════════════════
 function emailToKey(email) { return email.replace(/\./g,'_').replace(/@/g,'__at__'); }
 
-async function saveUserToFirebase(user) {
-  try {
-    await db.ref('users/' + emailToKey(user.email)).set({
-      nickname: user.nickname || '',
-      email: user.email,
-      promo: user.promo || 'social',
-      analysesLeft: user.analysesLeft,
-      analysesTotal: user.analysesTotal || user.analysesLeft,
-      registeredAt: user.registeredAt,
-      lang: user.lang || 'ru',
-      loginMethod: user.loginMethod || 'promo'
-    });
-  } catch(e) { console.warn('Firebase DB:', e.message); }
-}
+// ══════════════════════════════════════════════
+// ПРОПУСК
+// ══════════════════════════════════════════════
+// Раньше личностью человека была строка email, вписанная в форму: её нельзя
+// было ни доказать, ни восстановить. Теперь личность подтверждает Firebase,
+// а сервер берёт email из подписанного пропуска.
+let currentMode = 'signin';
 
-async function getUserFromFirebase(email) {
+async function getIdToken() {
   try {
-    const snap = await db.ref('users/' + emailToKey(email)).once('value');
-    return snap.val();
+    const u = auth.currentUser;
+    return u ? await u.getIdToken() : null;
   } catch(e) { return null; }
 }
 
-// ══════════════════════════════════════════════
-// ВХОД ЧЕРЕЗ GOOGLE
-// ══════════════════════════════════════════════
-// Проверка имени ПЕРЕД входом через соцсети —
-// без неё Google/Facebook дают только формальное имя из профиля, а не то,
-// как человека называют друзья
-function checkGateBeforeSocial() {
-  const T = TRANSLATIONS[currentLang];
-  const nickEl = document.getElementById('inp-nickname');
-  nickEl.classList.remove('input-error');
-
-  if (!nickEl.value.trim()) {
-    showMsg(T.errName, 'error');
-    nickEl.classList.add('input-error');
-    nickEl.focus();
-    return false;
-  }
-  if (!document.getElementById('inp-consent').checked) {
-    showMsg(T.errConsent, 'error');
-    return false;
-  }
-  return true;
+async function api(path, body) {
+  const headers = {'Content-Type': 'application/json'};
+  const token = await getIdToken();
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const r = await fetch(SERVER + path, {
+    method: 'POST', headers, body: JSON.stringify(body || {})
+  });
+  return await r.json();
 }
 
-async function signInWithGoogle() {
-  if (!checkGateBeforeSocial()) return;
+// Калькулятор читает пользователя из памяти браузера в десятке мест.
+// Кладём туда ровно тот же объект, что и раньше — он не заметит разницы.
+function storeProfile(profile, extra) {
+  const u = Object.assign({
+    nickname: profile.nickname || '',
+    email: profile.email || '',
+    analysesLeft: profile.analysesLeft || 0,
+    analysesTotal: profile.analysesTotal || 0,
+    lang: profile.lang || currentLang,
+    unlimited: !!profile.unlimited,
+    subscriptionTier: profile.subscriptionTier || '',
+    registeredAt: profile.registeredAt || new Date().toISOString()
+  }, extra || {});
+  saveUser(u);
+  return u;
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  const T = TRANSLATIONS[currentLang];
+  const on  = 'rgba(255,255,255,0.08)';
+  document.getElementById('tab-signin').style.background = mode==='signin' ? on : 'none';
+  document.getElementById('tab-signin').style.color = mode==='signin' ? 'var(--text)' : 'var(--text-faint)';
+  document.getElementById('tab-signup').style.background = mode==='signup' ? on : 'none';
+  document.getElementById('tab-signup').style.color = mode==='signup' ? 'var(--text)' : 'var(--text-faint)';
+
+  const signup = mode==='signup';
+  document.getElementById('row-nickname').style.display = signup ? 'block' : 'none';
+  document.getElementById('row-promo').style.display    = signup ? 'block' : 'none';
+  document.getElementById('row-consent').style.display  = signup ? 'flex'  : 'none';
+  document.getElementById('row-forgot').style.display   = signup ? 'none'  : 'block';
+  document.getElementById('inp-password').setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+  document.getElementById('t-btn-enter').textContent = signup ? T.btnSignup : T.btnSignin;
+  showMsg('', '');
+}
+
+// ══════════════════════════════════════════════
+// ВХОД / РЕГИСТРАЦИЯ ПО ПОЧТЕ И ПАРОЛЮ
+// ══════════════════════════════════════════════
+async function submitAuth() {
+  const T = TRANSLATIONS[currentLang];
+  const email = document.getElementById('inp-email').value.trim().toLowerCase();
+  const pw    = document.getElementById('inp-password').value;
+  const btn   = document.getElementById('btn-enter');
+  showMsg('', '');
+
+  if (!email || !email.includes('@')) { showMsg(T.errEmail, 'error'); return; }
+  if (!pw || pw.length < 6) { showMsg(T.errPassword, 'error'); return; }
+
+  const nickname = document.getElementById('inp-nickname').value.trim();
+  const promo    = document.getElementById('inp-promo').value.trim().toUpperCase();
+
+  if (currentMode === 'signup') {
+    if (!nickname) { showMsg(T.errName, 'error'); return; }
+    if (!document.getElementById('inp-consent').checked) { showMsg(T.errConsent, 'error'); return; }
+  }
+
+  btn.classList.add('loading'); btn.disabled = true;
   try {
-    const result = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    await handleSocialLogin(result.user, 'google');
+    if (currentMode === 'signin') {
+      await auth.signInWithEmailAndPassword(email, pw);
+    } else {
+      await auth.createUserWithEmailAndPassword(email, pw);
+    }
+    await finishLogin({ nickname, promo, method: 'password' });
+  } catch(e) {
+    btn.classList.remove('loading'); btn.disabled = false;
+    const c = e.code || '';
+    if (c === 'auth/wrong-password' || c === 'auth/invalid-credential') {
+      showMsg(T.errWrongPw, 'error');
+    } else if (c === 'auth/user-not-found') {
+      showMsg(T.errNoAccount, 'error'); setMode('signup');
+    } else if (c === 'auth/email-already-in-use') {
+      // Аккаунт есть — возможно, человек регистрировался по промокоду.
+      // Не отфутболиваем: предлагаем войти.
+      showMsg(T.errEmailTaken, 'error'); setMode('signin');
+    } else if (c === 'auth/weak-password') {
+      showMsg(T.errPassword, 'error');
+    } else {
+      showMsg(e.message, 'error');
+    }
+  }
+}
+
+async function resetPassword() {
+  const T = TRANSLATIONS[currentLang];
+  const email = document.getElementById('inp-email').value.trim().toLowerCase();
+  if (!email || !email.includes('@')) { showMsg(T.errEmail, 'error'); return; }
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showMsg(T.pwSent, 'success');
   } catch(e) { showMsg(e.message, 'error'); }
 }
 
 // ══════════════════════════════════════════════
-// ВХОД ЧЕРЕЗ FACEBOOK
+// ВХОД ЧЕРЕЗ GOOGLE / FACEBOOK
 // ══════════════════════════════════════════════
-async function signInWithFacebook() {
-  if (!checkGateBeforeSocial()) return;
+async function signInWithGoogle() {
   try {
-    const result = await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
-    await handleSocialLogin(result.user, 'facebook');
+    const r = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
+    await finishLogin({ nickname: (r.user.displayName || '').split(' ')[0], method: 'google' });
+  } catch(e) { showMsg(e.message, 'error'); }
+}
+
+async function signInWithFacebook() {
+  try {
+    const r = await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
+    await finishLogin({ nickname: (r.user.displayName || '').split(' ')[0], method: 'facebook' });
   } catch(e) {
     if (e.code === 'auth/account-exists-with-different-credential') {
-      showMsg('Email уже зарегистрирован через другой способ входа.', 'error');
+      showMsg(TRANSLATIONS[currentLang].errEmailTaken, 'error');
     } else { showMsg(e.message, 'error'); }
   }
 }
 
-async function handleSocialLogin(firebaseUser, method) {
-  const email = firebaseUser.email;
-  // Берём то, что человек сам ввёл в форму — не гадаем по гугл-профилю
-  const nickname = document.getElementById('inp-nickname').value.trim() || (firebaseUser.displayName || email).split(' ')[0];
-  let existing = await getUserFromFirebase(email);
-  if (existing) {
-    saveUser({ ...existing, email });
-    showMsg(`С возвращением, ${existing.nickname || nickname}!`, 'success');
-  } else {
-    const user = { nickname, email, promo: 'social-' + method, analysesLeft: ANALYSES_PER_CODE, analysesTotal: ANALYSES_PER_CODE,
-      registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: method };
-    saveUser(user);
-    await saveUserToFirebase(user);
-    const gotBonus = await applyReferralIfAny(email);
-    if (gotBonus) {
-      user.analysesLeft += REFERRAL_BONUS_AMOUNT;
-      user.analysesTotal += REFERRAL_BONUS_AMOUNT;
-      saveUser(user);
-      showMsg(TRANSLATIONS[currentLang].refBonusMsg(REFERRAL_BONUS_AMOUNT), 'success');
-    } else {
-      showMsg(TRANSLATIONS[currentLang].entering(nickname), 'success');
+// ══════════════════════════════════════════════
+// ВХОД ЧЕРЕЗ TELEGRAM
+// ══════════════════════════════════════════════
+// Telegram почту не сообщает. Если этот Telegram ещё ни к кому не привязан —
+// спрашиваем почту один раз. Сервер проверяет подпись Telegram и выдаёт
+// разовый ключ, которым мы получаем у Firebase обычный пропуск.
+window.onTelegramAuth = async function(tgUser) {
+  const T = TRANSLATIONS[currentLang];
+  showMsg('', '');
+  try {
+    let res = await api('/auth/telegram', { telegram: tgUser });
+    if (res.status === 'need_email') {
+      const email = (prompt(T.needEmailTg) || '').trim().toLowerCase();
+      if (!email || !email.includes('@')) { showMsg(T.errEmail, 'error'); return; }
+      res = await api('/auth/telegram', { telegram: tgUser, email });
     }
+    if (res.status === 'email_taken') { showMsg(T.tgTaken, 'error'); return; }
+    if (res.status !== 'ok' || !res.token) { showMsg(res.message || T.errConnection, 'error'); return; }
+    await auth.signInWithCustomToken(res.token);
+    await finishLogin({ nickname: res.nickname || '', method: 'telegram' });
+  } catch(e) { showMsg(T.errConnection, 'error'); }
+};
+
+function mountTelegramButton() {
+  try {
+    const wrap = document.getElementById('tg-login-wrap');
+    if (!wrap || wrap.dataset.mounted) return;
+    wrap.dataset.mounted = '1';
+    const sc = document.createElement('script');
+    sc.src = 'https://telegram.org/js/telegram-widget.js?22';
+    sc.async = true;
+    sc.setAttribute('data-telegram-login', 'AionVi_bot');
+    sc.setAttribute('data-size', 'large');
+    sc.setAttribute('data-radius', '2');
+    sc.setAttribute('data-onauth', 'onTelegramAuth(user)');
+    sc.setAttribute('data-request-access', 'write');
+    wrap.appendChild(sc);
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════
+// ОБЩЕЕ ЗАВЕРШЕНИЕ ВХОДА
+// ══════════════════════════════════════════════
+// Сервер создаёт запись и сам решает, сколько дать анализов. Браузер это
+// число больше не присылает — раньше именно здесь оно подделывалось.
+async function finishLogin({ nickname, promo, method }) {
+  const T = TRANSLATIONS[currentLang];
+  try {
+    const res = await api('/auth/register', {
+      nickname: nickname || '', promo: promo || '',
+      lang: currentLang, loginMethod: method || ''
+    });
+    if (res.status !== 'ok') { showMsg(res.message || T.errConnection, 'error'); return; }
+
+    const u = storeProfile(res.profile, { loginMethod: method });
+
+    if (res.created) {
+      const gotBonus = await applyReferralIfAny(u.email);
+      if (gotBonus) {
+        const fresh = await api('/auth/session', {});
+        if (fresh.status === 'ok') storeProfile(fresh.profile, { loginMethod: method });
+        showMsg(T.refBonusMsg(REFERRAL_BONUS_AMOUNT), 'success');
+      } else if (res.promoRejected) {
+        showMsg(T.errUsed, 'error');
+        setTimeout(() => { window.location.href = 'calculator.html'; }, 2200);
+        return;
+      } else {
+        showMsg(T.entering(u.nickname || nickname || ''), 'success');
+      }
+    } else {
+      showMsg(T.welcome(u.nickname || nickname || ''), 'success');
+    }
+    setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
+  } catch(e) {
+    showMsg(T.errConnection, 'error');
   }
-  setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
+}
+
+// ══════════════════════════════════════════════
+// ГОСТЕВОЙ ВХОД
+// ══════════════════════════════════════════════
+function enterAsGuest() {
+  try { localStorage.setItem('aion_guest', '1'); } catch(e) {}
+  return true; // ссылка сама уводит в калькулятор
+}
+
+// ══════════════════════════════════════════════
+// ВОЗВРАТ ТЕХ, КТО ЗАСТРЯЛ СНАРУЖИ
+// ══════════════════════════════════════════════
+// Люди, зарегистрированные по промокоду до появления входа, аккаунта в
+// Firebase не имеют. Их промокод сожжён, и раньше они получали
+// "код уже использован" без всякого выхода. Теперь им предлагается
+// придумать пароль — запись, баланс и история остаются на месте.
+let pendingClaimEmail = '';
+
+async function claimExistingAccount() {
+  const T = TRANSLATIONS[currentLang];
+  const pw = document.getElementById('inp-password2').value;
+  const btn = document.getElementById('btn-setpw');
+  const msg = document.getElementById('msg2');
+  msg.textContent = '';
+  if (!pw || pw.length < 6) { msg.textContent = T.errPassword; msg.className = 'msg error'; return; }
+  btn.classList.add('loading'); btn.disabled = true;
+  try {
+    await auth.createUserWithEmailAndPassword(pendingClaimEmail, pw);
+    await finishLogin({ nickname: '', method: 'password' });
+  } catch(e) {
+    btn.classList.remove('loading'); btn.disabled = false;
+    msg.textContent = e.code === 'auth/email-already-in-use' ? T.errEmailTaken : e.message;
+    msg.className = 'msg error';
+  }
+}
+
+function showSetPassword(email, nickname) {
+  const T = TRANSLATIONS[currentLang];
+  pendingClaimEmail = email;
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('setpw-box').style.display = 'block';
+  document.getElementById('t-setpw-intro').textContent = T.setPwIntro;
 }
 
 // ══════════════════════════════════════════════
@@ -693,9 +1002,9 @@ window.onload = function() {
   initFirebaseApp();
   const savedLang = localStorage.getItem('aion_lang') || 'en';
   setLang(savedLang);
+  setMode('signin');
+  mountTelegramButton();
 
-  // Реферальная метка из ссылки (?ref=...) — запоминаем, кто пригласил.
-  // Начислим бонус после успешной регистрации нового человека.
   try {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
@@ -703,110 +1012,40 @@ window.onload = function() {
       localStorage.setItem('aion_ref', ref);
       const banner = document.getElementById('ref-banner');
       if (banner) banner.style.display = 'block';
+      setMode('signup');
     }
   } catch(e) {}
 
-  const user = getUser();
-  if (user && user.email && user.analysesLeft > 0) {
-    getUserFromFirebase(user.email).then(fb => {
-      showAlreadyIn(fb ? { ...user, analysesLeft: fb.analysesLeft } : user);
-    }).catch(() => showAlreadyIn(user));
-  }
+  // Уже вошёл на этом устройстве? Спрашиваем у сервера актуальный баланс.
+  auth.onAuthStateChanged(async (fbUser) => {
+    if (!fbUser) return;
+    try {
+      const res = await api('/auth/session', {});
+      if (res.status === 'ok') {
+        showAlreadyIn(storeProfile(res.profile, {}));
+      } else if (res.status === 'not_registered') {
+        await finishLogin({ nickname: (fbUser.displayName || '').split(' ')[0], method: 'restored' });
+      }
+    } catch(e) {}
+  });
 };
 
-// Вызов реферального бонуса после регистрации нового пользователя
 async function applyReferralIfAny(email) {
   try {
     const ref = localStorage.getItem('aion_ref');
     if (!ref) return false;
-    const r = await fetch(`${SERVER}/referral`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ ref, email })
-    });
-    const d = await r.json();
-    localStorage.removeItem('aion_ref'); // одноразово
+    const d = await api('/referral', { ref, email });
+    localStorage.removeItem('aion_ref');
     return d.status === 'ok';
   } catch(e) { return false; }
 }
 
 function showAlreadyIn(user) {
   document.getElementById('login-form').style.display = 'none';
+  document.getElementById('setpw-box').style.display = 'none';
   document.getElementById('already-in').style.display = 'block';
   document.getElementById('welcome-name').textContent = TRANSLATIONS[currentLang].welcome(user.nickname || '');
-  document.getElementById('analyses-left').textContent = user.analysesLeft;
-}
-
-// ══════════════════════════════════════════════
-// ВХОД ПО ПРОМОКОДУ
-// ══════════════════════════════════════════════
-async function enterApp() {
-  const T = TRANSLATIONS[currentLang];
-  const nickname = document.getElementById('inp-nickname').value.trim();
-  const email    = document.getElementById('inp-email').value.trim().toLowerCase();
-  const promo    = document.getElementById('inp-promo').value.trim().toUpperCase();
-  const btn      = document.getElementById('btn-enter');
-  showMsg('', '');
-  if (!nickname)                     { showMsg(T.errName, 'error'); return; }
-  if (!email || !email.includes('@')) { showMsg(T.errEmail, 'error'); return; }
-  if (!document.getElementById('inp-consent').checked) { showMsg(T.errConsent, 'error'); return; }
-  btn.classList.add('loading'); btn.disabled = true;
-
-  // Сначала проверяем — может, этот email уже зарегистрирован (человек
-  // просто потерял локальную сессию: почистил кэш, сменил устройство,
-  // переустановил приложение). Тогда пускаем обратно с их текущим
-  // остатком анализов — промокод для этого не нужен вообще, свой они
-  // уже потратили при первой регистрации.
-  let existing;
-  try {
-    existing = await getUserFromFirebase(email);
-  } catch(e) { existing = null; }
-
-  if (existing) {
-    saveUser({ ...existing, email });
-    showMsg(`С возвращением, ${existing.nickname || nickname}!`, 'success');
-    setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
-    return;
-  }
-
-  // Новый email — тут промокод уже обязателен
-  if (!promo) {
-    showMsg(T.errPromo, 'error');
-    btn.classList.remove('loading'); btn.disabled = false; return;
-  }
-
-  let redeemResult;
-  try {
-    const r = await fetch(`${SERVER}/redeem`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ code: promo })
-    });
-    redeemResult = await r.json();
-  } catch(e) {
-    showMsg(T.errConnection || 'Ошибка соединения с сервером', 'error');
-    btn.classList.remove('loading'); btn.disabled = false; return;
-  }
-
-  if (!redeemResult.valid) {
-    const msg = redeemResult.reason === 'used' ? T.errUsed : T.errNotFound;
-    showMsg(msg, 'error'); btn.classList.remove('loading'); btn.disabled = false; return;
-  }
-
-  const user = { nickname, email, promo, analysesLeft: ANALYSES_PER_CODE, analysesTotal: ANALYSES_PER_CODE,
-    registeredAt: new Date().toISOString(), lang: currentLang, loginMethod: 'promo' };
-  saveUser(user); markCodeUsed(promo);
-  await saveUserToFirebase(user);
-  const gotBonus = await applyReferralIfAny(email);
-  if (gotBonus) {
-    user.analysesLeft += REFERRAL_BONUS_AMOUNT;
-    user.analysesTotal += REFERRAL_BONUS_AMOUNT;
-    saveUser(user);
-    showMsg(T.refBonusMsg(REFERRAL_BONUS_AMOUNT), 'success');
-  } else {
-    showMsg(T.entering(nickname), 'success');
-  }
-  setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
+  document.getElementById('analyses-left').textContent = user.unlimited ? '∞' : user.analysesLeft;
 }
 
 function showMsg(text, type) {
@@ -818,11 +1057,17 @@ function showMsg(text, type) {
 function logout() {
   auth.signOut().catch(() => {});
   localStorage.removeItem('aion_user');
+  localStorage.removeItem('aion_guest');
   document.getElementById('already-in').style.display = 'none';
+  document.getElementById('setpw-box').style.display = 'none';
   document.getElementById('login-form').style.display = 'block';
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Enter') enterApp(); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('setpw-box').style.display === 'block') claimExistingAccount();
+  else if (document.getElementById('login-form').style.display !== 'none') submitAuth();
+});
 </script>
 <script>
 if ('serviceWorker' in navigator) {
