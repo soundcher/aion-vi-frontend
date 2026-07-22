@@ -1621,9 +1621,18 @@ async function initFirebase() {
     const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where } =
       await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { getAuth, onAuthStateChanged } =
+      await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
     const app = initializeApp(FIREBASE_CONFIG);
     db = getFirestore(app);
     window._fs = { collection, addDoc, getDocs, query, orderBy, limit, where };
+    window._auth = getAuth(app);
+    // Ждём, пока Firebase восстановит вход — иначе первые запросы уйдут
+    // без пропуска и сервер их отклонит.
+    await new Promise(resolve => {
+      const stop = onAuthStateChanged(window._auth, () => { stop(); resolve(); });
+      setTimeout(resolve, 3000);
+    });
     console.log('Firebase OK');
   } catch(e) {
     console.warn('Firebase недоступен:', e.message);
@@ -1634,6 +1643,55 @@ async function initFirebase() {
 // СЕРВЕР И СОСТОЯНИЕ
 // ══════════════════════════════════════════════
 const SERVER = 'https://aion-vi-server-production.up.railway.app';
+
+// ══════════════════════════════════════════════
+// ПОЛЬЗОВАТЕЛЬ: ОДНА ТОЧКА ДОСТУПА
+// ══════════════════════════════════════════════
+// Раньше пользователь читался из памяти браузера в дюжине мест, и каждое
+// верило написанному там числу анализов. Теперь память браузера — только
+// витрина для быстрой отрисовки, а источник правды — сервер.
+function getUser() {
+  try { return JSON.parse(localStorage.getItem('aion_user') || 'null'); }
+  catch(e) { return null; }
+}
+function setUser(u) {
+  try { localStorage.setItem('aion_user', JSON.stringify(u)); } catch(e) {}
+}
+function isGuest() {
+  return !getUser() && localStorage.getItem('aion_guest') === '1';
+}
+
+// Пропуск: подписанный Firebase токен. По нему сервер понимает, кто пришёл.
+async function getIdToken() {
+  try {
+    const u = window._auth && window._auth.currentUser;
+    return u ? await u.getIdToken() : null;
+  } catch(e) { return null; }
+}
+
+// Единая обёртка для запросов к серверу — сама прикладывает пропуск.
+async function apiPost(path, body) {
+  const headers = {'Content-Type': 'application/json'};
+  const token = await getIdToken();
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return await fetch(SERVER + path, {
+    method: 'POST', headers, body: JSON.stringify(body || {})
+  });
+}
+
+// Свежий баланс с сервера. Память браузера обновляем от него, а не наоборот.
+async function refreshProfile() {
+  try {
+    const r = await apiPost('/auth/session', {});
+    const d = await r.json();
+    if (d.status === 'ok' && d.profile) {
+      setUser(Object.assign({}, getUser() || {}, d.profile));
+      if (typeof renderAnalysesCounter === 'function') renderAnalysesCounter();
+      return d.profile;
+    }
+  } catch(e) {}
+  return null;
+}
 // ⚠️ Когда подключишь свой домен вместо Firebase-адреса — замени строку ниже
 const SITE_URL = 'https://aion-vi.web.app';
 let currentSummary = '';
@@ -1684,18 +1742,14 @@ function selectRating(n) {
 async function submitRating() {
   if (!currentRating) return;
   const comment = document.getElementById('rating-comment').value.trim();
-  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const user = getUser();
   try {
-    await fetch(`${SERVER}/rate`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: user?.email || '',
-        rating: currentRating,
-        comment: comment,
-        compat: !!compatEnabled,
-        theme: compatEnabled ? (document.querySelector('.compat-theme-btn.active')?.dataset.theme || '') : ''
-      })
+    await apiPost('/rate', {
+      email: user?.email || '',
+      rating: currentRating,
+      comment: comment,
+      compat: !!compatEnabled,
+      theme: compatEnabled ? (document.querySelector('.compat-theme-btn.active')?.dataset.theme || '') : ''
     });
   } catch(e) {}
   document.getElementById('rating-stars').style.display = 'none';
@@ -2103,7 +2157,7 @@ function removeExtraPerson(n) {
 // ══════════════════════════════════════════════
 function openFeedbackModal() {
   document.getElementById('feedback-modal').classList.add('show');
-  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const user = getUser();
   if (user) {
     document.getElementById('fb-name').value = user.nickname || '';
     document.getElementById('fb-email').value = user.email || '';
@@ -2199,7 +2253,7 @@ async function geocodeP2() {
 // ЖИВОЕ ПРИВЕТСТВИЕ AION Vi
 // ══════════════════════════════════════════════
 function renderAnalysesCounter() {
-  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const user = getUser();
   const box = document.getElementById('analyses-counter');
   if (!user || typeof user.analysesLeft !== 'number') { box.style.display = 'none'; return; }
   const total = Math.max(user.analysesTotal || 5, user.analysesLeft, 1);
@@ -2211,7 +2265,7 @@ function renderAnalysesCounter() {
 }
 
 function initGreeting() {
-  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const user = getUser();
   const nickname = user?.nickname || '';
   const emailKey = user?.email ? user.email.replace(/\./g,'_').replace(/@/g,'__at__') : 'anon';
   const lastVisit = localStorage.getItem(`aion_last_visit_${emailKey}`);
@@ -2274,7 +2328,7 @@ async function generateQuickProfile(calcData, p2calcData) {
   if (el) el.innerHTML = '<div style="color:var(--text-faint);font-size:12px;padding:10px;">✦ AION Vi изучает твой код...</div>';
 
   try {
-    const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+    const user = getUser();
     const nickname = user?.nickname || document.getElementById('firstname')?.value || '';
     const num = calcData.numerology || {};
     const bazi = calcData.bazi || {};
@@ -2540,7 +2594,7 @@ async function generateAnalysis() {
 
   // Проверка остатка анализов ДО любых расходов на API
   try {
-    const u = JSON.parse(localStorage.getItem('aion_user') || 'null');
+    const u = getUser();
     if (u && typeof u.analysesLeft === 'number' && u.analysesLeft <= 0) {
       const box = document.getElementById('analysis-box');
       box.innerHTML = `
@@ -2676,23 +2730,20 @@ async function generateAnalysis() {
     const requestText = document.getElementById('request').value.trim();
     const themeLabel = compatEnabled ? THEME_NAMES[selectedTheme] : '';
 
-    const r = await fetch(`${SERVER}/generate`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        summary: currentSummary,
-        request: requestText,
-        lang_instruction: langInstruction,
-        compat_enabled: compatEnabled,
-        compat_theme: themeLabel,
-        compat_summaries: compatPeople,
-        no_time: currentClientData.no_time || false,
-        client_info: { firstname: currentClientData.firstname || '', lastname: currentClientData.lastname || '' },
-        answer_mode: document.getElementById('answer-mode').value,
-        conversation_history: conversationHistory,
-        nickname: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).nickname || '',
-        email: (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || ''
-      })
+    // email не отправляем — сервер берёт его из пропуска и по нему же
+    // списывает анализ. Подставить чужой адрес больше невозможно.
+    const r = await apiPost('/generate', {
+      summary: currentSummary,
+      request: requestText,
+      lang_instruction: langInstruction,
+      compat_enabled: compatEnabled,
+      compat_theme: themeLabel,
+      compat_summaries: compatPeople,
+      no_time: currentClientData.no_time || false,
+      client_info: { firstname: currentClientData.firstname || '', lastname: currentClientData.lastname || '' },
+      answer_mode: document.getElementById('answer-mode').value,
+      conversation_history: conversationHistory,
+      nickname: (getUser() || {}).nickname || ''
     });
     const data = await r.json();
 
@@ -2729,7 +2780,7 @@ async function generateAnalysis() {
     // персональных функций (обзор месяца и т.п.). Это данные person1,
     // а не person2/3/4 из блока совместимости.
     try {
-      const ownUser = JSON.parse(localStorage.getItem('aion_user') || 'null');
+      const ownUser = getUser();
       if (ownUser) {
         ownUser.ownBirth = {
           day: currentClientData.day,
@@ -2740,7 +2791,7 @@ async function generateAnalysis() {
           lat: currentClientData.lat,
           lon: currentClientData.lon
         };
-        localStorage.setItem('aion_user', JSON.stringify(ownUser));
+        setUser(ownUser);
       }
     } catch(e) {}
 
@@ -2785,10 +2836,10 @@ async function generateAnalysis() {
     // Синхронизируем счётчик с сервером — сервер единственный, кто реально
     // списывает анализ, браузер только отображает актуальное число
     try {
-      const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+      const user = getUser();
       if (user && typeof data.analyses_left === 'number') {
         user.analysesLeft = data.analyses_left;
-        localStorage.setItem('aion_user', JSON.stringify(user));
+        setUser(user);
         renderAnalysesCounter();
         if (user.analysesLeft <= 2) {
           const warn = user.analysesLeft === 0
@@ -2945,7 +2996,7 @@ const LEMONSQUEEZY_LINKS = {
 };
 
 function openPricingModal() {
-  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const user = getUser();
   const email = user?.email || '';
   // Передаём email как custom data — вебхук на сервере получит его обратно
   // и поймёт, кому именно начислять пакет после оплаты.
@@ -2965,7 +3016,7 @@ function openGiftModal() {
 
   // Метка отправителя для будущей реферальной программы —
   // берём промокод пользователя, а если его нет (соц-вход) — nickname
-  const senderUser = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const senderUser = getUser();
   const refTag = senderUser?.promo || senderUser?.nickname || 'friend';
   const shareUrl = `${SITE_URL}/?ref=${encodeURIComponent(refTag)}`;
 
@@ -3118,7 +3169,7 @@ async function saveToFirebase(analysis, client, request) {
   if (!db) return;
   try {
     const { collection, addDoc } = window._fs;
-    const owner = (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || '';
+    const owner = (getUser() || {}).email || '';
     await addDoc(collection(db, 'analyses'), {
       ownerEmail: owner,
       createdAt: new Date().toISOString(),
@@ -3146,7 +3197,7 @@ async function openHistory() {
   itemsEl.innerHTML = '<div class="history-empty">Загружаю...</div>';
   overlay.classList.add('show');
 
-  const myEmail = (JSON.parse(localStorage.getItem('aion_user') || 'null') || {}).email || '';
+  const myEmail = (getUser() || {}).email || '';
   if (!myEmail) {
     itemsEl.innerHTML = '<div class="history-empty">Войди в аккаунт, чтобы видеть свою историю.</div>';
     return;
@@ -3154,11 +3205,9 @@ async function openHistory() {
 
   try {
     // История хранится на сервере в закрытом разделе — клиент получает ТОЛЬКО свою
-    const resp = await fetch(`${SERVER}/history`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ email: myEmail })
-    });
+    // email больше не отправляем: сервер берёт его из пропуска.
+    // Раньше сюда можно было подставить ЧУЖОЙ адрес и прочитать чужую переписку.
+    const resp = await apiPost('/history', {});
     const result = await resp.json();
     const docs = result.items || [];
 
@@ -3224,26 +3273,21 @@ function openMonthlyDigestBanner() {
 }
 
 async function checkMonthlyDigest() {
-  const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+  const user = getUser();
   if (!user || !user.email || !user.ownBirth) return;
   const b = user.ownBirth;
   if (!b.day || !b.month || !b.year) return;
 
   try {
-    const r = await fetch(`${SERVER}/monthly-digest`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: user.email,
-        day: b.day,
-        month: b.month,
-        year: b.year,
-        hour: b.hour,
-        minute: b.minute,
-        lat: b.lat,
-        lon: b.lon,
-        lang_instruction: t('generatePromptLang')
-      })
+    const r = await apiPost('/monthly-digest', {
+      day: b.day,
+      month: b.month,
+      year: b.year,
+      hour: b.hour,
+      minute: b.minute,
+      lat: b.lat,
+      lon: b.lon,
+      lang_instruction: t('generatePromptLang')
     });
     const data = await r.json();
     if (data.status === 'ok' && data.analysis) {
@@ -3350,13 +3394,9 @@ async function subscribeToPush() {
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       });
     }
-    const user = JSON.parse(localStorage.getItem('aion_user') || 'null');
+    const user = getUser();
     if (user && user.email) {
-      await fetch(`${SERVER}/push/subscribe`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ email: user.email, subscription: sub.toJSON() })
-      });
+      await apiPost('/push/subscribe', { email: user.email, subscription: sub.toJSON() });
     }
   } catch(e) {
     console.log('Не удалось подписаться на push:', e.message);
@@ -3654,11 +3694,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // Проверка входа СРАЗУ при загрузке — если сессия потеряна (например,
   // после очистки данных сайта в браузере), не даём человеку тратить время
   // на заполнение формы, чтобы споткнуться только в конце на сервере.
-  const loggedInUser = JSON.parse(localStorage.getItem('aion_user') || 'null');
-  if (!loggedInUser || !loggedInUser.email) {
+  // Гость — человек, выбравший "попробовать без регистрации". Его пускаем:
+  // один бесплатный анализ он получает без аккаунта.
+  const loggedInUser = getUser();
+  if ((!loggedInUser || !loggedInUser.email) && !isGuest()) {
     window.location.href = 'index.html';
     return;
   }
+
+  // Спрашиваем у сервера настоящий баланс. Память браузера — только витрина:
+  // раньше ей верили на слово, и подкрученное там число открывало доступ.
+  // Настоящий баланс спросим у сервера сразу после запуска Firebase (ниже).
 
   // Загружаем сохранённый язык
   const savedLang = localStorage.getItem('aion_lang') || 'en';
@@ -3686,19 +3732,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Фиксируем, что человек реально был — нужно для push "по неактивности"
   (function sendHeartbeat() {
-    const u = JSON.parse(localStorage.getItem('aion_user') || 'null');
+    const u = getUser();
     if (u && u.email) {
-      fetch(`${SERVER}/user/heartbeat`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ email: u.email })
-      }).catch(() => {});
+      apiPost('/user/heartbeat', { email: u.email }).catch(() => {});
     }
   })();
 
   checkServer();
   setInterval(checkServer, 10000);
-  initFirebase();
+  // Firebase запускается ОДИН раз. Внутри он дожидается восстановления входа,
+  // поэтому дальше пропуск уже доступен и баланс можно спросить у сервера.
+  initFirebase().then(() => {
+    const u = getUser();
+    if (u && u.email) refreshProfile();
+  });
   // Очищаем старые профили с undefined place
   try {
     const p = getProfiles().filter(x => x.place && x.place !== 'undefined');

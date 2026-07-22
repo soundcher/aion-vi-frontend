@@ -271,10 +271,10 @@
 <div class="lang-bar">
   <button onclick="adjustFontScale(-1)" class="lang-btn" style="font-size:12px;" title="Меньше текст">A−</button>
   <button onclick="adjustFontScale(1)" class="lang-btn" style="font-size:16px;" title="Больше текст">A+</button>
-  <button class="lang-btn active" onclick="setLang('en')" title="English">🇬🇧</button>
-  <button class="lang-btn" onclick="setLang('uk')" title="Українська">🇺🇦</button>
-  <button class="lang-btn" onclick="setLang('pl')" title="Polski">🇵🇱</button>
-  <button class="lang-btn" onclick="setLang('ru')" title="Русский">🇷🇺</button>
+  <button class="lang-btn active" data-lang="en" onclick="setLang('en')" title="English">🇬🇧</button>
+  <button class="lang-btn" data-lang="uk" onclick="setLang('uk')" title="Українська">🇺🇦</button>
+  <button class="lang-btn" data-lang="pl" onclick="setLang('pl')" title="Polski">🇵🇱</button>
+  <button class="lang-btn" data-lang="ru" onclick="setLang('ru')" title="Русский">🇷🇺</button>
 </div>
 
 <div class="container">
@@ -362,6 +362,7 @@
     </div>
 
     <!-- Telegram: виджет подставляет сюда свою кнопку сам -->
+    <div id="t-tg-note" style="font-size:10px;color:var(--text-faint);text-align:center;margin-bottom:6px;letter-spacing:0.5px;"></div>
     <div id="tg-login-wrap" style="display:flex;justify-content:center;margin-bottom:16px;min-height:1px;"></div>
 
     <div class="divider"></div>
@@ -406,7 +407,7 @@
 
   <div class="note">
     <span id="t-group-note">Group analysis (5+ people) —</span><br>
-    <a href="mailto:aionvi_kod@gmail.com">aionvi_kod@gmail.com</a>
+    <a href="mailto:soundcher11@gmail.com">soundcher11@gmail.com</a>
   </div>
 
 </div>
@@ -417,6 +418,7 @@
 // ══════════════════════════════════════════════
 const TRANSLATIONS = {
   en: {
+    tgNote: 'Telegram — one tap, no password',
     authTitle: 'Access to AION Vi',
     tabSignin: 'Sign in',
     tabSignup: 'Create account',
@@ -467,6 +469,7 @@ const TRANSLATIONS = {
     refBonusMsg: (b) => `✦ Welcome! You got +${b} free questions for accepting a friend's invite.`,
   },
   uk: {
+    tgNote: 'Telegram — один дотик, без пароля',
     authTitle: 'Вхід до AION Vi',
     tabSignin: 'Увійти',
     tabSignup: 'Створити акаунт',
@@ -517,6 +520,7 @@ const TRANSLATIONS = {
     refBonusMsg: (b) => `✦ Ласкаво просимо! Ти отримав(-ла) +${b} безкоштовних запитань за запрошення друга.`,
   },
   pl: {
+    tgNote: 'Telegram — jedno dotknięcie, bez hasła',
     authTitle: 'Dostęp do AION Vi',
     tabSignin: 'Zaloguj się',
     tabSignup: 'Załóż konto',
@@ -567,6 +571,7 @@ const TRANSLATIONS = {
     refBonusMsg: (b) => `✦ Witaj! Otrzymałeś(-aś) +${b} darmowych pytań za przyjęcie zaproszenia.`,
   },
   ru: {
+    tgNote: 'Telegram — один тап, без пароля',
     authTitle: 'Вход в AION Vi',
     tabSignin: 'Войти',
     tabSignup: 'Создать аккаунт',
@@ -637,9 +642,12 @@ function setLang(lang) {
   const T = TRANSLATIONS[lang];
 
   // Флаги
+  // Ищем кнопку по языку, а не по номеру: "A−" и "A+" тоже имеют класс
+  // lang-btn, из-за чего нумерация съезжала на две позиции и подсвечивался
+  // соседний флаг.
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  const flags = { en: 0, uk: 1, pl: 2, ru: 3 };
-  document.querySelectorAll('.lang-btn')[flags[lang]].classList.add('active');
+  const flagBtn = document.querySelector(`.lang-btn[data-lang="${lang}"]`);
+  if (flagBtn) flagBtn.classList.add('active');
 
   // Тексты
   document.getElementById('t-tagline').textContent = T.tagline;
@@ -668,6 +676,7 @@ function setLang(lang) {
   set('t-forgot-pw', T.forgotPw);
   set('t-or-signin', T.orContinue);
   set('t-guest-link', T.guestLink);
+  set('t-tg-note', T.tgNote);
   set('t-guest-note', T.guestNote);
   set('t-setpw-title', T.setPwTitle);
   set('t-lbl-password2', T.lblPassword);
@@ -685,6 +694,15 @@ function setLang(lang) {
   const user = getUser();
   if (user && user.nickname) {
     document.getElementById('welcome-name').textContent = T.welcome(user.nickname);
+  }
+
+  // Кнопку Telegram рисует их скрипт, поменять надпись задним числом
+  // нельзя — пересобираем её целиком под новый язык.
+  const tgWrap = document.getElementById('tg-login-wrap');
+  if (tgWrap && tgWrap.dataset.mounted) {
+    tgWrap.innerHTML = '';
+    delete tgWrap.dataset.mounted;
+    mountTelegramButton();
   }
 
   localStorage.setItem('aion_lang', lang);
@@ -908,6 +926,9 @@ function mountTelegramButton() {
     sc.setAttribute('data-radius', '2');
     sc.setAttribute('data-onauth', 'onTelegramAuth(user)');
     sc.setAttribute('data-request-access', 'write');
+    // Надпись на самой кнопке рисует Telegram. Без этого он берёт язык
+    // интерфейса Telegram, а не язык, выбранный в приложении.
+    sc.setAttribute('data-lang', currentLang === 'uk' ? 'uk' : (currentLang === 'ru' ? 'ru' : (currentLang === 'pl' ? 'pl' : 'en')));
     wrap.appendChild(sc);
   } catch(e) {}
 }
