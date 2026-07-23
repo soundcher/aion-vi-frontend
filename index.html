@@ -918,12 +918,16 @@ function loadFacebookSdk() {
   return _fbSdkPromise;
 }
 
-async function signInWithFacebook() {
+function signInWithFacebook() {
   const T = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
-  try {
-    await loadFacebookSdk();
-  } catch(e) { showMsg(T.errConnection, 'error'); return; }
-
+  // Мобильные браузеры разрешают открыть окно входа Facebook, только если
+  // это происходит СРАЗУ внутри нажатия кнопки, без единой паузы (await).
+  // Раньше здесь ждали загрузку SDK перед вызовом — эта пауза рвала связь
+  // с нажатием, и браузер тихо блокировал окно, без единой ошибки на экране.
+  if (typeof FB === 'undefined') {
+    showMsg(T.errConnection, 'error');
+    return;
+  }
   FB.login(async (response) => {
     if (!response.authResponse) return; // человек закрыл диалог сам — не ошибка
     try {
@@ -1078,6 +1082,10 @@ window.onload = async function() {
   setLang(savedLang);
   setMode('signin');
   mountTelegramButton();
+  // Грузим SDK Facebook заранее — к моменту нажатия кнопки он уже готов,
+  // и FB.login() можно звать мгновенно, без паузы, которая рвёт связь
+  // с нажатием и приводит к тихой блокировке окна входа на мобильных.
+  loadFacebookSdk().catch(() => {});
 
   // Человек вернулся после входа через Google/Facebook — разбираем результат.
   const pendingMethod = localStorage.getItem('aion_pending_login');
