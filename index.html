@@ -892,11 +892,22 @@ async function resetPassword() {
 // про начатый вход ("missing initial state"). Открываем редирект явно —
 // человек уходит на Google/Facebook и возвращается обратно в приложение;
 // результат разбирается ниже, при загрузке страницы.
-async function signInWithGoogle() {
-  try {
-    localStorage.setItem('aion_pending_login', 'google');
-    await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
-  } catch(e) { showMsg(e.message, 'error'); }
+// Приложение живёт на aion-vi.web.app, а обработчик входа Firebase — на
+// aion-vi.firebaseapp.com. Схема "уйти и вернуться" (redirect) требует,
+// чтобы браузер пронёс память между этими двумя разными адресами — в
+// обычном режиме иногда получается, в инкогнито никогда. Всплывающее
+// окно (popup) этой памяти не требует вообще, поэтому не подвержено
+// проблеме. Вызывается БЕЗ await перед собой — задержка в один тик рвёт
+// связь с нажатием кнопки, и мобильный браузер тихо блокирует окно.
+function signInWithGoogle() {
+  const T = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+  auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+    .then(r => finishLogin({ nickname: (r.user.displayName || '').split(' ')[0], method: 'google' }))
+    .catch(e => {
+      if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') return;
+      if (e.code === 'auth/account-exists-with-different-credential') showMsg(T.errEmailTaken, 'error');
+      else showMsg(e.message, 'error');
+    });
 }
 
 // Facebook на мобильных ломает общую редирект-схему Firebase чаще, чем
@@ -1090,26 +1101,7 @@ window.onload = async function() {
   // Когда вернём — раскомментировать строку ниже.
   // loadFacebookSdk().catch(() => {});
 
-  // Человек вернулся после входа через Google/Facebook — разбираем результат.
-  const pendingMethod = localStorage.getItem('aion_pending_login');
-  if (pendingMethod) {
-    localStorage.removeItem('aion_pending_login');
-    try {
-      const r = await auth.getRedirectResult();
-      if (r && r.user) {
-        await finishLogin({ nickname: (r.user.displayName || '').split(' ')[0], method: pendingMethod });
-        return;
-      }
-    } catch(e) {
-      const T = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
-      if (e.code === 'auth/account-exists-with-different-credential') {
-        showMsg(T.errEmailTaken, 'error');
-      } else if (e.code) {
-        showMsg(e.message, 'error');
-      }
-      // Иначе — человек просто передумал и вернулся сам, без ошибки. Молчим.
-    }
-  }
+
 
   try {
     const params = new URLSearchParams(window.location.search);
