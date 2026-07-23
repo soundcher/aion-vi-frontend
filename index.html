@@ -882,22 +882,24 @@ async function resetPassword() {
 // ══════════════════════════════════════════════
 // ВХОД ЧЕРЕЗ GOOGLE / FACEBOOK
 // ══════════════════════════════════════════════
+// Попап на мобильных браузерах ненадёжен: Chrome его часто блокирует,
+// Firebase тогда молча переключается на редирект сам — но именно в этот
+// незаметный момент браузер иногда теряет то, что должен был запомнить
+// про начатый вход ("missing initial state"). Открываем редирект явно —
+// человек уходит на Google/Facebook и возвращается обратно в приложение;
+// результат разбирается ниже, при загрузке страницы.
 async function signInWithGoogle() {
   try {
-    const r = await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    await finishLogin({ nickname: (r.user.displayName || '').split(' ')[0], method: 'google' });
+    localStorage.setItem('aion_pending_login', 'google');
+    await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
   } catch(e) { showMsg(e.message, 'error'); }
 }
 
 async function signInWithFacebook() {
   try {
-    const r = await auth.signInWithPopup(new firebase.auth.FacebookAuthProvider());
-    await finishLogin({ nickname: (r.user.displayName || '').split(' ')[0], method: 'facebook' });
-  } catch(e) {
-    if (e.code === 'auth/account-exists-with-different-credential') {
-      showMsg(TRANSLATIONS[currentLang].errEmailTaken, 'error');
-    } else { showMsg(e.message, 'error'); }
-  }
+    localStorage.setItem('aion_pending_login', 'facebook');
+    await auth.signInWithRedirect(new firebase.auth.FacebookAuthProvider());
+  } catch(e) { showMsg(e.message, 'error'); }
 }
 
 // ══════════════════════════════════════════════
@@ -1032,14 +1034,35 @@ function showSetPassword(email, nickname) {
 // ══════════════════════════════════════════════
 // ИНИЦИАЛИЗАЦИЯ
 // ══════════════════════════════════════════════
-window.onload = function() {
+window.onload = async function() {
   const savedScale = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
   if (savedScale > 0) applyFontScale(savedScale);
-  initFirebaseApp();
+  await initFirebaseApp();
   const savedLang = localStorage.getItem('aion_lang') || 'en';
   setLang(savedLang);
   setMode('signin');
   mountTelegramButton();
+
+  // Человек вернулся после входа через Google/Facebook — разбираем результат.
+  const pendingMethod = localStorage.getItem('aion_pending_login');
+  if (pendingMethod) {
+    localStorage.removeItem('aion_pending_login');
+    try {
+      const r = await auth.getRedirectResult();
+      if (r && r.user) {
+        await finishLogin({ nickname: (r.user.displayName || '').split(' ')[0], method: pendingMethod });
+        return;
+      }
+    } catch(e) {
+      const T = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
+      if (e.code === 'auth/account-exists-with-different-credential') {
+        showMsg(T.errEmailTaken, 'error');
+      } else if (e.code) {
+        showMsg(e.message, 'error');
+      }
+      // Иначе — человек просто передумал и вернулся сам, без ошибки. Молчим.
+    }
+  }
 
   try {
     const params = new URLSearchParams(window.location.search);
