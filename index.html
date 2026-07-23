@@ -895,11 +895,47 @@ async function signInWithGoogle() {
   } catch(e) { showMsg(e.message, 'error'); }
 }
 
+// Facebook на мобильных ломает общую редирект-схему Firebase чаще, чем
+// Google (см. missing initial state) — вероятно, дело в собственных
+// внутренних переходах facebook.com при входе. Вместо неё — родной SDK
+// Facebook: он сам открывает диалог входа и отдаёт готовый токен, без
+// зависимости от sessionStorage браузера между переходами.
+let _fbSdkPromise = null;
+function loadFacebookSdk() {
+  if (_fbSdkPromise) return _fbSdkPromise;
+  _fbSdkPromise = new Promise((resolve, reject) => {
+    window.fbAsyncInit = function() {
+      FB.init({ appId: '1029177436475941', cookie: true, xfbml: false, version: 'v19.0' });
+      resolve();
+    };
+    const sc = document.createElement('script');
+    sc.src = 'https://connect.facebook.net/en_US/sdk.js';
+    sc.async = true;
+    sc.onerror = () => reject(new Error('facebook_sdk_failed'));
+    document.body.appendChild(sc);
+    setTimeout(() => reject(new Error('facebook_sdk_timeout')), 8000);
+  });
+  return _fbSdkPromise;
+}
+
 async function signInWithFacebook() {
+  const T = TRANSLATIONS[currentLang] || TRANSLATIONS.en;
   try {
-    localStorage.setItem('aion_pending_login', 'facebook');
-    await auth.signInWithRedirect(new firebase.auth.FacebookAuthProvider());
-  } catch(e) { showMsg(e.message, 'error'); }
+    await loadFacebookSdk();
+  } catch(e) { showMsg(T.errConnection, 'error'); return; }
+
+  FB.login(async (response) => {
+    if (!response.authResponse) return; // человек закрыл диалог сам — не ошибка
+    try {
+      const credential = firebase.auth.FacebookAuthProvider.credential(response.authResponse.accessToken);
+      const r = await auth.signInWithCredential(credential);
+      await finishLogin({ nickname: (r.user.displayName || '').split(' ')[0], method: 'facebook' });
+    } catch(e) {
+      if (e.code === 'auth/account-exists-with-different-credential') {
+        showMsg(T.errEmailTaken, 'error');
+      } else { showMsg(e.message, 'error'); }
+    }
+  }, { scope: 'email' });
 }
 
 // ══════════════════════════════════════════════
