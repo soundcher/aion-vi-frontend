@@ -406,16 +406,31 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 <!-- Счётчик анализов -->
 <div id="analyses-counter" style="display:none;margin-bottom:14px;">
   <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:4px;">
-    <span id="analyses-counter-label">Осталось анализов</span>
+    <span id="analyses-counter-label">Осталось запросов</span>
     <span id="analyses-counter-numbers"></span>
   </div>
   <div style="height:5px;background:var(--panel2);border-radius:3px;overflow:hidden;">
     <div id="analyses-counter-bar" style="height:100%;background:var(--gold);border-radius:3px;transition:width .4s;width:100%;"></div>
   </div>
-  <div style="text-align:right;margin-top:4px;">
-    <span onclick="openPricingModal()" style="font-size:11px;color:var(--gold);cursor:pointer;text-decoration:underline;" id="pricing-link">Пополнить пакет</span>
+  <div style="text-align:center;margin-top:10px;" id="pricing-nudge-wrap">
+    <span onclick="openPricingModal()" id="pricing-link"
+      style="display:inline-block;font-size:12px;color:var(--navy);background:var(--gold);padding:7px 16px;border-radius:20px;cursor:pointer;font-weight:600;letter-spacing:0.3px;animation:nudgeGlow 2.2s ease-in-out infinite;">
+      Пополнить пакет
+    </span>
   </div>
 </div>
+
+<style>
+/* Мягкое дыхание свечения — привлекает взгляд, не раздражает */
+@keyframes nudgeGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,165,99,0.45); }
+  50%      { box-shadow: 0 0 0 7px rgba(201,165,99,0); }
+}
+@keyframes nudgeRed {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(196,106,74,0.5); }
+  50%      { box-shadow: 0 0 0 7px rgba(196,106,74,0); }
+}
+</style>
 
 <!-- Баннер "Обзор месяца" -->
 <div id="monthly-digest-banner" onclick="openMonthlyDigestBanner()" style="display:none;margin-bottom:14px;padding:12px 14px;border:1px solid var(--gold);border-radius:2px;cursor:pointer;text-align:center;font-size:12px;color:var(--gold);">
@@ -438,19 +453,19 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
     <div style="border:1px solid var(--line2);border-radius:2px;padding:14px;margin-bottom:10px;">
       <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;" id="tier-start-name">Старт — €9.99/мес</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-start-desc">10 анализов + история</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-start-desc">10 запросов + история</div>
       <a href="#" id="checkout-start" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
     </div>
 
     <div style="border:1px solid var(--gold);border-radius:2px;padding:14px;margin-bottom:10px;">
       <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;" id="tier-basic-name">Базовый — €19.99/мес</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-basic-desc">23 анализа + совместимость</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-basic-desc">23 запроса + совместимость</div>
       <a href="#" id="checkout-basic" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
     </div>
 
     <div style="border:1px solid var(--line2);border-radius:2px;padding:14px;margin-bottom:14px;">
       <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;" id="tier-pro-name">Про — €29.99/мес</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-pro-desc">40 анализов + транзиты + PDF с брендингом</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-pro-desc">40 запросов + транзиты + PDF с брендингом</div>
       <a href="#" id="checkout-pro" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
     </div>
 
@@ -496,7 +511,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
     <div class="field"><label id="label-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="minute" placeholder="—" oninput="clampField(this,0,59,'Минуты');onTimeInput()"></div>
   </div>
   <div id="no-time-warning" style="display:none;font-size:11px;color:var(--gold-dim);margin-bottom:8px;padding:6px 10px;border:1px solid var(--gold-dim);border-radius:2px;opacity:0.85;">
-    ⚠ Время рождения не указано — точность анализа натальной карты и некоторых расчётов будет ниже
+    ⚠ Время рождения не указано — точность натальной карты и некоторых расчётов будет ниже
   </div>
 
   <div class="field" style="margin-bottom:10px;">
@@ -512,14 +527,14 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;">
         <input type="checkbox" id="compat-toggle" onchange="toggleCompat(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--gold);">
-        <span id="lbl-compat-toggle">✦ Анализ совместимости</span>
+        <span id="lbl-compat-toggle">✦ Совместимость</span>
       </label>
     </div>
 
     <div id="compat-form" style="display:none;">
       <!-- Тема совместимости -->
       <div class="field" style="margin-bottom:12px;">
-        <label id="lbl-compat-theme">Тема анализа</label>
+        <label id="lbl-compat-theme">Тема запроса</label>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px;" id="compat-themes">
           <button class="compat-theme-btn active" data-theme="romantic" id="theme-romantic" onclick="selectTheme(this)">💑 Романтика</button>
           <button class="compat-theme-btn" data-theme="family" id="theme-family" onclick="selectTheme(this)">👨‍👩‍👧 Семья</button>
@@ -783,7 +798,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <div class="analysis-section">
     <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;">
       <div></div>
-      <button class="btn-generate" onclick="generateAnalysis()" id="gen-btn">✦ Сгенерировать анализ</button>
+      <button class="btn-generate" onclick="generateAnalysis()" id="gen-btn">✦ Отправить запрос</button>
       <button class="btn-music-toggle" id="btn-music-toggle" onclick="toggleMusicGlobal()" title="Музыка: включена" style="justify-self:end;">♪</button>
     </div>
     <div style="text-align:center;">
@@ -855,15 +870,15 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <hr class="pdf-divider">
   <div class="pdf-body" id="pdf-body">—</div>
   <hr class="pdf-divider">
-  <div class="pdf-footer">AION Vi · Персональный анализ создан специально для тебя</div>
+  <div class="pdf-footer">AION Vi · Персональный ответ создан специально для тебя</div>
 </div>
 </div><!-- /wrap -->
 
 <!-- МОДАЛЬНОЕ ОКНО: ПОДАРИТЬ -->
 <div class="modal-overlay" id="gift-modal">
   <div class="modal-box">
-    <h3 id="modal-gift-title">🎁 Поделиться анализом</h3>
-    <p id="modal-gift-sub">Пригласи друга по своей ссылке — и вы оба получите по 5 бесплатных анализов ✦</p>
+    <h3 id="modal-gift-title">🎁 Поделиться ответом</h3>
+    <p id="modal-gift-sub">Пригласи друга по своей ссылке — и вы оба получите по 5 бесплатных запросов ✦</p>
 
     <button class="share-btn" onclick="downloadShareCard()" style="width:100%;justify-content:center;border-color:var(--gold-dim);background:#2d2820;margin-bottom:14px;padding:12px;">
       <svg viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" style="width:18px;height:18px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -904,7 +919,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 <div class="history-overlay" id="history-overlay">
   <div class="history-box">
     <h3>
-      <span id="history-title-text">История анализов</span>
+      <span id="history-title-text">История запросов</span>
       <button class="modal-close" style="width:auto;padding:6px 16px;margin:0;" onclick="closeHistory()">✕ Закрыть</button>
     </h3>
     <div id="history-list-view">
@@ -940,12 +955,12 @@ const LANG = {
     labelMinute: 'Minute',
     labelPlace: 'Place of Birth',
     labelGender: 'Gender', genderMale: 'Male', genderFemale: 'Female',
-    compatToggle: '✦ Compatibility Analysis', compatThemeLabel: 'Analysis Topic',
+    compatToggle: '✦ Compatibility', compatThemeLabel: 'Request topic',
     themeRomantic: '💑 Romance', themeFamily: '👨‍👩‍👧 Family', themeBusiness: '🤝 Business',
     themeTeam: '💼 Work', themeFriendship: '🌿 Friendship', themeOther: '✦ Other',
     lblPerson2: '✦ Second Person', lblPerson3: '✦ Third Person', lblPerson4: '✦ Fourth Person',
     btnAddP2: '+ Second Person', btnAddP3: '+ Third Person', btnAddP4: '+ Fourth Person',
-    groupAnalysisHint: '✦ Group analysis (5+ people) — on request',
+    groupAnalysisHint: '✦ Group request (5+ people) — by arrangement',
     btnFeedback: '✉ Feedback', fbTitle: '✉ Feedback', fbLblName: 'Name', fbLblEmail: 'Email',
     fbLblMessage: 'Message', fbSendBtn: '✦ Send', fbCloseBtn: 'Close',
     labelRequest: 'Request / Question',
@@ -953,7 +968,7 @@ const LANG = {
     requestPlaceholder: 'Request/Question. Add context for a more accurate reading.',
     requestHint: '⚠ Less than 50 characters left — be concise',
     btnCalculate: 'Calculate',
-    btnGenerate: '✦ Generate Analysis',
+    btnGenerate: '✦ Send request',
     btnMusicOn: 'On',
     btnMusicOff: 'Off',
     btnHistory: '📋 History',
@@ -965,9 +980,9 @@ const LANG = {
     quickQTruthText: 'Tell me the truth about me. As a friend.',
     pushEnableBtn: 'Enable', pushDismissBtn: 'Not now',
     pricingTitle: '✦ Choose a package',
-    tierStartName: 'Start — €9.99/mo', tierStartDesc: '10 analyses + history',
-    tierBasicName: 'Basic — €19.99/mo', tierBasicDesc: '23 analyses + compatibility',
-    tierProName: 'Pro — €29.99/mo', tierProDesc: '40 analyses + transits + branded PDF',
+    tierStartName: 'Start — €9.99/mo', tierStartDesc: '10 requests + history',
+    tierBasicName: 'Basic — €19.99/mo', tierBasicDesc: '23 requests + compatibility',
+    tierProName: 'Pro — €29.99/mo', tierProDesc: '40 requests + transits + branded PDF',
     btnCheckout: 'Get started', pricingCloseBtn: 'Close',
     btnCopy: 'Copy text',
     btnShowSummary: 'Show summary',
@@ -977,11 +992,11 @@ const LANG = {
     coordsDefault: 'Coordinates not set',
     errorFields: 'Please fill in day, month and year of birth',
     errorServer: 'Cannot connect to server. Make sure server.py is running.',
-    modalGiftTitle: '🎁 Share Analysis',
-    modalGiftSub: 'The analysis will be opened for saving or sharing',
+    modalGiftTitle: '🎁 Share answer',
+    modalGiftSub: 'The answer will be opened for saving or sharing',
     modalClose: 'Close',
-    historyTitle: 'Analysis History',
-    historyEmpty: 'History is empty — analyses will appear here after generation',
+    historyTitle: 'Request history',
+    historyEmpty: 'History is empty — answers will appear here after generation',
     historyLoading: 'Loading...',
     historyNoName: 'No name',
     historyNoRequest: 'No request',
@@ -1037,19 +1052,19 @@ const LANG = {
     geocodeSearching: 'Searching...',
     geocodeNotFound: 'Place not found',
     geocodeError: 'Geocoding error — server unavailable',
-    analysisCopied: 'Analysis copied',
+    analysisCopied: 'Answer copied',
     summaryCopied: 'Summary copied — paste into Claude',
     copyManual: 'Select text manually and copy (Ctrl+C)',
     needCalculate: 'Calculate client data first',
     needGender: 'Please select gender',
-    analysesLeftLabel: 'Analyses left',
+    analysesLeftLabel: 'Requests left',
     ratingLabel: 'How was this reading for you?',
     ratingCommentPh: 'What worked, what didn\'t — every word helps (optional)',
     ratingSend: 'Send feedback',
     ratingThanks: 'Thank you — this really helps.',
     ratingNudge: 'By the way — don\'t forget to rate your last reading 🙂',
-    shareGmailSubject: 'AION Vi — Your Personal Analysis',
-    shareTelegramText: 'AION Vi — Personal Analysis',
+    shareGmailSubject: 'AION Vi — Your personal answer',
+    shareTelegramText: 'AION Vi — Personal answer',
     greetFirst: '{name}Hi! I\'m AION Vi. I know too much about you to stay silent. Ask — I\'ll tell you everything! 😊 Try your very first question like this: "Tell me everything you know about me" — in Thinking mode.',
     greetReturn: '{name}Finally! I was starting to worry... Great to see you! Shall we begin?',
     greetVariants: ['{name}Oh! Hi! I was waiting for you today!', '{name}Hi! Glad you\'re back. Shall we begin?', '{name}Together again! What shall we discover today?', '{name}You\'re back! I was just thinking about you.', '{name}Hello! I missed you.', '{name}Oh, it\'s you again! Shall we continue?', '{name}Come in. I\'m ready if you are.'],
@@ -1069,20 +1084,20 @@ const LANG = {
     labelMinute: 'Minuta',
     labelPlace: 'Miejsce urodzenia',
     labelGender: 'Płeć', genderMale: 'Mężczyzna', genderFemale: 'Kobieta',
-    compatToggle: '✦ Analiza kompatybilności', compatThemeLabel: 'Temat analizy',
+    compatToggle: '✦ Kompatybilność', compatThemeLabel: 'Temat zapytania',
     themeRomantic: '💑 Romans', themeFamily: '👨‍👩‍👧 Rodzina', themeBusiness: '🤝 Biznes',
     themeTeam: '💼 Praca', themeFriendship: '🌿 Przyjaźń', themeOther: '✦ Inne',
     lblPerson2: '✦ Druga osoba', lblPerson3: '✦ Trzecia osoba', lblPerson4: '✦ Czwarta osoba',
     btnAddP2: '+ Druga osoba', btnAddP3: '+ Trzecia osoba', btnAddP4: '+ Czwarta osoba',
-    groupAnalysisHint: '✦ Analiza grupowa (5+ osób) — na życzenie',
+    groupAnalysisHint: '✦ Zapytanie grupowe (5+ osób) — na życzenie',
     btnFeedback: '✉ Kontakt', fbTitle: '✉ Kontakt', fbLblName: 'Imię', fbLblEmail: 'Email',
     fbLblMessage: 'Wiadomość', fbSendBtn: '✦ Wyślij', fbCloseBtn: 'Zamknij',
     labelRequest: 'Zapytanie / Pytanie',
     modeLabel: 'Format odpowiedzi', modeDeep: '🧠 Myślenie', modeQuick: '⚡ Szybka odpowiedź',
-    requestPlaceholder: 'Zapytanie/Pytanie. Dodaj kontekst dla dokładniejszej analizy.',
+    requestPlaceholder: 'Zapytanie/Pytanie. Dodaj kontekst dla dokładniejszej odpowiedzi.',
     requestHint: '⚠ Zostało mniej niż 50 znaków — bądź zwięzły',
     btnCalculate: 'Oblicz',
-    btnGenerate: '✦ Generuj analizę',
+    btnGenerate: '✦ Wyślij zapytanie',
     btnMusicOn: 'Wł.',
     btnMusicOff: 'Wył.',
     btnHistory: '📋 Historia',
@@ -1094,9 +1109,9 @@ const LANG = {
     quickQTruthText: 'Powiedz mi prawdę o mnie. Jak przyjaciel.',
     pushEnableBtn: 'Włącz', pushDismissBtn: 'Nie teraz',
     pricingTitle: '✦ Wybierz pakiet',
-    tierStartName: 'Start — €9.99/mies.', tierStartDesc: '10 analiz + historia',
-    tierBasicName: 'Podstawowy — €19.99/mies.', tierBasicDesc: '23 analizy + kompatybilność',
-    tierProName: 'Pro — €29.99/mies.', tierProDesc: '40 analiz + tranzyty + PDF z brandingiem',
+    tierStartName: 'Start — €9.99/mies.', tierStartDesc: '10 zapytań + historia',
+    tierBasicName: 'Podstawowy — €19.99/mies.', tierBasicDesc: '23 zapytania + kompatybilność',
+    tierProName: 'Pro — €29.99/mies.', tierProDesc: '40 zapytań + tranzyty + PDF z brandingiem',
     btnCheckout: 'Zamów', pricingCloseBtn: 'Zamknij',
     btnCopy: 'Kopiuj tekst',
     btnShowSummary: 'Pokaż podsumowanie',
@@ -1106,11 +1121,11 @@ const LANG = {
     coordsDefault: 'Współrzędne nieokreślone',
     errorFields: 'Uzupełnij dzień, miesiąc i rok urodzenia',
     errorServer: 'Nie można połączyć się z serwerem. Upewnij się, że server.py działa.',
-    modalGiftTitle: '🎁 Udostępnij analizę',
-    modalGiftSub: 'Analiza zostanie otwarta do zapisania lub wysłania',
+    modalGiftTitle: '🎁 Udostępnij odpowiedź',
+    modalGiftSub: 'Odpowiedź zostanie otwarta do zapisania lub wysłania',
     modalClose: 'Zamknij',
-    historyTitle: 'Historia analiz',
-    historyEmpty: 'Historia jest pusta — analizy pojawią się po wygenerowaniu',
+    historyTitle: 'Historia zapytań',
+    historyEmpty: 'Historia jest pusta — odpowiedzi pojawią się po wygenerowaniu',
     historyLoading: 'Ładowanie...',
     historyNoName: 'Bez nazwy',
     historyNoRequest: 'Bez zapytania',
@@ -1160,19 +1175,19 @@ const LANG = {
     geocodeSearching: 'Szukam...',
     geocodeNotFound: 'Miejsce nieznalezione',
     geocodeError: 'Błąd geokodowania — serwer niedostępny',
-    analysisCopied: 'Analiza skopiowana',
+    analysisCopied: 'Odpowiedź skopiowana',
     summaryCopied: 'Podsumowanie skopiowane — wklej do Claude',
     copyManual: 'Zaznacz tekst ręcznie i skopiuj (Ctrl+C)',
     needCalculate: 'Najpierw oblicz dane klienta',
     needGender: 'Proszę wybrać płeć',
-    analysesLeftLabel: 'Pozostało analiz',
+    analysesLeftLabel: 'Pozostało zapytań',
     ratingLabel: 'Jak ci się podobał ten rozbiór?',
     ratingCommentPh: 'Co zadziałało, co nie — każde słowo pomaga (opcjonalnie)',
     ratingSend: 'Wyślij opinię',
     ratingThanks: 'Dziękuję — to naprawdę pomaga.',
     ratingNudge: 'Nawiasem mówiąc — nie zapomnij ocenić ostatniego rozbioru 🙂',
-    shareGmailSubject: 'AION Vi — Twoja Osobista Analiza',
-    shareTelegramText: 'AION Vi — Osobista Analiza',
+    shareGmailSubject: 'AION Vi — Twoja osobista odpowiedź',
+    shareTelegramText: 'AION Vi — Osobista odpowiedź',
     greetFirst: '{name}Cześć! Jestem AION Vi. Wiem o tobie zbyt wiele, by milczeć. Pytaj — wszystko ci powiem! 😊 Zadaj mi pierwsze pytanie tak: „Opowiedz mi wszystko, co o mnie wiesz” — w trybie Myślenie.',
     greetReturn: '{name}Nareszcie! Już się martwiłem... Miło cię widzieć! Zaczynamy?',
     greetVariants: ['{name}O! Cześć! Czekałem na ciebie dziś!', '{name}Cześć! Cieszę się, że znowu tu jesteś. Zaczynamy?', '{name}Znów razem! Czego dziś się dowiemy?', '{name}Znowu tu jesteś! Właśnie o tobie myślałem.', '{name}Witaj! Tęskniłem za tobą.', '{name}O, to znowu ty! Kontynuujemy?', '{name}Wejdź. Jestem gotowy, jeśli ty jesteś gotowy.'],
@@ -1192,12 +1207,12 @@ const LANG = {
     labelMinute: 'Хвилини',
     labelPlace: 'Місце народження',
     labelGender: 'Стать', genderMale: 'Чоловіча', genderFemale: 'Жіноча',
-    compatToggle: '✦ Аналіз сумісності', compatThemeLabel: 'Тема аналізу',
+    compatToggle: '✦ Сумісність', compatThemeLabel: 'Тема запиту',
     themeRomantic: '💑 Романтика', themeFamily: '👨‍👩‍👧 Сім\'я', themeBusiness: '🤝 Бізнес',
     themeTeam: '💼 Робота', themeFriendship: '🌿 Дружба', themeOther: '✦ Інше',
     lblPerson2: '✦ Друга людина', lblPerson3: '✦ Третя людина', lblPerson4: '✦ Четверта людина',
     btnAddP2: '+ Друга людина', btnAddP3: '+ Третя людина', btnAddP4: '+ Четверта людина',
-    groupAnalysisHint: '✦ Груповий аналіз (5+ людей) — за запитом',
+    groupAnalysisHint: '✦ Груповий запит (5+ людей) — за домовленістю',
     btnFeedback: '✉ Зворотний зв\'язок', fbTitle: '✉ Зворотний зв\'язок', fbLblName: 'Ім\'я', fbLblEmail: 'Email',
     fbLblMessage: 'Питання', fbSendBtn: '✦ Надіслати', fbCloseBtn: 'Закрити',
     labelRequest: 'Запит / Питання',
@@ -1205,7 +1220,7 @@ const LANG = {
     requestPlaceholder: 'Запит/Питання. Для точнішого розрахунку додай контекст.',
     requestHint: '⚠ Залишилось менше 50 знаків — формулюй лаконічно',
     btnCalculate: 'Розрахувати',
-    btnGenerate: '✦ Згенерувати аналіз',
+    btnGenerate: '✦ Надіслати запит',
     btnMusicOn: 'Увімк.',
     btnMusicOff: 'Вимк.',
     btnHistory: '📋 Історія',
@@ -1217,9 +1232,9 @@ const LANG = {
     quickQTruthText: 'Розкажи мені правду про мене. Як друг.',
     pushEnableBtn: 'Увімкнути', pushDismissBtn: 'Не зараз',
     pricingTitle: '✦ Обери пакет',
-    tierStartName: 'Старт — €9.99/міс.', tierStartDesc: '10 аналізів + історія',
-    tierBasicName: 'Базовий — €19.99/міс.', tierBasicDesc: '23 аналізи + сумісність',
-    tierProName: 'Про — €29.99/міс.', tierProDesc: '40 аналізів + транзити + PDF з брендингом',
+    tierStartName: 'Старт — €9.99/міс.', tierStartDesc: '10 запитів + історія',
+    tierBasicName: 'Базовий — €19.99/міс.', tierBasicDesc: '23 запити + сумісність',
+    tierProName: 'Про — €29.99/міс.', tierProDesc: '40 запитів + транзити + PDF з брендингом',
     btnCheckout: 'Оформити', pricingCloseBtn: 'Закрити',
     btnCopy: 'Скопіювати текст',
     btnShowSummary: 'Показати зведення',
@@ -1229,11 +1244,11 @@ const LANG = {
     coordsDefault: 'Координати не визначено',
     errorFields: 'Заповни день, місяць і рік народження',
     errorServer: 'Не можу підключитись до сервера. Переконайся що server.py запущено.',
-    modalGiftTitle: '🎁 Поділитись аналізом',
-    modalGiftSub: 'Аналіз буде відкрито для збереження або відправки',
+    modalGiftTitle: '🎁 Поділитись відповіддю',
+    modalGiftSub: 'Відповідь буде відкрито для збереження або відправки',
     modalClose: 'Закрити',
-    historyTitle: 'Історія аналізів',
-    historyEmpty: 'Історія порожня — аналізи зʼявляться після генерації',
+    historyTitle: 'Історія запитів',
+    historyEmpty: 'Історія порожня — відповіді зʼявляться після генерації',
     historyLoading: 'Завантаження...',
     historyNoName: 'Без імені',
     historyNoRequest: 'Без запиту',
@@ -1283,19 +1298,19 @@ const LANG = {
     geocodeSearching: 'Шукаю...',
     geocodeNotFound: 'Місце не знайдено',
     geocodeError: 'Помилка геокодування — сервер недоступний',
-    analysisCopied: 'Аналіз скопійовано',
+    analysisCopied: 'Відповідь скопійовано',
     summaryCopied: 'Зведення скопійовано — встав у Claude',
     copyManual: 'Виділи текст вручну та скопіюй (Ctrl+C)',
     needCalculate: 'Спочатку розрахуй дані клієнта',
     needGender: 'Будь ласка, вкажи стать',
-    analysesLeftLabel: 'Залишилось аналізів',
+    analysesLeftLabel: 'Залишилось запитів',
     ratingLabel: 'Як тобі цей розбір?',
     ratingCommentPh: 'Що спрацювало, що ні — кожне слово допомагає (необов\'язково)',
     ratingSend: 'Надіслати відгук',
     ratingThanks: 'Дякую — це справді допомагає.',
     ratingNudge: 'До речі — не забудь оцінити останній розбір 🙂',
-    shareGmailSubject: 'AION Vi — Твій персональний аналіз',
-    shareTelegramText: 'AION Vi — Персональний аналіз',
+    shareGmailSubject: 'AION Vi — Твоя персональна відповідь',
+    shareTelegramText: 'AION Vi — Персональна відповідь',
     greetFirst: '{name}Привіт! Мене звати AION Vi. Я знаю про тебе занадто багато, щоб мовчати. Питай — я все розповім! 😊 Постав мені перше запитання так: «Розкажи мені все, що знаєш про мене» — у режимі Мислення.',
     greetReturn: '{name}Нарешті! Я вже думав, щось сталося... Радий тебе бачити! Почнемо?',
     greetVariants: ['{name}О! Привіт! Чекав на тебе сьогодні!', '{name}Привіт! Радий, що ти знову тут. Почнемо?', '{name}Знову разом! Що дізнаємось сьогодні?', '{name}Ти знову тут! Я якраз думав про тебе.', '{name}Здрастуй! А я за тобою скучив.', '{name}О, це знову ти! Продовжимо?', '{name}Заходь. Я готовий, якщо ти готовий.', 'Оу! Привітики! Я вже встиг скучити!', 'Ну, нарешті! Бо я вже хотів дзвонити по лікарнях!', 'Хєй! Шо ти? Як ти? Я вже встиг скучити', 'Бууум! Хто це до нас прийшов?! Про що поговоримо цього разу?', 'Привіт! Поговоримо про щось серйозне чи розважимося?', 'Скільки можна тебе чекати?! І де тебе носило?! Ну, що, поїхали!', 'Привіт! Саме той момент, коли я готовий розповісти тобі більше, ніж раніше', 'Сиджу, чекаю на тебе тут… на самоті… Казала мені мама: Йоня, вчися на стоматолога і до тебе потягнуться люди. Еххх… Ну, шо, поїхали?'],
@@ -1315,12 +1330,12 @@ const LANG = {
     labelMinute: 'Минуты',
     labelPlace: 'Место рождения',
     labelGender: 'Пол', genderMale: 'Мужской', genderFemale: 'Женский',
-    compatToggle: '✦ Анализ совместимости', compatThemeLabel: 'Тема анализа',
+    compatToggle: '✦ Совместимость', compatThemeLabel: 'Тема запроса',
     themeRomantic: '💑 Романтика', themeFamily: '👨‍👩‍👧 Семья', themeBusiness: '🤝 Бизнес',
     themeTeam: '💼 Работа', themeFriendship: '🌿 Дружба', themeOther: '✦ Другое',
     lblPerson2: '✦ Второй человек', lblPerson3: '✦ Третий человек', lblPerson4: '✦ Четвёртый человек',
     btnAddP2: '+ Второй человек', btnAddP3: '+ Третий человек', btnAddP4: '+ Четвёртый человек',
-    groupAnalysisHint: '✦ Групповой анализ (5 и более человек) — по запросу',
+    groupAnalysisHint: '✦ Групповой запрос (5 и более человек) — по договорённости',
     btnFeedback: '✉ Обратная связь', fbTitle: '✉ Обратная связь', fbLblName: 'Имя', fbLblEmail: 'Email',
     fbLblMessage: 'Вопрос', fbSendBtn: '✦ Отправить', fbCloseBtn: 'Закрыть',
     labelRequest: 'Запрос',
@@ -1328,7 +1343,7 @@ const LANG = {
     requestPlaceholder: 'Запрос/Вопрос. Для более точного расчёта добавь контекст.',
     requestHint: '⚠ Осталось менее 50 знаков — формулируй лаконично',
     btnCalculate: 'Рассчитать',
-    btnGenerate: '✦ Сгенерировать анализ',
+    btnGenerate: '✦ Отправить запрос',
     btnMusicOn: 'Вкл',
     btnMusicOff: 'Выкл',
     btnHistory: '📋 История',
@@ -1340,9 +1355,9 @@ const LANG = {
     quickQTruthText: 'Расскажи обо мне правду. Как друг.',
     pushEnableBtn: 'Включить', pushDismissBtn: 'Не сейчас',
     pricingTitle: '✦ Выбери пакет',
-    tierStartName: 'Старт — €9.99/мес', tierStartDesc: '10 анализов + история',
-    tierBasicName: 'Базовый — €19.99/мес', tierBasicDesc: '23 анализа + совместимость',
-    tierProName: 'Про — €29.99/мес', tierProDesc: '40 анализов + транзиты + PDF с брендированием',
+    tierStartName: 'Старт — €9.99/мес', tierStartDesc: '10 запросов + история',
+    tierBasicName: 'Базовый — €19.99/мес', tierBasicDesc: '23 запроса + совместимость',
+    tierProName: 'Про — €29.99/мес', tierProDesc: '40 запросов + транзиты + PDF с брендированием',
     btnCheckout: 'Оформить', pricingCloseBtn: 'Закрыть',
     btnCopy: 'Скопировать текст',
     btnShowSummary: 'Показать сводку',
@@ -1352,11 +1367,11 @@ const LANG = {
     coordsDefault: 'Координаты не определены',
     errorFields: 'Заполни день, месяц и год рождения',
     errorServer: 'Не могу подключиться к серверу. Убедись что server.py запущен в cmd.',
-    modalGiftTitle: '🎁 Поделиться анализом',
-    modalGiftSub: 'Анализ будет открыт для сохранения или отправки',
+    modalGiftTitle: '🎁 Поделиться ответом',
+    modalGiftSub: 'Ответ будет открыт для сохранения или отправки',
     modalClose: 'Закрыть',
-    historyTitle: 'История анализов',
-    historyEmpty: 'История пуста — анализы появятся здесь после генерации',
+    historyTitle: 'История запросов',
+    historyEmpty: 'История пуста — ответы появятся здесь после генерации',
     historyLoading: 'Загружаю...',
     historyNoName: 'Без имени',
     historyNoRequest: 'Без запроса',
@@ -1406,19 +1421,19 @@ const LANG = {
     geocodeSearching: 'Ищу...',
     geocodeNotFound: 'Место не найдено',
     geocodeError: 'Ошибка геокодирования — сервер недоступен',
-    analysisCopied: 'Анализ скопирован',
+    analysisCopied: 'Ответ скопирован',
     summaryCopied: 'Сводка скопирована — вставляй в Claude',
     copyManual: 'Выдели текст вручную и скопируй (Ctrl+C)',
     needCalculate: 'Сначала рассчитай данные клиента',
     needGender: 'Пожалуйста, укажи пол',
-    analysesLeftLabel: 'Осталось анализов',
+    analysesLeftLabel: 'Осталось запросов',
     ratingLabel: 'Как тебе мой ответ?',
     ratingCommentPh: 'Что зашло, что нет — любое слово поможет (необязательно)',
     ratingSend: 'Отправить отзыв',
     ratingThanks: 'Спасибо — это правда помогает.',
     ratingNudge: 'Кстати — не забудь оценить прошлый разбор 🙂',
-    shareGmailSubject: 'AION Vi — Твой персональный анализ',
-    shareTelegramText: 'AION Vi — Персональный анализ',
+    shareGmailSubject: 'AION Vi — Твой персональный ответ',
+    shareTelegramText: 'AION Vi — Персональный ответ',
     greetFirst: '{name}Привет! Меня зовут AION Vi. Я знаю о тебе слишком много, чтобы молчать. Спрашивай — я всё расскажу! 😊 Задай мне самый первый вопрос так: «Расскажи обо мне всё, что знаешь» — в режиме Мышление.',
     greetReturn: '{name}Ну, наконец-то! Я уж думал, случилось что... Рад тебя видеть! Начнём?',
     greetVariants: ['{name}О! Привет! Ждал тебя сегодня!', '{name}Привет! Рад, что снова здесь. Начнём?', '{name}Снова вместе! Что узнаем сегодня?', '{name}Ты снова здесь! Я как раз думал о тебе.', '{name}Здравствуй! А я по тебе соскучился.', '{name}О, это снова ты! Продолжим?', '{name}Заходи. Я готов, если ты готов.'],
@@ -1650,6 +1665,8 @@ const SERVER = 'https://aion-vi-server-production.up.railway.app';
 // Раньше пользователь читался из памяти браузера в дюжине мест, и каждое
 // верило написанному там числу анализов. Теперь память браузера — только
 // витрина для быстрой отрисовки, а источник правды — сервер.
+function emailToKey(email) { return email.replace(/\./g,'_').replace(/@/g,'__at__'); }
+
 function getUser() {
   try { return JSON.parse(localStorage.getItem('aion_user') || 'null'); }
   catch(e) { return null; }
@@ -2262,6 +2279,25 @@ function renderAnalysesCounter() {
   document.getElementById('analyses-counter-bar').style.width = pct + '%';
   if (pct <= 20) document.getElementById('analyses-counter-bar').style.background = 'var(--red, #c46a4a)';
   box.style.display = 'block';
+
+  // "Пополнить пакет" молчит, пока анализов достаточно, и мягко привлекает
+  // внимание, когда их мало — а не висит на виду всегда одинаково тихо.
+  const nudge = document.getElementById('pricing-nudge-wrap');
+  const link  = document.getElementById('pricing-link');
+  // Ссылка видна ВСЕГДА — и как напоминание, и как вход в тарифы в любой
+  // момент. Меняется только оформление: тихая ссылка, пока запросов хватает;
+  // золотая плашка с дыханием при остатке 3 и меньше; красная при нуле.
+  if (user.unlimited) { nudge.style.display = 'none'; return; }
+  nudge.style.display = 'block';
+  const low = user.analysesLeft <= 3;
+  const out = user.analysesLeft <= 0;
+  link.style.background     = out ? 'var(--red, #c46a4a)' : (low ? 'var(--gold)' : 'transparent');
+  link.style.color          = out ? '#fbeceb' : (low ? 'var(--navy, #0d1525)' : 'var(--gold)');
+  link.style.textDecoration = low ? 'none' : 'underline';
+  link.style.padding        = low ? '7px 16px' : '0';
+  link.style.borderRadius   = low ? '20px' : '0';
+  link.style.fontWeight     = low ? '600' : '400';
+  link.style.animation      = low ? (out ? 'nudgeRed 2.2s ease-in-out infinite' : 'nudgeGlow 2.2s ease-in-out infinite') : 'none';
 }
 
 function initGreeting() {
@@ -2291,10 +2327,15 @@ function initGreeting() {
   typeText('greeting-text', greeting, 76);
 }
 
+let _typeTimer = null;
 function typeText(elId, text, speed) {
   const el = document.getElementById(elId);
   const cursor = document.getElementById('typing-cursor');
   if (!el) return;
+  // Гасим предыдущую анимацию. Без этого при смене языка старый и новый
+  // текст печатались в один элемент одновременно, буква через букву —
+  // получалась каша вида "nСgл аyвoчuи".
+  if (_typeTimer) { clearInterval(_typeTimer); _typeTimer = null; }
   el.textContent = '';
   let i = 0;
   const timer = setInterval(() => {
@@ -2303,9 +2344,11 @@ function typeText(elId, text, speed) {
       i++;
     } else {
       clearInterval(timer);
+      _typeTimer = null;
       if (cursor) setTimeout(() => cursor.style.display = 'none', 2000);
     }
   }, speed);
+  _typeTimer = timer;
 }
 
 // ══════════════════════════════════════════════
@@ -2599,7 +2642,7 @@ async function generateAnalysis() {
       const box = document.getElementById('analysis-box');
       box.innerHTML = `
         <div style="text-align:center;padding:20px 10px;">
-          <div style="font-size:15px;color:var(--gold);margin-bottom:12px;">Твои анализы на этом пакете закончились</div>
+          <div style="font-size:15px;color:var(--gold);margin-bottom:12px;">Твои запросы на этом пакете закончились</div>
           <div style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px;">
             Мы разобрали лишь малую часть того, что скрыто в твоём коде. Впереди — ответы о твоём пути, отношениях, решениях. Я готов продолжить, как только ты будешь готов.
           </div>
@@ -2841,10 +2884,15 @@ async function generateAnalysis() {
         user.analysesLeft = data.analyses_left;
         setUser(user);
         renderAnalysesCounter();
-        if (user.analysesLeft <= 2) {
+        if (data.referralBonusApplied) {
+          // Друг сделал свой первый запрос — бонус пришёл именно сейчас,
+          // не в момент его регистрации. Человек иначе не поймёт, откуда
+          // взялись лишние 5 запросов.
+          box.insertAdjacentHTML('afterend', `<div style="margin-top:10px;font-size:12px;color:var(--gold);text-align:center;">🎁 Друг воспользовался приглашением — вы оба получили +5 запросов!</div>`);
+        } else if (user.analysesLeft <= 2) {
           const warn = user.analysesLeft === 0
-            ? '⚠ Анализы закончились. Для продолжения нужен новый промокод или подписка.'
-            : `⚡ Осталось анализов: ${user.analysesLeft}`;
+            ? '⚠ Запросы закончились. Для продолжения нужен новый промокод или подписка.'
+            : `⚡ Осталось запросов: ${user.analysesLeft}`;
           box.insertAdjacentHTML('afterend', `<div style="margin-top:10px;font-size:12px;color:var(--gold);text-align:center;">${warn}</div>`);
         }
       }
@@ -2875,7 +2923,7 @@ function fillPdfBlock(analysis, client) {
 
 // ── Скачать PDF через печать ──
 async function downloadPDF() {
-  if (!currentAnalysis) { alert('Сначала сгенерируй анализ'); return; }
+  if (!currentAnalysis) { alert('Сначала отправь запрос'); return; }
   const client = currentClientData;
   const name = [client.firstname, client.lastname].filter(Boolean).join(' ') || '—';
   const birthdate = client.day && client.month && client.year
@@ -2912,7 +2960,7 @@ async function downloadPDF() {
           try {
             await navigator.share({
               title: `AION Vi · ${name}`,
-              text: 'Персональный анализ от AION Vi',
+              text: 'Персональный ответ от AION Vi',
               files: [file]
             });
             return;
@@ -2952,7 +3000,7 @@ async function downloadPDF() {
 <div style="font-size:20px;margin-top:10px;">${name}</div>
 <div style="font-size:12px;color:#9b7e4a;">${birthdate}</div></div>
 <div style="white-space:pre-wrap;">${text}</div>
-<div class="footer">AION Vi · Персональный анализ создан специально для тебя</div>
+<div class="footer">AION Vi · Персональный ответ создан специально для тебя</div>
 </body></html>`;
     const win = window.open('', '_blank');
     win.document.write(html);
@@ -2976,7 +3024,7 @@ function copyForMessenger() {
   if (!currentAnalysis) return;
   const client = currentClientData;
   const name = [client.firstname, client.lastname].filter(Boolean).join(' ');
-  const text = `✦ AION Vi · Персональный анализ
+  const text = `✦ AION Vi · Персональный ответ
 ${name ? '👤 ' + name + '\n' : ''}\n${currentAnalysis}`;
   navigator.clipboard.writeText(text).then(() => { alert('Скопировано'); closeGiftModal(); }).catch(() => {});
 }
@@ -3014,19 +3062,22 @@ function openGiftModal() {
   const client = currentClientData;
   const name = [client.firstname, client.lastname].filter(Boolean).join(' ') || '';
 
-  // Метка отправителя для будущей реферальной программы —
-  // берём промокод пользователя, а если его нет (соц-вход) — nickname
+  // Метка отправителя — собственный ключ отправителя в базе. Раньше здесь
+  // стояли promo/nickname: у всех, кто регистрировался БЕЗ промокода, поле
+  // promo хранит одну и ту же служебную строку "signup" — сервер не смог бы
+  // понять, кто кого пригласил, у всех была бы одна метка. Ключ уникален
+  // всегда, коллизий не бывает.
   const senderUser = getUser();
-  const refTag = senderUser?.promo || senderUser?.nickname || 'friend';
+  const refTag = senderUser?.email ? emailToKey(senderUser.email) : '';
   const shareUrl = `${SITE_URL}/?ref=${encodeURIComponent(refTag)}`;
 
-  const preview = `✦ AION Vi — Персональный навигатор\n\nЯ пользуюсь AION Vi — он отвечает на мои вопросы, опираясь на мои личные данные, а не общими фразами. Попробуй и ты — а мы оба получим по 5 бесплатных анализов:\n${shareUrl}`;
+  const preview = `✦ AION Vi — Персональный навигатор\n\nЯ пользуюсь AION Vi — он отвечает на мои вопросы, опираясь на мои личные данные, а не общими фразами. Попробуй и ты — а мы оба получим по 5 бесплатных запросов:\n${shareUrl}`;
   const text = encodeURIComponent(preview);
 
   document.getElementById('share-telegram').href = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${text}`;
   document.getElementById('share-whatsapp').href = `https://wa.me/?text=${text}`;
   document.getElementById('share-viber').href = `viber://forward?text=${text}`;
-  document.getElementById('share-gmail').href = `https://mail.google.com/mail/?view=cm&body=${text}&su=${encodeURIComponent('AION Vi — Твой персональный анализ')}`;
+  document.getElementById('share-gmail').href = `https://mail.google.com/mail/?view=cm&body=${text}&su=${encodeURIComponent('AION Vi — Твой персональный ответ')}`;
 
   const fbBtn = document.getElementById('share-fbmessenger');
   if (fbBtn) fbBtn.href = `https://www.facebook.com/dialog/send?app_id=966242223397117`;
@@ -3212,7 +3263,7 @@ async function openHistory() {
     const docs = result.items || [];
 
     if (!docs.length) {
-      itemsEl.innerHTML = '<div class="history-empty">История пуста — анализы появятся здесь после генерации</div>';
+      itemsEl.innerHTML = '<div class="history-empty">История пуста — ответы появятся здесь после генерации</div>';
       return;
     }
 

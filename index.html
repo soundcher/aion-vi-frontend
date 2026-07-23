@@ -290,9 +290,22 @@
   <!-- Форма входа -->
   <div class="form-box" id="login-form">
     <div id="ref-banner" style="display:none;background:rgba(201,165,99,0.1);border:1px solid #c9a563;border-radius:2px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#c9a563;text-align:center;">
-      <span id="t-ref-banner">✦ Тебя пригласил друг — зарегистрируйся, и вы оба получите по 5 бесплатных анализов</span>
+      <span id="t-ref-banner">✦ Тебя пригласил друг — зарегистрируйся и получи +5 бонусных сверх бесплатных</span>
     </div>
     <div class="form-title" id="t-form-title">Access to AION Vi</div>
+
+    <!-- Главный путь: попробовать сразу, без регистрации. Стоит первым
+         сознательно — на этапе привлечения ценность нужно дать до того,
+         как о чём-то просить. Регистрация после "вау" даётся легко,
+         до него — отталкивает. -->
+    <a href="calculator.html" id="btn-guest-main" onclick="enterAsGuest()"
+      style="display:block;text-align:center;background:var(--gold);color:#0d1525;padding:13px;border-radius:2px;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:0.5px;margin-bottom:8px;">
+      Try free, no account →
+    </a>
+    <div id="t-guest-note" style="font-size:10px;color:var(--text-faint);text-align:center;margin-bottom:18px;letter-spacing:0.5px;">You can try one request without an account.</div>
+
+    <div class="divider" style="margin:0 0 16px;"></div>
+    <div id="t-have-account" style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-faint);text-align:center;margin-bottom:12px;">or sign in</div>
 
     <!-- Переключатель: войти / создать аккаунт -->
     <div style="display:flex;gap:0;margin-bottom:18px;border:1px solid var(--line);border-radius:2px;overflow:hidden;">
@@ -365,14 +378,6 @@
     <div id="t-tg-note" style="font-size:10px;color:var(--text-faint);text-align:center;margin-bottom:6px;letter-spacing:0.5px;"></div>
     <div id="tg-login-wrap" style="display:flex;justify-content:center;margin-bottom:16px;min-height:1px;"></div>
 
-    <div class="divider"></div>
-
-    <!-- Гостевой путь: равноценная альтернатива, а не мелкая сноска -->
-    <div style="text-align:center;margin-top:6px;">
-      <a href="calculator.html" id="t-guest-link" onclick="enterAsGuest()"
-        style="color:var(--gold);font-size:12px;text-decoration:none;letter-spacing:0.5px;border-bottom:1px solid rgba(201,165,99,0.4);padding-bottom:2px;">Try free, no account →</a>
-      <div id="t-guest-note" style="font-size:10px;color:var(--text-faint);margin-top:8px;letter-spacing:0.5px;">You can try one analysis without an account.</div>
-    </div>
   </div>
 
   <!-- Придумай пароль: для тех, кто регистрировался по промокоду до появления входа -->
@@ -395,7 +400,7 @@
     <div class="welcome" id="welcome-name">Welcome back</div>
     <div class="sub-welcome" id="t-sub-welcome">AION Vi is glad to see you</div>
     <div class="count" id="analyses-left">—</div>
-    <div class="count-label" id="t-count-label">analyses available</div>
+    <div class="count-label" id="t-count-label">requests available</div>
     <a href="calculator.html" class="btn-open" id="t-btn-open">✦ Open navigator</a>
     <div style="margin-top:18px;">
       <button onclick="logout()" id="t-logout"
@@ -406,7 +411,7 @@
   </div>
 
   <div class="note">
-    <span id="t-group-note">Group analysis (5+ people) —</span><br>
+    <span id="t-group-note">Group request (5+ people) —</span><br>
     <a href="mailto:soundcher11@gmail.com">soundcher11@gmail.com</a>
   </div>
 
@@ -418,6 +423,7 @@
 // ══════════════════════════════════════════════
 const TRANSLATIONS = {
   en: {
+    haveAccount: 'or sign in',
     tgNote: 'Telegram — one tap, no password',
     authTitle: 'Access to AION Vi',
     tabSignin: 'Sign in',
@@ -434,12 +440,12 @@ const TRANSLATIONS = {
     errWrongPw: 'Wrong email or password.',
     errNoAccount: 'No account with this email. Create one below.',
     errEmailTaken: 'This email is already registered. Sign in instead.',
-    needEmailTg: 'Almost there — enter your email so we can save your analyses',
+    needEmailTg: 'Almost there — enter your email so we can save your requests',
     setPwTitle: 'Set a password',
-    setPwIntro: 'Your account already exists. Create a password so you can always get back in — your analyses and history stay with you.',
+    setPwIntro: 'Your account already exists. Create a password so you can always get back in — your requests and history stay with you.',
     btnSetPw: '✦ Save password',
     tgTaken: 'This email is already registered. Sign in your usual way first.',
-    guestNote: 'You can try one analysis without an account.',
+    guestNote: 'You can try one request without an account.',
     tagline: 'Your personal navigator',
     formTitle: 'Access to AION Vi',
     lblNickname: 'Friends call me',
@@ -453,7 +459,7 @@ const TRANSLATIONS = {
     orSignIn: 'or sign in with',
     errName: 'Enter the name your friends use',
     errConsent: 'Please agree to the Privacy Policy and Terms of Use',
-    consentText: 'I agree to the', consentPrivacy: 'Privacy Policy', consentAnd: 'and', consentTerms: 'Terms of Use', refBanner: '✦ You were invited by a friend — sign up and you both get 5 free analyses',
+    consentText: 'I agree to the', consentPrivacy: 'Privacy Policy', consentAnd: 'and', consentTerms: 'Terms of Use', refBanner: '✦ You were invited by a friend — sign up and get +5 bonus on top of your free ones (both of you)',
     errEmail: 'Enter a valid email',
     errPromo: 'Enter your promo code',
     errNotFound: 'Promo code not found. Check spelling.',
@@ -461,14 +467,15 @@ const TRANSLATIONS = {
     errUsed: 'This promo code has already been used.',
     welcome: (n) => `Welcome back, ${n}`,
     subWelcome: 'AION Vi is glad to see you',
-    countLabel: 'analyses available',
+    countLabel: 'requests available',
     btnOpen: '✦ Open navigator',
     logout: 'Sign out',
-    groupNote: 'Group analysis (5+ people) —',
+    groupNote: 'Group request (5+ people) —',
     entering: (n) => `✦ Welcome, ${n}! Opening navigator...`,
     refBonusMsg: (b) => `✦ Welcome! You got +${b} free questions for accepting a friend's invite.`,
   },
   uk: {
+    haveAccount: 'або увійти',
     tgNote: 'Telegram — один дотик, без пароля',
     authTitle: 'Вхід до AION Vi',
     tabSignin: 'Увійти',
@@ -485,12 +492,12 @@ const TRANSLATIONS = {
     errWrongPw: 'Невірна пошта або пароль.',
     errNoAccount: 'Акаунта з такою поштою немає. Створи новий нижче.',
     errEmailTaken: 'Ця пошта вже зареєстрована. Увійди замість реєстрації.',
-    needEmailTg: 'Майже все — вкажи пошту, щоб ми зберегли твої аналізи',
+    needEmailTg: 'Майже все — вкажи пошту, щоб ми зберегли твої запити',
     setPwTitle: 'Придумай пароль',
-    setPwIntro: 'Твій акаунт уже існує. Створи пароль, щоб завжди могти повернутися — аналізи та історія залишаться з тобою.',
+    setPwIntro: 'Твій акаунт уже існує. Створи пароль, щоб завжди могти повернутися — запити та історія залишаться з тобою.',
     btnSetPw: '✦ Зберегти пароль',
     tgTaken: 'Ця пошта вже зареєстрована. Спершу увійди звичним способом.',
-    guestNote: 'Можна спробувати один аналіз без акаунта.',
+    guestNote: 'Можна спробувати один запит без акаунта.',
     tagline: 'Твій персональний навігатор',
     formTitle: 'Доступ до AION Vi',
     lblNickname: 'Як тебе називають друзі?',
@@ -504,7 +511,7 @@ const TRANSLATIONS = {
     orSignIn: 'або увійди через',
     errName: 'Введи імʼя — як тебе називають друзі',
     errConsent: 'Погодься з Політикою конфіденційності та Умовами використання',
-    consentText: 'Я погоджуюсь з', consentPrivacy: 'Політикою конфіденційності', consentAnd: 'та', consentTerms: 'Умовами використання', refBanner: '✦ Тебе запросив друг — зареєструйся, і ви обоє отримаєте по 5 безкоштовних аналізів',
+    consentText: 'Я погоджуюсь з', consentPrivacy: 'Політикою конфіденційності', consentAnd: 'та', consentTerms: 'Умовами використання', refBanner: '✦ Тебе запросив друг — зареєструйся і отримай +5 бонусних понад безкоштовні (у вас обох)',
     errEmail: 'Введи коректний email',
     errPromo: 'Введи промокод',
     errNotFound: 'Промокод не знайдено. Перевір правильність.',
@@ -512,14 +519,15 @@ const TRANSLATIONS = {
     errUsed: 'Цей промокод вже використано.',
     welcome: (n) => `З поверненням, ${n}`,
     subWelcome: 'AION Vi радий бачити тебе знову',
-    countLabel: 'аналізів доступно',
+    countLabel: 'запитів доступно',
     btnOpen: '✦ Відкрити навігатор',
     logout: 'Вийти',
-    groupNote: 'Груповий аналіз (5+ людей) —',
+    groupNote: 'Груповий запит (5+ людей) —',
     entering: (n) => `✦ Ласкаво просимо, ${n}! Відкриваю навігатор...`,
     refBonusMsg: (b) => `✦ Ласкаво просимо! Ти отримав(-ла) +${b} безкоштовних запитань за запрошення друга.`,
   },
   pl: {
+    haveAccount: 'lub zaloguj się',
     tgNote: 'Telegram — jedno dotknięcie, bez hasła',
     authTitle: 'Dostęp do AION Vi',
     tabSignin: 'Zaloguj się',
@@ -536,12 +544,12 @@ const TRANSLATIONS = {
     errWrongPw: 'Błędny e-mail lub hasło.',
     errNoAccount: 'Nie ma konta z tym e-mailem. Załóż je poniżej.',
     errEmailTaken: 'Ten e-mail jest już zarejestrowany. Zaloguj się.',
-    needEmailTg: 'Prawie gotowe — podaj e-mail, żebyśmy zapisali twoje analizy',
+    needEmailTg: 'Prawie gotowe — podaj e-mail, żebyśmy zapisali twoje zapytania',
     setPwTitle: 'Ustaw hasło',
-    setPwIntro: 'Twoje konto już istnieje. Ustaw hasło, żeby zawsze móc wrócić — analizy i historia zostają z tobą.',
+    setPwIntro: 'Twoje konto już istnieje. Ustaw hasło, żeby zawsze móc wrócić — zapytania i historia zostają z tobą.',
     btnSetPw: '✦ Zapisz hasło',
     tgTaken: 'Ten e-mail jest już zarejestrowany. Najpierw zaloguj się swoim zwykłym sposobem.',
-    guestNote: 'Możesz wypróbować jedną analizę bez konta.',
+    guestNote: 'Możesz wypróbować jedno zapytanie bez konta.',
     tagline: 'Twój osobisty nawigator',
     formTitle: 'Dostęp do AION Vi',
     lblNickname: 'Jak nazywają cię przyjaciele?',
@@ -555,7 +563,7 @@ const TRANSLATIONS = {
     orSignIn: 'lub zaloguj przez',
     errName: 'Podaj imię, którym zwracają się do ciebie przyjaciele',
     errConsent: 'Zaakceptuj Politykę prywatności i Warunki korzystania',
-    consentText: 'Akceptuję', consentPrivacy: 'Politykę prywatności', consentAnd: 'i', consentTerms: 'Warunki korzystania', refBanner: '✦ Zaprosił Cię znajomy — zarejestruj się, a oboje otrzymacie po 5 darmowych analiz',
+    consentText: 'Akceptuję', consentPrivacy: 'Politykę prywatności', consentAnd: 'i', consentTerms: 'Warunki korzystania', refBanner: '✦ Zaprosił Cię znajomy — zarejestruj się i otrzymaj +5 bonusowych oprócz darmowych (oboje)',
     errEmail: 'Podaj prawidłowy email',
     errPromo: 'Wpisz kod promocyjny',
     errNotFound: 'Kod promocyjny nie znaleziony. Sprawdź pisownię.',
@@ -563,14 +571,15 @@ const TRANSLATIONS = {
     errUsed: 'Ten kod promocyjny został już wykorzystany.',
     welcome: (n) => `Witaj z powrotem, ${n}`,
     subWelcome: 'AION Vi jest rad cię widzieć',
-    countLabel: 'analiz dostępnych',
+    countLabel: 'zapytań dostępnych',
     btnOpen: '✦ Otwórz nawigator',
     logout: 'Wyloguj',
-    groupNote: 'Analiza grupowa (5+ osób) —',
+    groupNote: 'Zapytanie grupowe (5+ osób) —',
     entering: (n) => `✦ Witaj, ${n}! Otwieram nawigator...`,
     refBonusMsg: (b) => `✦ Witaj! Otrzymałeś(-aś) +${b} darmowych pytań za przyjęcie zaproszenia.`,
   },
   ru: {
+    haveAccount: 'или войти',
     tgNote: 'Telegram — один тап, без пароля',
     authTitle: 'Вход в AION Vi',
     tabSignin: 'Войти',
@@ -587,12 +596,12 @@ const TRANSLATIONS = {
     errWrongPw: 'Неверная почта или пароль.',
     errNoAccount: 'Аккаунта с такой почтой нет. Создай новый ниже.',
     errEmailTaken: 'Эта почта уже зарегистрирована. Войди вместо регистрации.',
-    needEmailTg: 'Почти всё — укажи почту, чтобы мы сохранили твои анализы',
+    needEmailTg: 'Почти всё — укажи почту, чтобы мы сохранили твои запросы',
     setPwTitle: 'Придумай пароль',
-    setPwIntro: 'Твой аккаунт уже существует. Создай пароль, чтобы всегда мочь вернуться — анализы и история останутся с тобой.',
+    setPwIntro: 'Твой аккаунт уже существует. Создай пароль, чтобы всегда мочь вернуться — запросы и история останутся с тобой.',
     btnSetPw: '✦ Сохранить пароль',
     tgTaken: 'Эта почта уже зарегистрирована. Сначала войди привычным способом.',
-    guestNote: 'Можно попробовать один анализ без аккаунта.',
+    guestNote: 'Можно попробовать один запрос без аккаунта.',
     tagline: 'Твой персональный навигатор',
     formTitle: 'Доступ к AION Vi',
     lblNickname: 'Как к тебе обращаются друзья?',
@@ -606,7 +615,7 @@ const TRANSLATIONS = {
     orSignIn: 'или войди через',
     errName: 'Введи имя — как тебя называют друзья',
     errConsent: 'Согласись с Политикой конфиденциальности и Условиями использования',
-    consentText: 'Я согласен(на) с', consentPrivacy: 'Политикой конфиденциальности', consentAnd: 'и', consentTerms: 'Условиями использования', refBanner: '✦ Тебя пригласил друг — зарегистрируйся, и вы оба получите по 5 бесплатных анализов',
+    consentText: 'Я согласен(на) с', consentPrivacy: 'Политикой конфиденциальности', consentAnd: 'и', consentTerms: 'Условиями использования', refBanner: '✦ Тебя пригласил друг — зарегистрируйся и получи +5 бонусных сверх бесплатных (у вас обоих)',
     errEmail: 'Введи корректный email',
     errPromo: 'Введи промокод',
     errNotFound: 'Промокод не найден. Проверь правильность ввода.',
@@ -614,10 +623,10 @@ const TRANSLATIONS = {
     errUsed: 'Этот промокод уже был использован.',
     welcome: (n) => `С возвращением, ${n}`,
     subWelcome: 'AION Vi рад видеть тебя снова',
-    countLabel: 'анализов доступно',
+    countLabel: 'запросов доступно',
     btnOpen: '✦ Открыть навигатор',
     logout: 'Выйти',
-    groupNote: 'Групповой анализ (5+ человек) —',
+    groupNote: 'Групповой запрос (5+ человек) —',
     entering: (n) => `✦ Добро пожаловать, ${n}! Открываю навигатор...`,
     refBonusMsg: (b) => `✦ Добро пожаловать! Ты получил(а) +${b} бесплатных вопросов за приглашение друга.`,
   }
@@ -675,7 +684,8 @@ function setLang(lang) {
   ph ('inp-password', T.phPassword);
   set('t-forgot-pw', T.forgotPw);
   set('t-or-signin', T.orContinue);
-  set('t-guest-link', T.guestLink);
+  set('btn-guest-main', T.guestLink);
+  set('t-have-account', T.haveAccount);
   set('t-tg-note', T.tgNote);
   set('t-guest-note', T.guestNote);
   set('t-setpw-title', T.setPwTitle);
@@ -941,21 +951,26 @@ function mountTelegramButton() {
 async function finishLogin({ nickname, promo, method }) {
   const T = TRANSLATIONS[currentLang];
   try {
+    // Метка приглашения теперь едет вместе с регистрацией одним запросом —
+    // сервер сам решает, кому и когда начислить бонус (после первого
+    // настоящего запроса, не сразу). Отдельного вызова /referral больше нет.
+    const ref = localStorage.getItem('aion_ref');
+    const ts  = parseInt(localStorage.getItem('aion_ref_ts') || '0');
+    const refFresh = ref && ts && (Date.now() - ts < 72 * 60 * 60 * 1000);
+
     const res = await api('/auth/register', {
       nickname: nickname || '', promo: promo || '',
-      lang: currentLang, loginMethod: method || ''
+      lang: currentLang, loginMethod: method || '',
+      ref: refFresh ? ref : ''
     });
     if (res.status !== 'ok') { showMsg(res.message || T.errConnection, 'error'); return; }
+    localStorage.removeItem('aion_ref');
+    localStorage.removeItem('aion_ref_ts');
 
     const u = storeProfile(res.profile, { loginMethod: method });
 
     if (res.created) {
-      const gotBonus = await applyReferralIfAny(u.email);
-      if (gotBonus) {
-        const fresh = await api('/auth/session', {});
-        if (fresh.status === 'ok') storeProfile(fresh.profile, { loginMethod: method });
-        showMsg(T.refBonusMsg(REFERRAL_BONUS_AMOUNT), 'success');
-      } else if (res.promoRejected) {
+      if (res.promoRejected) {
         showMsg(T.errUsed, 'error');
         setTimeout(() => { window.location.href = 'calculator.html'; }, 2200);
         return;
@@ -1030,7 +1045,12 @@ window.onload = function() {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
     if (ref) {
+      // Метка приглашения помнится 72 часа, а не вечно. Раньше один
+      // непройденный до конца переход по ссылке "прилипал" к ЛЮБОЙ
+      // следующей регистрации на этом устройстве, даже никак не связанной
+      // с приглашением — человек получал бонус, о котором не просил.
       localStorage.setItem('aion_ref', ref);
+      localStorage.setItem('aion_ref_ts', String(Date.now()));
       const banner = document.getElementById('ref-banner');
       if (banner) banner.style.display = 'block';
       setMode('signup');
@@ -1050,16 +1070,6 @@ window.onload = function() {
     } catch(e) {}
   });
 };
-
-async function applyReferralIfAny(email) {
-  try {
-    const ref = localStorage.getItem('aion_ref');
-    if (!ref) return false;
-    const d = await api('/referral', { ref, email });
-    localStorage.removeItem('aion_ref');
-    return d.status === 'ok';
-  } catch(e) { return false; }
-}
 
 function showAlreadyIn(user) {
   document.getElementById('login-form').style.display = 'none';
