@@ -1622,7 +1622,7 @@ function applyTranslations() {
 // ══════════════════════════════════════════════
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyAM1VKa9iaC4Ox1Fzx1e1bEgRdbjVxK4QY",
-  authDomain: "aion-vi.firebaseapp.com",
+  authDomain: "aion-vi.web.app",
   projectId: "aion-vi",
   storageBucket: "aion-vi.firebasestorage.app",
   messagingSenderId: "422204652530",
@@ -2776,6 +2776,9 @@ async function generateAnalysis() {
     // email не отправляем — сервер берёт его из пропуска и по нему же
     // списывает анализ. Подставить чужой адрес больше невозможно.
     const r = await apiPost('/generate', {
+      // Гость идёт без пропуска — сервер должен знать, что это осознанный
+      // гостевой путь, а не сломанный вход, иначе ответит отказом.
+      guest: isGuest(),
       summary: currentSummary,
       request: requestText,
       lang_instruction: langInstruction,
