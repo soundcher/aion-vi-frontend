@@ -519,8 +519,10 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
     <input type="text" id="place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
   </div>
   <div class="coords-display" id="coords-display">Координаты не определены</div>
-  <input type="hidden" id="lat" value="50.45">
-  <input type="hidden" id="lon" value="30.52">
+  <!-- Пусто намеренно: любое значение по умолчанию означало бы, что человек
+       с ненайденным городом молча получит расчёт по чужому месту -->
+  <input type="hidden" id="lat" value="">
+  <input type="hidden" id="lon" value="">
 
   <!-- БЛОК СОВМЕСТИМОСТИ -->
   <div id="compat-block" style="margin-top:14px;margin-bottom:10px;border-top:1px solid var(--line2);padding-top:14px;">
@@ -872,6 +874,14 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <hr class="pdf-divider">
   <div class="pdf-footer">AION Vi · Персональный ответ создан специально для тебя</div>
 </div>
+<!-- Выход из аккаунта. Раньше он жил только на странице входа, а та теперь
+     пропускает человека в приложение сама — без этой ссылки сменить аккаунт
+     стало бы невозможно. Внизу намеренно: действие редкое. -->
+<div style="text-align:center;margin:28px 0 12px;">
+  <button type="button" id="btn-logout" onclick="logoutFromApp()"
+    style="background:none;border:none;color:var(--text-faint);font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;text-decoration:underline;">Выйти</button>
+</div>
+
 </div><!-- /wrap -->
 
 <!-- МОДАЛЬНОЕ ОКНО: ПОДАРИТЬ -->
@@ -990,7 +1000,10 @@ const LANG = {
     spinnerCalc: '⟳ Calculating...',
     spinnerGen: '⟳ Generating... (~40 sec)',
     coordsDefault: 'Coordinates not set',
+    logoutLink: 'Sign out',
+    logoutConfirm: 'Sign out of your account?',
     errorFields: 'Please fill in day, month and year of birth',
+    errorPlace: 'I could not find this place of birth. Please check the city name — without it the calculation would be wrong.',
     errorServer: 'Cannot connect to server. Make sure server.py is running.',
     modalGiftTitle: '🎁 Share answer',
     modalGiftSub: 'The answer will be opened for saving or sharing',
@@ -1119,7 +1132,10 @@ const LANG = {
     spinnerCalc: '⟳ Obliczam...',
     spinnerGen: '⟳ Generuję... (~40 sek)',
     coordsDefault: 'Współrzędne nieokreślone',
+    logoutLink: 'Wyloguj',
+    logoutConfirm: 'Wylogować się z konta?',
     errorFields: 'Uzupełnij dzień, miesiąc i rok urodzenia',
+    errorPlace: 'Nie udało mi się znaleźć tego miejsca urodzenia. Sprawdź nazwę miasta — bez tego obliczenie będzie błędne.',
     errorServer: 'Nie można połączyć się z serwerem. Upewnij się, że server.py działa.',
     modalGiftTitle: '🎁 Udostępnij odpowiedź',
     modalGiftSub: 'Odpowiedź zostanie otwarta do zapisania lub wysłania',
@@ -1242,7 +1258,10 @@ const LANG = {
     spinnerCalc: '⟳ Розраховую...',
     spinnerGen: '⟳ Генерую... (~40 сек)',
     coordsDefault: 'Координати не визначено',
+    logoutLink: 'Вийти',
+    logoutConfirm: 'Вийти з акаунта?',
     errorFields: 'Заповни день, місяць і рік народження',
+    errorPlace: 'Не вдалося знайти це місце народження. Перевір назву міста — без нього розрахунок буде хибним.',
     errorServer: 'Не можу підключитись до сервера. Переконайся що server.py запущено.',
     modalGiftTitle: '🎁 Поділитись відповіддю',
     modalGiftSub: 'Відповідь буде відкрито для збереження або відправки',
@@ -1365,7 +1384,10 @@ const LANG = {
     spinnerCalc: '⟳ Считаю...',
     spinnerGen: '⟳ Генерирую... (~40 сек)',
     coordsDefault: 'Координаты не определены',
+    logoutLink: 'Выйти',
+    logoutConfirm: 'Выйти из аккаунта?',
     errorFields: 'Заполни день, месяц и год рождения',
+    errorPlace: 'Не удалось найти это место рождения. Проверь название города — без него расчёт будет неверным.',
     errorServer: 'Не могу подключиться к серверу. Убедись что server.py запущен в cmd.',
     modalGiftTitle: '🎁 Поделиться ответом',
     modalGiftSub: 'Ответ будет открыт для сохранения или отправки',
@@ -1505,6 +1527,7 @@ function applyTranslations() {
   setText('theme-other', L.themeOther);
   setText('lbl-group-hint', L.groupAnalysisHint);
   setText('pricing-link', L.pricingLink);
+  setText('btn-logout', L.logoutLink);
   const quickQBtn = el('quick-q-truth');
   if (quickQBtn) {
     quickQBtn.textContent = L.quickQTruth;
@@ -1676,6 +1699,19 @@ function setUser(u) {
 }
 function isGuest() {
   return !getUser() && localStorage.getItem('aion_guest') === '1';
+}
+
+// Выход из аккаунта. Firebase здесь загружается по-другому, чем на странице
+// входа, поэтому саму отвязку делает та страница — сюда достаточно уйти с
+// меткой logout=1. Память браузера чистим сразу, чтобы человек не увидел
+// свои данные, если страница входа почему-то не откроется.
+function logoutFromApp() {
+  if (!confirm(t('logoutConfirm'))) return;
+  try {
+    localStorage.removeItem('aion_user');
+    localStorage.removeItem('aion_guest');
+  } catch(e) {}
+  window.location.replace('index.html?logout=1');
 }
 
 // Пропуск: подписанный Firebase токен. По нему сервер понимает, кто пришёл.
@@ -2054,7 +2090,7 @@ function onTimeInput() {
 async function autoGeocodeAll() {
   const place1 = document.getElementById('place').value.trim();
   const lat1 = document.getElementById('lat').value;
-  if (place1 && (!lat1 || lat1 === '50.45')) {
+  if (place1 && !lat1) {
     try {
       const r = await fetch(`${SERVER}/geocode`, {
         method:'POST', headers:{'Content-Type':'application/json'},
@@ -2558,6 +2594,16 @@ async function calculate(silent) {
     return false;
   }
 
+  // Место рождения обязательно: без него расчёт был бы уверенным и неверным.
+  // Раньше в форме по умолчанию стоял Киев, и человек об этом не знал.
+  if (!isFinite(payload.lat) || !isFinite(payload.lon)) {
+    if (!silent) {
+      showError(t('errorPlace'));
+      btn.disabled = false; spinner.classList.remove('show');
+    }
+    return false;
+  }
+
   // Сохраняем профиль для автозаполнения
   currentClientData = payload;
 
@@ -2590,8 +2636,8 @@ async function calculate(silent) {
               day: parseInt(p2day), month: parseInt(p2month), year: parseInt(p2year),
               hour: parseInt(document.getElementById('p2-hour').value || 12),
               minute: parseInt(document.getElementById('p2-minute').value || 0),
-              lat: parseFloat(document.getElementById('p2-lat').value || 50.45),
-              lon: parseFloat(document.getElementById('p2-lon').value || 30.52),
+              lat: parseFloat(document.getElementById('p2-lat').value),
+              lon: parseFloat(document.getElementById('p2-lon').value),
               firstname: document.getElementById('p2-firstname').value,
               lastname: document.getElementById('p2-lastname').value,
             })
@@ -2729,8 +2775,9 @@ async function generateAnalysis() {
             }
           } catch(e) {}
         }
-        plat = plat || '50.45';
-        plon = plon || '30.52';
+        // Раньше здесь подставлялись координаты Киева — человек получал
+        // уверенный и полностью неверный расчёт. Теперь просто пропускаем.
+        if (!plat || !plon) continue;
 
         try {
           const rN = await fetch(`${SERVER}/summary`, {

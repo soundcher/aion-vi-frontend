@@ -191,22 +191,6 @@
 
   .beta-note { font-size: 11px; color: var(--text-faint); text-align: center; line-height: 1.8; letter-spacing: 0.5px; }
 
-  /* Уже вошёл */
-  .already-in { display: none; text-align: center; }
-  .welcome { font-size: 20px; color: var(--gold); margin-bottom: 8px; }
-  .sub-welcome { font-size: 11px; color: var(--text-dim); margin-bottom: 20px; letter-spacing: 1.5px; text-transform: uppercase; }
-  .count { font-size: 48px; color: var(--teal); line-height: 1; margin-bottom: 4px; }
-  .count-label { font-size: 10px; color: var(--text-faint); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 28px; }
-  .btn-open {
-    display: inline-block; padding: 13px 36px;
-    border: 1px solid var(--teal); color: var(--teal);
-    font-family: inherit; font-size: 11px; letter-spacing: 3px;
-    text-transform: uppercase; cursor: pointer;
-    background: transparent; border-radius: 2px;
-    transition: all 0.25s; text-decoration: none;
-  }
-  .btn-open:hover { background: var(--teal); color: var(--bg); }
-
   .note { margin-top: 24px; font-size: 11px; color: var(--text-faint); text-align: center; line-height: 1.8; }
   .note a { color: var(--gold-dim); text-decoration: none; }
   .note a:hover { color: var(--gold); }
@@ -384,36 +368,6 @@
 
   </div>
 
-  <!-- Придумай пароль: для тех, кто регистрировался по промокоду до появления входа -->
-  <div class="form-box" id="setpw-box" style="display:none;">
-    <div class="form-title" id="t-setpw-title">Set a password</div>
-    <div id="t-setpw-intro" style="font-size:12px;line-height:1.6;color:var(--text-dim);margin-bottom:18px;text-align:center;"></div>
-    <div class="field">
-      <label id="t-lbl-password2">Password</label>
-      <input type="password" id="inp-password2" autocomplete="new-password">
-    </div>
-    <button class="btn" id="btn-setpw" onclick="claimExistingAccount()">
-      <span class="lbl" id="t-btn-setpw">✦ Save password</span>
-      <span class="spin">⟳</span>
-    </button>
-    <div class="msg" id="msg2"></div>
-  </div>
-
-  <!-- Уже вошёл -->
-  <div class="form-box already-in" id="already-in">
-    <div class="welcome" id="welcome-name">Welcome back</div>
-    <div class="sub-welcome" id="t-sub-welcome">AION Vi is glad to see you</div>
-    <div class="count" id="analyses-left">—</div>
-    <div class="count-label" id="t-count-label">requests available</div>
-    <a href="calculator.html" class="btn-open" id="t-btn-open">✦ Open navigator</a>
-    <div style="margin-top:18px;">
-      <button onclick="logout()" id="t-logout"
-        style="background:none;border:none;color:var(--text-faint);font-size:11px;cursor:pointer;font-family:inherit;letter-spacing:1px;">
-        Sign out
-      </button>
-    </div>
-  </div>
-
   <!-- Оверлей на время входа: перекрывает форму сразу после Google/Telegram,
        не дожидаясь ответа сервера — форма больше не мелькает -->
   <div id="login-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center;">
@@ -451,9 +405,6 @@ const TRANSLATIONS = {
     errNoAccount: 'No account with this email. Create one below.',
     errEmailTaken: 'This email is already registered. Sign in instead.',
     needEmailTg: 'Almost there — enter your email so we can save your requests',
-    setPwTitle: 'Set a password',
-    setPwIntro: 'Your account already exists. Create a password so you can always get back in — your requests and history stay with you.',
-    btnSetPw: '✦ Save password',
     tgTaken: 'This email is already registered. Sign in your usual way first.',
     guestNote: 'You can try one request without an account.',
     tagline: 'Your personal navigator',
@@ -476,10 +427,6 @@ const TRANSLATIONS = {
     errConnection: 'Connection error. Check your internet and try again.',
     errUsed: 'This promo code has already been used.',
     welcome: (n) => `Welcome back, ${n}`,
-    subWelcome: 'AION Vi is glad to see you',
-    countLabel: 'requests available',
-    btnOpen: '✦ Open navigator',
-    logout: 'Sign out',
     groupNote: 'Group request (5+ people) —',
     entering: (n) => `✦ Welcome, ${n}! Opening navigator...`,
     refBonusMsg: (b) => `✦ Welcome! You got +${b} free questions for accepting a friend's invite.`,
@@ -503,9 +450,6 @@ const TRANSLATIONS = {
     errNoAccount: 'Акаунта з такою поштою немає. Створи новий нижче.',
     errEmailTaken: 'Ця пошта вже зареєстрована. Увійди замість реєстрації.',
     needEmailTg: 'Майже все — вкажи пошту, щоб ми зберегли твої запити',
-    setPwTitle: 'Придумай пароль',
-    setPwIntro: 'Твій акаунт уже існує. Створи пароль, щоб завжди могти повернутися — запити та історія залишаться з тобою.',
-    btnSetPw: '✦ Зберегти пароль',
     tgTaken: 'Ця пошта вже зареєстрована. Спершу увійди звичним способом.',
     guestNote: 'Можна спробувати один запит без акаунта.',
     tagline: 'Твій персональний навігатор',
@@ -528,10 +472,6 @@ const TRANSLATIONS = {
     errConnection: 'Помилка з\'єднання. Перевір інтернет і спробуй ще раз.',
     errUsed: 'Цей промокод вже використано.',
     welcome: (n) => `З поверненням, ${n}`,
-    subWelcome: 'AION Vi радий бачити тебе знову',
-    countLabel: 'запитів доступно',
-    btnOpen: '✦ Відкрити навігатор',
-    logout: 'Вийти',
     groupNote: 'Груповий запит (5+ людей) —',
     entering: (n) => `✦ Ласкаво просимо, ${n}! Відкриваю навігатор...`,
     refBonusMsg: (b) => `✦ Ласкаво просимо! Ти отримав(-ла) +${b} безкоштовних запитань за запрошення друга.`,
@@ -555,9 +495,6 @@ const TRANSLATIONS = {
     errNoAccount: 'Nie ma konta z tym e-mailem. Załóż je poniżej.',
     errEmailTaken: 'Ten e-mail jest już zarejestrowany. Zaloguj się.',
     needEmailTg: 'Prawie gotowe — podaj e-mail, żebyśmy zapisali twoje zapytania',
-    setPwTitle: 'Ustaw hasło',
-    setPwIntro: 'Twoje konto już istnieje. Ustaw hasło, żeby zawsze móc wrócić — zapytania i historia zostają z tobą.',
-    btnSetPw: '✦ Zapisz hasło',
     tgTaken: 'Ten e-mail jest już zarejestrowany. Najpierw zaloguj się swoim zwykłym sposobem.',
     guestNote: 'Możesz wypróbować jedno zapytanie bez konta.',
     tagline: 'Twój osobisty nawigator',
@@ -580,10 +517,6 @@ const TRANSLATIONS = {
     errConnection: 'Błąd połączenia. Sprawdź internet i spróbuj ponownie.',
     errUsed: 'Ten kod promocyjny został już wykorzystany.',
     welcome: (n) => `Witaj z powrotem, ${n}`,
-    subWelcome: 'AION Vi jest rad cię widzieć',
-    countLabel: 'zapytań dostępnych',
-    btnOpen: '✦ Otwórz nawigator',
-    logout: 'Wyloguj',
     groupNote: 'Zapytanie grupowe (5+ osób) —',
     entering: (n) => `✦ Witaj, ${n}! Otwieram nawigator...`,
     refBonusMsg: (b) => `✦ Witaj! Otrzymałeś(-aś) +${b} darmowych pytań za przyjęcie zaproszenia.`,
@@ -607,9 +540,6 @@ const TRANSLATIONS = {
     errNoAccount: 'Аккаунта с такой почтой нет. Создай новый ниже.',
     errEmailTaken: 'Эта почта уже зарегистрирована. Войди вместо регистрации.',
     needEmailTg: 'Почти всё — укажи почту, чтобы мы сохранили твои запросы',
-    setPwTitle: 'Придумай пароль',
-    setPwIntro: 'Твой аккаунт уже существует. Создай пароль, чтобы всегда мочь вернуться — запросы и история останутся с тобой.',
-    btnSetPw: '✦ Сохранить пароль',
     tgTaken: 'Эта почта уже зарегистрирована. Сначала войди привычным способом.',
     guestNote: 'Можно попробовать один запрос без аккаунта.',
     tagline: 'Твой персональный навигатор',
@@ -632,10 +562,6 @@ const TRANSLATIONS = {
     errConnection: 'Ошибка соединения. Проверь интернет и попробуй снова.',
     errUsed: 'Этот промокод уже был использован.',
     welcome: (n) => `С возвращением, ${n}`,
-    subWelcome: 'AION Vi рад видеть тебя снова',
-    countLabel: 'запросов доступно',
-    btnOpen: '✦ Открыть навигатор',
-    logout: 'Выйти',
     groupNote: 'Групповой запрос (5+ человек) —',
     entering: (n) => `✦ Добро пожаловать, ${n}! Открываю навигатор...`,
     refBonusMsg: (b) => `✦ Добро пожаловать! Ты получил(а) +${b} бесплатных вопросов за приглашение друга.`,
@@ -698,23 +624,9 @@ function setLang(lang) {
   set('t-have-account', T.haveAccount);
   set('t-tg-note', T.tgNote);
   set('t-guest-note', T.guestNote);
-  set('t-setpw-title', T.setPwTitle);
-  set('t-lbl-password2', T.lblPassword);
-  ph ('inp-password2', T.phPassword);
-  set('t-btn-setpw', T.btnSetPw);
   set('t-form-title', T.authTitle);
   set('t-btn-enter', currentMode === 'signup' ? T.btnSignup : T.btnSignin);
-  document.getElementById('t-sub-welcome').textContent = T.subWelcome;
-  document.getElementById('t-count-label').textContent = T.countLabel;
-  document.getElementById('t-btn-open').textContent = T.btnOpen;
-  document.getElementById('t-logout').textContent = T.logout;
   document.getElementById('t-group-note').textContent = T.groupNote;
-
-  // Обновляем приветствие если уже вошёл
-  const user = getUser();
-  if (user && user.nickname) {
-    document.getElementById('welcome-name').textContent = T.welcome(user.nickname);
-  }
 
   // Кнопку Telegram рисует их скрипт, поменять надпись задним числом
   // нельзя — пересобираем её целиком под новый язык.
@@ -1070,47 +982,42 @@ function enterAsGuest() {
 }
 
 // ══════════════════════════════════════════════
-// ВОЗВРАТ ТЕХ, КТО ЗАСТРЯЛ СНАРУЖИ
-// ══════════════════════════════════════════════
-// Люди, зарегистрированные по промокоду до появления входа, аккаунта в
-// Firebase не имеют. Их промокод сожжён, и раньше они получали
-// "код уже использован" без всякого выхода. Теперь им предлагается
-// придумать пароль — запись, баланс и история остаются на месте.
-let pendingClaimEmail = '';
-
-async function claimExistingAccount() {
-  const T = TRANSLATIONS[currentLang];
-  const pw = document.getElementById('inp-password2').value;
-  const btn = document.getElementById('btn-setpw');
-  const msg = document.getElementById('msg2');
-  msg.textContent = '';
-  if (!pw || pw.length < 6) { msg.textContent = T.errPassword; msg.className = 'msg error'; return; }
-  btn.classList.add('loading'); btn.disabled = true;
-  try {
-    await auth.createUserWithEmailAndPassword(pendingClaimEmail, pw);
-    await finishLogin({ nickname: '', method: 'password' });
-  } catch(e) {
-    btn.classList.remove('loading'); btn.disabled = false;
-    msg.textContent = e.code === 'auth/email-already-in-use' ? T.errEmailTaken : e.message;
-    msg.className = 'msg error';
-  }
-}
-
-function showSetPassword(email, nickname) {
-  const T = TRANSLATIONS[currentLang];
-  pendingClaimEmail = email;
-  document.getElementById('login-form').style.display = 'none';
-  document.getElementById('setpw-box').style.display = 'block';
-  document.getElementById('t-setpw-intro').textContent = T.setPwIntro;
-}
-
-// ══════════════════════════════════════════════
 // ИНИЦИАЛИЗАЦИЯ
 // ══════════════════════════════════════════════
+// Признак "человек пришёл сюда специально выйти" — тогда автоматический
+// переход в приложение отключается, иначе выйти было бы невозможно.
+let suppressAutoEnter = false;
+
 window.onload = async function() {
   const savedScale = parseInt(localStorage.getItem('aion_font_scale_idx') || '0');
   if (savedScale > 0) applyFontScale(savedScale);
+
+  const params = new URLSearchParams(window.location.search);
+  const overlay = document.getElementById('login-overlay');
+
+  // Если на этом устройстве кто-то уже входил — почти наверняка сессия жива
+  // и через мгновение мы уйдём в приложение. Закрываем форму заранее, чтобы
+  // она не мелькнула. Если окажется, что сессии нет — оверлей снимется ниже.
+  if (!params.get('logout') && localStorage.getItem('aion_user') && overlay) {
+    overlay.style.display = 'flex';
+    // Страховка: если Firebase почему-то не ответит, человек не должен
+    // остаться перед пустым экраном навсегда.
+    setTimeout(() => { if (!suppressAutoEnter) overlay.style.display = 'none'; }, 6000);
+  }
+
   await initFirebaseApp();
+
+  // Выход из аккаунта: калькулятор присылает человека сюда со меткой logout=1.
+  // Всю механику выхода держим в одном месте — здесь.
+  if (params.get('logout') === '1') {
+    suppressAutoEnter = true;
+    try { await auth.signOut(); } catch(e) {}
+    localStorage.removeItem('aion_user');
+    localStorage.removeItem('aion_guest');
+    if (overlay) overlay.style.display = 'none';
+    try { history.replaceState(null, '', 'index.html'); } catch(e) {}
+  }
+
   const savedLang = localStorage.getItem('aion_lang') || 'en';
   setLang(savedLang);
   setMode('signin');
@@ -1119,10 +1026,7 @@ window.onload = async function() {
   // Когда вернём — раскомментировать строку ниже.
   // loadFacebookSdk().catch(() => {});
 
-
-
   try {
-    const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
     if (ref) {
       // Метка приглашения помнится 72 часа, а не вечно. Раньше один
@@ -1137,27 +1041,32 @@ window.onload = async function() {
     }
   } catch(e) {}
 
-  // Уже вошёл на этом устройстве? Спрашиваем у сервера актуальный баланс.
+  // Уже вошёл на этом устройстве? Раньше здесь показывался экран
+  // "С возвращением" с кнопкой "Открыть навигатор" — лишняя остановка на
+  // КАЖДОМ открытии приложения (точка входа PWA — эта страница). Теперь
+  // при живой сессии уходим в приложение сами. Баланс запросов калькулятор
+  // всё равно спрашивает у сервера при загрузке, показывать его здесь незачем.
   auth.onAuthStateChanged(async (fbUser) => {
-    if (!fbUser) return;
+    if (suppressAutoEnter) return;
+    if (!fbUser) { if (overlay) overlay.style.display = 'none'; return; }
     try {
       const res = await api('/auth/session', {});
       if (res.status === 'ok') {
-        showAlreadyIn(storeProfile(res.profile, {}));
+        storeProfile(res.profile, {});
+        if (overlay) overlay.style.display = 'flex';
+        // replace, а не href: кнопка "назад" из приложения не должна
+        // возвращать на эту страницу и снова запускать переход по кругу.
+        window.location.replace('calculator.html');
       } else if (res.status === 'not_registered') {
         await finishLogin({ nickname: (fbUser.displayName || '').split(' ')[0], method: 'restored' });
+      } else {
+        if (overlay) overlay.style.display = 'none';
       }
-    } catch(e) {}
+    } catch(e) {
+      if (overlay) overlay.style.display = 'none';
+    }
   });
 };
-
-function showAlreadyIn(user) {
-  document.getElementById('login-form').style.display = 'none';
-  document.getElementById('setpw-box').style.display = 'none';
-  document.getElementById('already-in').style.display = 'block';
-  document.getElementById('welcome-name').textContent = TRANSLATIONS[currentLang].welcome(user.nickname || '');
-  document.getElementById('analyses-left').textContent = user.unlimited ? '∞' : user.analysesLeft;
-}
 
 function showMsg(text, type) {
   const el = document.getElementById('msg');
@@ -1165,19 +1074,9 @@ function showMsg(text, type) {
   el.className = type ? `msg ${type}` : 'msg';
 }
 
-function logout() {
-  auth.signOut().catch(() => {});
-  localStorage.removeItem('aion_user');
-  localStorage.removeItem('aion_guest');
-  document.getElementById('already-in').style.display = 'none';
-  document.getElementById('setpw-box').style.display = 'none';
-  document.getElementById('login-form').style.display = 'block';
-}
-
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
-  if (document.getElementById('setpw-box').style.display === 'block') claimExistingAccount();
-  else if (document.getElementById('login-form').style.display !== 'none') submitAuth();
+  if (document.getElementById('login-form').style.display !== 'none') submitAuth();
 });
 </script>
 <script>

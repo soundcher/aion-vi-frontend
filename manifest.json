@@ -2,7 +2,7 @@
   "name": "AION Vi — Навигатор Жизни",
   "short_name": "AION Vi",
   "description": "Твой персональный навигатор — друг и спутник в быту и профессиональной деятельности",
-  "start_url": "/index.html",
+  "start_url": "/calculator.html",
   "display": "standalone",
   "background_color": "#0d1525",
   "theme_color": "#0d1525",
