@@ -414,6 +414,12 @@
     </div>
   </div>
 
+  <!-- Оверлей на время входа: перекрывает форму сразу после Google/Telegram,
+       не дожидаясь ответа сервера — форма больше не мелькает -->
+  <div id="login-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center;">
+    <span style="font-size:32px;color:var(--gold);">⟳</span>
+  </div>
+
   <div class="note">
     <span id="t-group-note">Group request (5+ people) —</span><br>
     <a href="mailto:soundcher11@gmail.com">soundcher11@gmail.com</a>
@@ -1007,6 +1013,10 @@ function mountTelegramButton() {
 // число больше не присылает — раньше именно здесь оно подделывалось.
 async function finishLogin({ nickname, promo, method }) {
   const T = TRANSLATIONS[currentLang];
+  // Перекрываем форму сразу, не дожидаясь ответа сервера — иначе на секунду-две
+  // виден пустой экран входа между закрытием окна Google и приходом ответа.
+  const overlay = document.getElementById('login-overlay');
+  if (overlay) overlay.style.display = 'flex';
   try {
     // Метка приглашения теперь едет вместе с регистрацией одним запросом —
     // сервер сам решает, кому и когда начислить бонус (после первого
@@ -1020,7 +1030,10 @@ async function finishLogin({ nickname, promo, method }) {
       lang: currentLang, loginMethod: method || '',
       ref: refFresh ? ref : ''
     });
-    if (res.status !== 'ok') { showMsg(res.message || T.errConnection, 'error'); return; }
+    if (res.status !== 'ok') {
+      if (overlay) overlay.style.display = 'none';
+      showMsg(res.message || T.errConnection, 'error'); return;
+    }
     localStorage.removeItem('aion_ref');
     localStorage.removeItem('aion_ref_ts');
 
@@ -1028,6 +1041,9 @@ async function finishLogin({ nickname, promo, method }) {
 
     if (res.created) {
       if (res.promoRejected) {
+        // Тут человеку нужно увидеть сообщение об отклонённом промокоде —
+        // открываем форму снова на те же 2.2 секунды перед переходом.
+        if (overlay) overlay.style.display = 'none';
         showMsg(T.errUsed, 'error');
         setTimeout(() => { window.location.href = 'calculator.html'; }, 2200);
         return;
@@ -1037,8 +1053,10 @@ async function finishLogin({ nickname, promo, method }) {
     } else {
       showMsg(T.welcome(u.nickname || nickname || ''), 'success');
     }
+    // Оверлей остаётся до перехода — приложение открывается без мелькания формы.
     setTimeout(() => { window.location.href = 'calculator.html'; }, 1400);
   } catch(e) {
+    if (overlay) overlay.style.display = 'none';
     showMsg(T.errConnection, 'error');
   }
 }
