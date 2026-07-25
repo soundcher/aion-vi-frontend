@@ -125,9 +125,9 @@ const SERVER = 'https://aion-vi-server-production.up.railway.app';
 let allCodes = [];
 let currentFilter = 'all';
 
-function getToken() { return sessionStorage.getItem('aion_admin_token') || ''; }
-function setToken(t) { sessionStorage.setItem('aion_admin_token', t); }
-function clearToken() { sessionStorage.removeItem('aion_admin_token'); }
+function getToken() { return sessionStorage.getItem('aion_admin_pw') || ''; }
+function setToken(t) { sessionStorage.setItem('aion_admin_pw', t); }
+function clearToken() { sessionStorage.removeItem('aion_admin_pw'); }
 
 function escapeHtml(s) {
   if (!s) return '';
@@ -148,7 +148,7 @@ async function api(path, method, body) {
   const json = await res.json().catch(() => ({}));
   if (res.status === 401) {
     clearToken();
-    showLogin('Сессия истекла — войди заново.');
+    showLogin('Не удалось подтвердить пароль — войди заново.');
     throw new Error('unauthorized');
   }
   return json;
@@ -179,7 +179,7 @@ async function login() {
     });
     const json = await res.json();
     if (json.status === 'ok') {
-      setToken(json.token);
+      setToken(password);
       showApp();
     } else {
       msgEl.textContent = json.message === 'too_many'
