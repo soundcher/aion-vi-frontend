@@ -4,15 +4,7 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'calculator.html'
-      - 'index.html'
-      - 'logo_FINAL_v30.png'
-      - 'Music/**'
-      - 'Music_Piano/**'
-      - 'firebase.json'
-      - '.firebaserc'
-      - '.github/workflows/**'
+
 
 jobs:
   deploy:
