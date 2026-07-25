@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AION Vi — Админ</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0d1525;
+    --panel: #131c2e;
+    --panel2: #16202f;
+    --teal: #5E8B76;
+    --text: #e8e0d0;
+    --text-dim: #9a9080;
+    --text-faint: #4a5060;
+    --line: rgba(200,180,140,0.10);
+    --line2: rgba(200,180,140,0.18);
+    --error: #c46a4a;
+    --gold: #c9a563;
+  }
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 32px 20px 60px; }
+  h1 { font-size: 22px; color: var(--gold); margin-bottom: 4px; }
+  .sub { font-size: 12px; color: var(--text-faint); margin-bottom: 28px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line2); border-radius: 4px;
+    padding: 22px; margin-bottom: 20px;
+  }
+  .card h2 { font-size: 15px; color: var(--gold); margin-bottom: 14px; font-weight: normal; letter-spacing: .3px; }
+  input, textarea {
+    width: 100%; background: var(--panel2); border: 1px solid var(--line2); border-radius: 2px;
+    color: var(--text); padding: 10px 12px; font-family: inherit; font-size: 14px;
+  }
+  textarea { min-height: 90px; resize: vertical; font-family: 'Courier New', monospace; font-size: 12px; }
+  button {
+    background: var(--teal); border: none; border-radius: 2px; color: #0d1525;
+    padding: 10px 18px; font-family: inherit; font-size: 13px; font-weight: bold;
+    cursor: pointer; letter-spacing: .3px;
+  }
+  button:hover { opacity: .88; }
+  button.secondary { background: transparent; border: 1px solid var(--line2); color: var(--text-dim); font-weight: normal; }
+  button.danger { background: var(--error); color: #fff; padding: 5px 10px; font-size: 11px; }
+  .msg { font-size: 12px; margin-top: 10px; min-height: 16px; }
+  .msg.error { color: var(--error); }
+  .msg.ok { color: var(--teal); }
+  #login-screen { max-width: 360px; margin: 15vh auto 0; text-align: center; }
+  #login-screen h1 { margin-bottom: 20px; }
+  #login-screen input { margin-bottom: 12px; }
+  #login-screen button { width: 100%; padding: 12px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; }
+  .stat-box { background: var(--panel2); border: 1px solid var(--line); border-radius: 2px; padding: 14px; text-align: center; }
+  .stat-num { font-size: 26px; color: var(--gold); }
+  .stat-label { font-size: 11px; color: var(--text-faint); margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+  th { color: var(--text-faint); font-weight: normal; text-transform: uppercase; font-size: 10px; letter-spacing: .5px; }
+  .badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; letter-spacing: .3px; }
+  .badge.free { background: rgba(94,139,118,0.18); color: var(--teal); }
+  .badge.used { background: rgba(196,106,74,0.18); color: var(--error); }
+  .row-actions { text-align: right; }
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 14px; }
+  .filter-bar button { padding: 6px 12px; font-size: 11px; background: var(--panel2); color: var(--text-dim); font-weight: normal; border: 1px solid var(--line2); }
+  .filter-bar button.active { background: var(--teal); color: #0d1525; font-weight: bold; }
+  #app-screen { display: none; }
+  .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .logout-link { font-size: 11px; color: var(--text-faint); cursor: pointer; text-decoration: underline; }
+  .empty { color: var(--text-faint); font-size: 12px; padding: 12px 0; }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <h1>✦ AION Vi — Админ</h1>
+  <input type="password" id="inp-password" placeholder="Пароль" autocomplete="current-password">
+  <button onclick="login()">Войти</button>
+  <div class="msg error" id="login-msg"></div>
+</div>
+
+<div class="wrap" id="app-screen">
+  <div class="top-row">
+    <div>
+      <h1>✦ AION Vi — Админ</h1>
+      <div class="sub">Промокоды и статистика</div>
+    </div>
+    <span class="logout-link" onclick="logout()">Выйти</span>
+  </div>
+
+  <div class="card">
+    <h2>Статистика</h2>
+    <div class="stats-grid" id="stats-grid">
+      <div class="empty">Загрузка…</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Добавить промокоды</h2>
+    <div class="sub" style="margin-bottom:10px;">Голый список через запятую/пробел/перенос строки — или построчно вида «1. AION-XXX-0000 +++ Имя» (так, как в твоей таблице). Имя после кода сохранится как заметка.</div>
+    <textarea id="inp-codes" placeholder="AION-XXX-0000, AION-XXX-0001...&#10;или&#10;1. AION-XXX-0000 +++ Имя Фамилия"></textarea>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
+      <button onclick="addCodes()">Добавить</button>
+      <span class="msg" id="add-msg"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Промокоды</h2>
+    <div class="filter-bar">
+      <button class="active" data-filter="all" onclick="setFilter('all')">Все</button>
+      <button data-filter="free" onclick="setFilter('free')">Свободные</button>
+      <button data-filter="used" onclick="setFilter('used')">Использованные</button>
+    </div>
+    <div id="codes-table"><div class="empty">Загрузка…</div></div>
+  </div>
+</div>
+
+<script>
+const SERVER = 'https://aion-vi-server-production.up.railway.app';
+let allCodes = [];
+let currentFilter = 'all';
+
+function getToken() { return sessionStorage.getItem('aion_admin_token') || ''; }
+function setToken(t) { sessionStorage.setItem('aion_admin_token', t); }
+function clearToken() { sessionStorage.removeItem('aion_admin_token'); }
+
+function escapeHtml(s) {
+  if (!s) return '';
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+async function api(path, method, body) {
+  const headers = { 'Content-Type': 'application/json' };
+  const token = getToken();
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(SERVER + path, {
+    method: method || 'GET',
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const json = await res.json().catch(() => ({}));
+  if (res.status === 401) {
+    clearToken();
+    showLogin('Сессия истекла — войди заново.');
+    throw new Error('unauthorized');
+  }
+  return json;
+}
+
+function showLogin(msg) {
+  document.getElementById('login-screen').style.display = 'block';
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-msg').textContent = msg || '';
+}
+
+function showApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  loadStats();
+  loadCodes();
+}
+
+async function login() {
+  const password = document.getElementById('inp-password').value;
+  const msgEl = document.getElementById('login-msg');
+  msgEl.textContent = '';
+  try {
+    const res = await fetch(SERVER + '/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+    });
+    const json = await res.json();
+    if (json.status === 'ok') {
+      setToken(json.token);
+      showApp();
+    } else {
+      msgEl.textContent = json.message === 'too_many'
+        ? 'Слишком много попыток. Подожди немного.'
+        : 'Неверный пароль.';
+    }
+  } catch (e) {
+    msgEl.textContent = 'Не удалось подключиться к серверу.';
+  }
+}
+
+function logout() {
+  clearToken();
+  showLogin();
+}
+
+async function loadStats() {
+  const grid = document.getElementById('stats-grid');
+  try {
+    const json = await api('/admin/stats');
+    if (json.status !== 'ok') { grid.innerHTML = '<div class="empty">Не удалось загрузить.</div>'; return; }
+    const tierLabels = { free: 'Без подписки', start: 'Старт', basic: 'Базовый', pro: 'Про' };
+    let tierBoxes = '';
+    for (const [tier, count] of Object.entries(json.byTier || {})) {
+      tierBoxes += `<div class="stat-box"><div class="stat-num">${count}</div><div class="stat-label">${tierLabels[tier] || tier}</div></div>`;
+    }
+    grid.innerHTML = `
+      <div class="stat-box"><div class="stat-num">${json.totalUsers}</div><div class="stat-label">Всего пользователей</div></div>
+      <div class="stat-box"><div class="stat-num">${json.signupsToday}</div><div class="stat-label">Регистраций сегодня</div></div>
+      <div class="stat-box"><div class="stat-num">${json.promoCodesUsed} / ${json.promoCodesTotal}</div><div class="stat-label">Промокоды использ.</div></div>
+      ${tierBoxes}
+    `;
+  } catch (e) { /* уже обработано в api() при 401 */ }
+}
+
+async function loadCodes() {
+  const box = document.getElementById('codes-table');
+  try {
+    const json = await api('/admin/promocodes');
+    if (json.status !== 'ok') { box.innerHTML = '<div class="empty">Не удалось загрузить.</div>'; return; }
+    allCodes = json.items || [];
+    renderCodes();
+  } catch (e) { /* уже обработано в api() */ }
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-bar button').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
+  renderCodes();
+}
+
+function renderCodes() {
+  const box = document.getElementById('codes-table');
+  let items = allCodes;
+  if (currentFilter === 'free') items = items.filter(i => !i.used);
+  if (currentFilter === 'used') items = items.filter(i => i.used);
+
+  if (!items.length) {
+    box.innerHTML = '<div class="empty">Пусто.</div>';
+    return;
+  }
+
+  let rows = items.map(i => `
+    <tr>
+      <td>${i.code}</td>
+      <td>${i.used ? `<span class="badge used">использован</span>` : `<span class="badge free">свободен</span>`}</td>
+      <td>${escapeHtml(i.note) || '—'}</td>
+      <td>${i.usedBy || '—'}</td>
+      <td>${i.usedAt ? new Date(i.usedAt).toLocaleDateString('ru-RU') : '—'}</td>
+      <td class="row-actions"><button class="danger" onclick="deleteCode('${i.code}')">Удалить</button></td>
+    </tr>
+  `).join('');
+
+  box.innerHTML = `
+    <table>
+      <thead><tr><th>Код</th><th>Статус</th><th>Отдан (заметка)</th><th>Зарегистрировался</th><th>Когда</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+async function addCodes() {
+  const raw = document.getElementById('inp-codes').value.trim();
+  const msgEl = document.getElementById('add-msg');
+  if (!raw) return;
+  msgEl.className = 'msg';
+  msgEl.textContent = 'Добавляю…';
+  try {
+    const json = await api('/admin/promocodes/add', 'POST', { codes: raw });
+    if (json.status === 'ok') {
+      msgEl.className = 'msg ok';
+      msgEl.textContent = `Добавлено: ${json.added.length}${json.skipped.length ? `, уже было: ${json.skipped.length}` : ''}.`;
+      document.getElementById('inp-codes').value = '';
+      loadCodes();
+      loadStats();
+    } else {
+      msgEl.className = 'msg error';
+      msgEl.textContent = 'Не удалось добавить.';
+    }
+  } catch (e) { /* уже обработано в api() */ }
+}
+
+async function deleteCode(code) {
+  if (!confirm(`Удалить код ${code}?`)) return;
+  try {
+    await api('/admin/promocodes/delete', 'POST', { code });
+    loadCodes();
+    loadStats();
+  } catch (e) { /* уже обработано в api() */ }
+}
+
+document.getElementById('inp-password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') login();
+});
+
+// При открытии страницы: если токен уже есть — сразу пробуем, иначе логин
+if (getToken()) { showApp(); } else { showLogin(); }
+</script>
+</body>
+</html>
