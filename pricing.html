@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AION Vi — Pricing</title>
+<meta name="description" content="AION Vi pricing — free tier and monthly subscription plans.">
+<link rel="icon" href="favicon-32.png">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0d1525;
+    --panel: #131c2e;
+    --panel2: #16202f;
+    --teal: #5E8B76;
+    --gold: #c9a563;
+    --text: #e8e0d0;
+    --text-dim: #9a9080;
+    --text-faint: #6a7080;
+    --line: rgba(200,180,140,0.12);
+    --line2: rgba(200,180,140,0.22);
+  }
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 34px 20px 60px; }
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 26px; gap: 12px; }
+  .brand { font-size: 15px; color: var(--gold); letter-spacing: 1px; text-decoration: none; }
+  select {
+    background: var(--panel2); border: 1px solid var(--line2); border-radius: 2px;
+    color: var(--text-dim); padding: 6px 8px; font-family: inherit; font-size: 12px; cursor: pointer;
+  }
+  h1 { font-size: 26px; color: var(--gold); font-weight: normal; margin-bottom: 8px; letter-spacing: .5px; }
+  .lead { font-size: 14px; color: var(--text-dim); line-height: 1.7; margin-bottom: 30px; }
+  .tier {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 3px;
+    padding: 20px 22px; margin-bottom: 14px;
+  }
+  .tier.free { border-style: dashed; }
+  .tier-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .tier-name { font-size: 17px; color: var(--gold); }
+  .tier-price { font-size: 15px; color: var(--text); white-space: nowrap; }
+  .tier-price span { font-size: 12px; color: var(--text-faint); }
+  .tier-desc { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+  .cta {
+    display: inline-block; margin-top: 26px; background: var(--teal); color: #0d1525;
+    text-decoration: none; padding: 12px 26px; border-radius: 2px; font-size: 14px;
+    font-weight: bold; letter-spacing: .3px;
+  }
+  .cta:hover { opacity: .9; }
+  .note { font-size: 12px; color: var(--text-faint); line-height: 1.7; margin-top: 26px; }
+  .foot { margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--text-faint); line-height: 2; }
+  .foot a { color: var(--text-dim); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a href="index.html" class="brand">✦ AION Vi</a>
+    <select id="lang-select" onchange="setLang(this.value)">
+      <option value="en">🌐 English</option>
+      <option value="uk">🌐 Українська</option>
+      <option value="pl">🌐 Polski</option>
+      <option value="ru">🌐 Русский</option>
+    </select>
+  </div>
+
+  <h1 id="t-title">Pricing</h1>
+  <p class="lead" id="t-lead"></p>
+
+  <div class="tier free">
+    <div class="tier-head">
+      <span class="tier-name" id="t-free-name">Free</span>
+      <span class="tier-price" id="t-free-price">€0</span>
+    </div>
+    <div class="tier-desc" id="t-free-desc"></div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-head">
+      <span class="tier-name" id="t-start-name">Start</span>
+      <span class="tier-price">€9.99 <span id="t-per-1">/ month</span></span>
+    </div>
+    <div class="tier-desc" id="t-start-desc"></div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-head">
+      <span class="tier-name" id="t-basic-name">Basic</span>
+      <span class="tier-price">€19.99 <span id="t-per-2">/ month</span></span>
+    </div>
+    <div class="tier-desc" id="t-basic-desc"></div>
+  </div>
+
+  <div class="tier">
+    <div class="tier-head">
+      <span class="tier-name" id="t-pro-name">Pro</span>
+      <span class="tier-price">€29.99 <span id="t-per-3">/ month</span></span>
+    </div>
+    <div class="tier-desc" id="t-pro-desc"></div>
+  </div>
+
+  <a href="index.html" class="cta" id="t-cta">Try AION Vi</a>
+
+  <p class="note" id="t-note"></p>
+
+  <div class="foot">
+    <a href="privacy.html" id="t-privacy">Privacy Policy</a> ·
+    <a href="terms.html" id="t-terms">Terms of Service</a> ·
+    <a href="mailto:soundcher11@gmail.com">soundcher11@gmail.com</a>
+  </div>
+
+</div>
+
+<script>
+// Тексты — те же формулировки, что и в самом приложении, чтобы цена на
+// странице и цена в окне оплаты не разошлись между собой.
+const LANG = {
+  en: {
+    title: 'Pricing',
+    lead: 'AION Vi is a subscription web app. Each plan gives you a monthly quota of personal requests — you ask a question, AION Vi writes you a personal, detailed answer. Cancel anytime.',
+    freeName: 'Free', freePrice: '€0',
+    freeDesc: 'Try it without paying: 1 request as a guest, plus 2 more after you create an account. No card required.',
+    startName: 'Start', startDesc: '10 requests per month + conversation history',
+    basicName: 'Basic', basicDesc: '23 requests per month + compatibility between two people',
+    proName: 'Pro', proDesc: '40 requests per month + transits + branded PDF export',
+    per: '/ month',
+    cta: 'Try AION Vi',
+    note: 'All plans are billed monthly and can be cancelled at any time. Prices are in euros and include applicable VAT. Questions about billing — write to soundcher11@gmail.com, I answer personally.',
+    privacy: 'Privacy Policy', terms: 'Terms of Service',
+  },
+  uk: {
+    title: 'Тарифи',
+    lead: 'AION Vi — застосунок за підпискою. Кожен пакет дає певну кількість особистих запитів на місяць: ти ставиш питання — AION Vi пише тобі особисту, розгорнуту відповідь. Скасувати можна будь-коли.',
+    freeName: 'Безкоштовно', freePrice: '€0',
+    freeDesc: 'Спробуй без оплати: 1 запит як гість і ще 2 після реєстрації. Картка не потрібна.',
+    startName: 'Старт', startDesc: '10 запитів на місяць + історія діалогів',
+    basicName: 'Базовий', basicDesc: '23 запити на місяць + перевірка сумісності двох людей',
+    proName: 'Про', proDesc: '40 запитів на місяць + транзити + фірмовий PDF',
+    per: '/ місяць',
+    cta: 'Спробувати AION Vi',
+    note: 'Усі пакети оплачуються щомісяця, скасувати можна будь-коли. Ціни в євро, ПДВ уже враховано. Питання щодо оплати — пиши на soundcher11@gmail.com, відповідаю особисто.',
+    privacy: 'Політика конфіденційності', terms: 'Умови використання',
+  },
+  pl: {
+    title: 'Cennik',
+    lead: 'AION Vi to aplikacja w modelu subskrypcji. Każdy pakiet daje określoną liczbę osobistych zapytań miesięcznie — zadajesz pytanie, AION Vi pisze osobistą, szczegółową odpowiedź. Możesz anulować w każdej chwili.',
+    freeName: 'Bezpłatnie', freePrice: '€0',
+    freeDesc: 'Wypróbuj bez opłat: 1 zapytanie jako gość i 2 kolejne po rejestracji. Karta nie jest wymagana.',
+    startName: 'Start', startDesc: '10 zapytań miesięcznie + historia rozmów',
+    basicName: 'Podstawowy', basicDesc: '23 zapytania miesięcznie + kompatybilność dwóch osób',
+    proName: 'Pro', proDesc: '40 zapytań miesięcznie + tranzyty + firmowy PDF',
+    per: '/ miesiąc',
+    cta: 'Wypróbuj AION Vi',
+    note: 'Wszystkie pakiety rozliczane są miesięcznie i można je anulować w dowolnym momencie. Ceny w euro, zawierają VAT. Pytania o płatności — napisz na soundcher11@gmail.com, odpowiadam osobiście.',
+    privacy: 'Polityka prywatności', terms: 'Warunki korzystania',
+  },
+  ru: {
+    title: 'Тарифы',
+    lead: 'AION Vi — приложение по подписке. Каждый пакет даёт определённое количество личных запросов в месяц: ты задаёшь вопрос — AION Vi пишет тебе личный, развёрнутый ответ. Отменить можно в любой момент.',
+    freeName: 'Бесплатно', freePrice: '€0',
+    freeDesc: 'Попробовать без оплаты: 1 запрос как гость и ещё 2 после регистрации. Карта не нужна.',
+    startName: 'Старт', startDesc: '10 запросов в месяц + история диалогов',
+    basicName: 'Базовый', basicDesc: '23 запроса в месяц + проверка совместимости двух людей',
+    proName: 'Про', proDesc: '40 запросов в месяц + транзиты + фирменный PDF',
+    per: '/ месяц',
+    cta: 'Попробовать AION Vi',
+    note: 'Все пакеты оплачиваются ежемесячно, отменить можно в любой момент. Цены в евро, НДС уже включён. Вопросы по оплате — пиши на soundcher11@gmail.com, отвечаю лично.',
+    privacy: 'Политика конфиденциальности', terms: 'Условия использования',
+  },
+};
+
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+function setLang(code) {
+  const L = LANG[code] || LANG.en;
+  document.documentElement.lang = code;
+  try { localStorage.setItem('aion_lang', code); } catch(e) {}
+  document.getElementById('lang-select').value = code;
+
+  setText('t-title', L.title);
+  setText('t-lead', L.lead);
+  setText('t-free-name', L.freeName);
+  setText('t-free-price', L.freePrice);
+  setText('t-free-desc', L.freeDesc);
+  setText('t-start-name', L.startName);
+  setText('t-start-desc', L.startDesc);
+  setText('t-basic-name', L.basicName);
+  setText('t-basic-desc', L.basicDesc);
+  setText('t-pro-name', L.proName);
+  setText('t-pro-desc', L.proDesc);
+  setText('t-per-1', L.per);
+  setText('t-per-2', L.per);
+  setText('t-per-3', L.per);
+  setText('t-cta', L.cta);
+  setText('t-note', L.note);
+  setText('t-privacy', L.privacy);
+  setText('t-terms', L.terms);
+  document.title = 'AION Vi — ' + L.title;
+}
+
+// Язык тот же, что человек уже выбрал в приложении. Для нового
+// посетителя — английский, как и на странице входа.
+let saved = 'en';
+try { saved = localStorage.getItem('aion_lang') || 'en'; } catch(e) {}
+setLang(LANG[saved] ? saved : 'en');
+</script>
+</body>
+</html>

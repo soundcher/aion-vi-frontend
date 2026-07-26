@@ -374,6 +374,14 @@
     <span style="font-size:32px;color:var(--gold);">⟳</span>
   </div>
 
+  <!-- Цены обязаны быть видны ДО входа: этого требуют и платёжные
+       партнёры, и просто здравый смысл — человек хочет знать, сколько
+       это стоит, прежде чем регистрироваться. -->
+  <div style="text-align:center;margin-top:22px;">
+    <a href="pricing.html" id="t-pricing-link"
+      style="color:var(--gold);font-size:12px;letter-spacing:0.5px;text-decoration:underline;">Pricing</a>
+  </div>
+
   <div class="note">
     <span id="t-group-note">Group request (5+ people) —</span><br>
     <a href="mailto:soundcher11@gmail.com">soundcher11@gmail.com</a>
@@ -428,6 +436,7 @@ const TRANSLATIONS = {
     errUsed: 'This promo code has already been used.',
     welcome: (n) => `Welcome back, ${n}`,
     groupNote: 'Group request (5+ people) —',
+    pricingLink: 'Pricing',
     entering: (n) => `✦ Welcome, ${n}! Opening navigator...`,
     refBonusMsg: (b) => `✦ Welcome! You got +${b} free questions for accepting a friend's invite.`,
   },
@@ -473,6 +482,7 @@ const TRANSLATIONS = {
     errUsed: 'Цей промокод вже використано.',
     welcome: (n) => `З поверненням, ${n}`,
     groupNote: 'Груповий запит (5+ людей) —',
+    pricingLink: 'Тарифи',
     entering: (n) => `✦ Ласкаво просимо, ${n}! Відкриваю навігатор...`,
     refBonusMsg: (b) => `✦ Ласкаво просимо! Ти отримав(-ла) +${b} безкоштовних запитань за запрошення друга.`,
   },
@@ -518,6 +528,7 @@ const TRANSLATIONS = {
     errUsed: 'Ten kod promocyjny został już wykorzystany.',
     welcome: (n) => `Witaj z powrotem, ${n}`,
     groupNote: 'Zapytanie grupowe (5+ osób) —',
+    pricingLink: 'Cennik',
     entering: (n) => `✦ Witaj, ${n}! Otwieram nawigator...`,
     refBonusMsg: (b) => `✦ Witaj! Otrzymałeś(-aś) +${b} darmowych pytań za przyjęcie zaproszenia.`,
   },
@@ -563,6 +574,7 @@ const TRANSLATIONS = {
     errUsed: 'Этот промокод уже был использован.',
     welcome: (n) => `С возвращением, ${n}`,
     groupNote: 'Групповой запрос (5+ человек) —',
+    pricingLink: 'Тарифы',
     entering: (n) => `✦ Добро пожаловать, ${n}! Открываю навигатор...`,
     refBonusMsg: (b) => `✦ Добро пожаловать! Ты получил(а) +${b} бесплатных вопросов за приглашение друга.`,
   }
@@ -627,6 +639,7 @@ function setLang(lang) {
   set('t-form-title', T.authTitle);
   set('t-btn-enter', currentMode === 'signup' ? T.btnSignup : T.btnSignin);
   document.getElementById('t-group-note').textContent = T.groupNote;
+  document.getElementById('t-pricing-link').textContent = T.pricingLink;
 
   // Кнопку Telegram рисует их скрипт, поменять надпись задним числом
   // нельзя — пересобираем её целиком под новый язык.
