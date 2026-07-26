@@ -100,6 +100,50 @@
   </div>
 
   <div class="card">
+    <h2>Индивидуальный код</h2>
+    <div class="sub" style="margin-bottom:10px;">Один код — одному человеку. Сколько запросов дать — предустановка, меняется прямо тут.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <input type="text" id="inp-single-note" placeholder="Кому (необязательно)" style="flex:1;min-width:140px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:11px;color:var(--text-faint);white-space:nowrap;">запросов:</label>
+        <input type="number" id="inp-single-grant" value="5" min="1" max="1000" style="width:70px;">
+      </div>
+      <button onclick="generateSingle()" style="white-space:nowrap;">Сгенерировать</button>
+    </div>
+    <div id="single-result" style="margin-top:10px;display:none;">
+      <div style="background: var(--panel2); border: 1px solid var(--teal); border-radius: 2px; padding: 12px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <span id="single-code" style="font-size:16px;letter-spacing:1px;color:var(--gold);"></span>
+        <button class="secondary" onclick="copyCode('single-code')">Копировать</button>
+      </div>
+    </div>
+    <div class="msg error" id="single-msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>Массовая генерация (акция)</h2>
+    <div class="sub" style="margin-bottom:10px;">Один код на много людей — например, для поста в Instagram. Показывает, сколько уже погашено из лимита.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <input type="text" id="inp-multi-note" placeholder="Название акции (необязательно)" style="flex:1;min-width:140px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:11px;color:var(--text-faint);white-space:nowrap;">людей:</label>
+        <input type="number" id="inp-multi-max" value="100" min="1" max="100000" style="width:80px;">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label style="font-size:11px;color:var(--text-faint);white-space:nowrap;">запросов каждому:</label>
+        <input type="number" id="inp-multi-grant" value="5" min="1" max="1000" style="width:70px;">
+      </div>
+      <button onclick="generateMulti()" style="white-space:nowrap;">Сгенерировать</button>
+    </div>
+    <div id="multi-result" style="margin-top:10px;display:none;">
+      <div style="background: var(--panel2); border: 1px solid var(--teal); border-radius: 2px; padding: 12px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        <span id="multi-code" style="font-size:16px;letter-spacing:1px;color:var(--gold);"></span>
+        <button class="secondary" onclick="copyCode('multi-code')">Копировать</button>
+      </div>
+    </div>
+    <div class="msg error" id="multi-msg"></div>
+  </div>
+
+  <div class="card">
     <h2>Добавить промокоды</h2>
     <div class="sub" style="margin-bottom:10px;">Голый список через запятую/пробел/перенос строки — или построчно вида «1. AION-XXX-0000 +++ Имя» (так, как в твоей таблице). Имя после кода сохранится как заметка.</div>
     <textarea id="inp-codes" placeholder="AION-XXX-0000, AION-XXX-0001...&#10;или&#10;1. AION-XXX-0000 +++ Имя Фамилия"></textarea>
@@ -245,7 +289,9 @@ function renderCodes() {
   let rows = items.map(i => `
     <tr>
       <td>${i.code}</td>
-      <td>${i.used ? `<span class="badge used">использован</span>` : `<span class="badge free">свободен</span>`}</td>
+      <td>${i.type === 'multi' ? '<span class="badge free" style="background:rgba(201,165,99,0.18);color:var(--gold);">акция</span>' : 'разовый'}</td>
+      <td>${i.grant ?? '—'}</td>
+      <td>${i.used ? `<span class="badge used">${i.type === 'multi' ? 'исчерпан' : 'использован'}</span>` : `<span class="badge free">свободен</span>`}</td>
       <td>${escapeHtml(i.note) || '—'}</td>
       <td>${i.usedBy || '—'}</td>
       <td>${i.usedAt ? new Date(i.usedAt).toLocaleDateString('ru-RU') : '—'}</td>
@@ -255,10 +301,64 @@ function renderCodes() {
 
   box.innerHTML = `
     <table>
-      <thead><tr><th>Код</th><th>Статус</th><th>Отдан (заметка)</th><th>Зарегистрировался</th><th>Когда</th><th></th></tr></thead>
+      <thead><tr><th>Код</th><th>Тип</th><th>Даёт</th><th>Статус</th><th>Отдан (заметка)</th><th>Зарегистрировался</th><th>Когда</th><th></th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
   `;
+}
+
+function readIntInput(id, fallback) {
+  const v = parseInt(document.getElementById(id).value, 10);
+  return Number.isFinite(v) && v > 0 ? v : fallback;
+}
+
+async function generateSingle() {
+  const note = document.getElementById('inp-single-note').value.trim();
+  const grant = readIntInput('inp-single-grant', 5);
+  const msgEl = document.getElementById('single-msg');
+  const resultBox = document.getElementById('single-result');
+  msgEl.textContent = '';
+  resultBox.style.display = 'none';
+  try {
+    const json = await api('/admin/promocodes/generate', 'POST', { note, type: 'single', analysesGrant: grant });
+    if (json.status === 'ok') {
+      document.getElementById('single-code').textContent = json.code;
+      resultBox.style.display = 'block';
+      document.getElementById('inp-single-note').value = '';
+      loadCodes();
+      loadStats();
+    } else {
+      msgEl.textContent = 'Не удалось сгенерировать код.';
+    }
+  } catch (e) { /* уже обработано в api() */ }
+}
+
+async function generateMulti() {
+  const note = document.getElementById('inp-multi-note').value.trim();
+  const maxUses = readIntInput('inp-multi-max', 100);
+  const grant = readIntInput('inp-multi-grant', 5);
+  const msgEl = document.getElementById('multi-msg');
+  const resultBox = document.getElementById('multi-result');
+  msgEl.textContent = '';
+  resultBox.style.display = 'none';
+  try {
+    const json = await api('/admin/promocodes/generate', 'POST', { note, type: 'multi', maxUses, analysesGrant: grant });
+    if (json.status === 'ok') {
+      document.getElementById('multi-code').textContent = json.code;
+      resultBox.style.display = 'block';
+      document.getElementById('inp-multi-note').value = '';
+      loadCodes();
+      loadStats();
+    } else {
+      msgEl.textContent = 'Не удалось сгенерировать код.';
+    }
+  } catch (e) { /* уже обработано в api() */ }
+}
+
+function copyCode(elId) {
+  const text = document.getElementById(elId).textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).catch(() => {});
 }
 
 async function addCodes() {
