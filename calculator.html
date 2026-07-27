@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+<meta name="google" content="notranslate">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AION Vi — Навигатор Жизни</title>
@@ -1083,7 +1084,8 @@ const LANG = {
     ratingNudge: 'By the way — don\'t forget to rate your last reading 🙂',
     shareGmailSubject: 'AION Vi — Your personal answer',
     shareTelegramText: 'AION Vi — Personal answer',
-    greetFirst: '{name}Hi! I\'m AION Vi. I know too much about you to stay silent. Ask — I\'ll tell you everything! 😊 Try your very first question like this: "Tell me everything you know about me" — in Thinking mode.',
+    greetFirst: 'Hello, {name}! Good to see you! Before we begin — tell me a few things about yourself. Date, time, place of birth. It\'ll take a minute, and then we can talk properly.',
+    greetFirstNoName: 'Hello! Good to see you! Before we begin — tell me a few things about yourself. Date, time, place of birth. It\'ll take a minute, and then we can talk properly.',
     greetReturn: '{name}Finally! I was starting to worry... Great to see you! Shall we begin?',
     greetVariants: ['{name}Oh! Hi! I was waiting for you today!', '{name}Hi! Glad you\'re back. Shall we begin?', '{name}Together again! What shall we discover today?', '{name}You\'re back! I was just thinking about you.', '{name}Hello! I missed you.', '{name}Oh, it\'s you again! Shall we continue?', '{name}Come in. I\'m ready if you are.'],
   },
@@ -1213,7 +1215,8 @@ const LANG = {
     ratingNudge: 'Nawiasem mówiąc — nie zapomnij ocenić ostatniego rozbioru 🙂',
     shareGmailSubject: 'AION Vi — Twoja osobista odpowiedź',
     shareTelegramText: 'AION Vi — Osobista odpowiedź',
-    greetFirst: '{name}Cześć! Jestem AION Vi. Wiem o tobie zbyt wiele, by milczeć. Pytaj — wszystko ci powiem! 😊 Zadaj mi pierwsze pytanie tak: „Opowiedz mi wszystko, co o mnie wiesz” — w trybie Myślenie.',
+    greetFirst: 'Cześć, {name}! Cieszę się, że cię widzę! Zanim zaczniemy — opowiedz mi o sobie kilka rzeczy. Data, godzina, miejsce urodzenia. Zajmie to minutę, a potem będziemy mogli spokojnie porozmawiać.',
+    greetFirstNoName: 'Cześć! Cieszę się, że cię widzę! Zanim zaczniemy — opowiedz mi o sobie kilka rzeczy. Data, godzina, miejsce urodzenia. Zajmie to minutę, a potem będziemy mogli spokojnie porozmawiać.',
     greetReturn: '{name}Nareszcie! Już się martwiłem... Miło cię widzieć! Zaczynamy?',
     greetVariants: ['{name}O! Cześć! Czekałem na ciebie dziś!', '{name}Cześć! Cieszę się, że znowu tu jesteś. Zaczynamy?', '{name}Znów razem! Czego dziś się dowiemy?', '{name}Znowu tu jesteś! Właśnie o tobie myślałem.', '{name}Witaj! Tęskniłem za tobą.', '{name}O, to znowu ty! Kontynuujemy?', '{name}Wejdź. Jestem gotowy, jeśli ty jesteś gotowy.'],
   },
@@ -1343,7 +1346,8 @@ const LANG = {
     ratingNudge: 'До речі — не забудь оцінити останній розбір 🙂',
     shareGmailSubject: 'AION Vi — Твоя персональна відповідь',
     shareTelegramText: 'AION Vi — Персональна відповідь',
-    greetFirst: '{name}Привіт! Мене звати AION Vi. Я знаю про тебе занадто багато, щоб мовчати. Питай — я все розповім! 😊 Постав мені перше запитання так: «Розкажи мені все, що знаєш про мене» — у режимі Мислення.',
+    greetFirst: 'Здрастуй, {name}! Радий тебе бачити! Перш ніж почнемо — розкажи мені про себе кілька речей. Дата, час, місце народження. Це займе хвилину, а потім ми зможемо спокійно поговорити.',
+    greetFirstNoName: 'Здрастуй! Радий тебе бачити! Перш ніж почнемо — розкажи мені про себе кілька речей. Дата, час, місце народження. Це займе хвилину, а потім ми зможемо спокійно поговорити.',
     greetReturn: '{name}Нарешті! Я вже думав, щось сталося... Радий тебе бачити! Почнемо?',
     greetVariants: ['{name}О! Привіт! Чекав на тебе сьогодні!', '{name}Привіт! Радий, що ти знову тут. Почнемо?', '{name}Знову разом! Що дізнаємось сьогодні?', '{name}Ти знову тут! Я якраз думав про тебе.', '{name}Здрастуй! А я за тобою скучив.', '{name}О, це знову ти! Продовжимо?', '{name}Заходь. Я готовий, якщо ти готовий.', 'Оу! Привітики! Я вже встиг скучити!', 'Ну, нарешті! Бо я вже хотів дзвонити по лікарнях!', 'Хєй! Шо ти? Як ти? Я вже встиг скучити', 'Бууум! Хто це до нас прийшов?! Про що поговоримо цього разу?', 'Привіт! Поговоримо про щось серйозне чи розважимося?', 'Скільки можна тебе чекати?! І де тебе носило?! Ну, що, поїхали!', 'Привіт! Саме той момент, коли я готовий розповісти тобі більше, ніж раніше', 'Сиджу, чекаю на тебе тут… на самоті… Казала мені мама: Йоня, вчися на стоматолога і до тебе потягнуться люди. Еххх… Ну, шо, поїхали?'],
   },
@@ -1473,7 +1477,8 @@ const LANG = {
     ratingNudge: 'Кстати — не забудь оценить прошлый разбор 🙂',
     shareGmailSubject: 'AION Vi — Твой персональный ответ',
     shareTelegramText: 'AION Vi — Персональный ответ',
-    greetFirst: '{name}Привет! Меня зовут AION Vi. Я знаю о тебе слишком много, чтобы молчать. Спрашивай — я всё расскажу! 😊 Задай мне самый первый вопрос так: «Расскажи обо мне всё, что знаешь» — в режиме Мышление.',
+    greetFirst: 'Здравствуй, {name}! Рад тебя видеть! Прежде чем начнём — расскажи мне о себе пару вещей. Дата, время, место рождения. Это займёт минуту, а потом мы сможем спокойно поговорить.',
+    greetFirstNoName: 'Здравствуй! Рад тебя видеть! Прежде чем начнём — расскажи мне о себе пару вещей. Дата, время, место рождения. Это займёт минуту, а потом мы сможем спокойно поговорить.',
     greetReturn: '{name}Ну, наконец-то! Я уж думал, случилось что... Рад тебя видеть! Начнём?',
     greetVariants: ['{name}О! Привет! Ждал тебя сегодня!', '{name}Привет! Рад, что снова здесь. Начнём?', '{name}Снова вместе! Что узнаем сегодня?', '{name}Ты снова здесь! Я как раз думал о тебе.', '{name}Здравствуй! А я по тебе соскучился.', '{name}О, это снова ты! Продолжим?', '{name}Заходи. Я готов, если ты готов.'],
   },
@@ -1504,6 +1509,7 @@ function adjustFontScale(direction) {
 
 function setLanguage(lang) {
   currentLang = lang;
+  document.documentElement.lang = lang;
   localStorage.setItem('aion_lang', lang);
   applyTranslations();
   initGreeting(); // приветствие тоже должно звучать на новом языке, не оставаться на старом
@@ -2397,7 +2403,9 @@ function initGreeting() {
   let greeting = '';
   const namePart = nickname ? nickname + ', ' : '';
   if (isFirstEver) {
-    greeting = t('greetFirst').replace('{name}', namePart);
+    greeting = nickname
+      ? t('greetFirst').replace('{name}', nickname)
+      : t('greetFirstNoName');
   } else if (daysSince >= 5) {
     greeting = t('greetReturn').replace('{name}', namePart);
   } else {
@@ -2406,7 +2414,7 @@ function initGreeting() {
     greeting = list[Math.floor(Math.random() * list.length)].replace('{name}', namePart);
   }
 
-  typeText('greeting-text', greeting, 76);
+  typeText('greeting-text', greeting, 110);
 }
 
 let _typeTimer = null;
@@ -3509,10 +3517,11 @@ async function initPushBanner() {
   }
   document.getElementById('push-banner').style.display = 'block';
 
-  // Автоматически прячем через 5 секунд, если человек не кликнул сам
+  // Автоматически прячем через 10 секунд (было 5 — не хватало времени
+  // прочитать и среагировать), если человек не кликнул сам
   setTimeout(() => {
     document.getElementById('push-banner').style.display = 'none';
-  }, 5000);
+  }, 10000);
 }
 
 async function enablePush() {

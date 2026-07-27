@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="google" content="notranslate">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AION Vi</title>
@@ -596,6 +597,7 @@ function adjustFontScale(direction) {
 
 function setLang(lang) {
   currentLang = lang;
+  document.documentElement.lang = lang;
   const T = TRANSLATIONS[lang];
 
   // Флаги
