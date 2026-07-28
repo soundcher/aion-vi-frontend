@@ -943,6 +943,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
       <div id="history-detail-meta" style="font-size:11px;color:var(--text-faint);margin-bottom:12px;"></div>
       <div id="history-detail-request" style="font-size:13px;color:var(--text-dim);font-style:italic;margin-bottom:12px;"></div>
       <div class="hd-text" id="history-detail-text"></div>
+      <button class="btn-generate" id="btn-continue-theme" style="display:none;margin-top:16px;width:100%;" onclick="continueThemeFromHistory()">◂ Продолжить эту тему</button>
     </div>
   </div>
 </div>
@@ -1739,6 +1740,9 @@ function compatMaxPeople() {
   return 0; // Старт и бесплатный — без совместимости вообще
 }
 function tierAllowsPdf() {
+  return getTier() === 'pro';
+}
+function tierAllowsContinueTheme() {
   return getTier() === 'pro';
 }
 
@@ -3395,13 +3399,22 @@ async function openHistory() {
   }
 }
 
+let currentHistoryDetail = null; // текущая открытая запись истории — нужна кнопке "Продолжить тему"
+
 function showHistoryDetail(d, dateStr, name) {
+  currentHistoryDetail = d;
   document.getElementById('history-list-view').style.display = 'none';
   document.getElementById('history-detail-view').classList.add('show');
   document.getElementById('history-detail-name').textContent = name;
   document.getElementById('history-detail-meta').textContent = `${dateStr} · ${d.day||''}/${d.month||''}/${d.year||''} · ${d.place||''}`;
   document.getElementById('history-detail-request').textContent = d.request ? '«' + d.request + '»' : '';
   document.getElementById('history-detail-text').textContent = d.analysis || '';
+
+  // Кнопка "Продолжить тему" — только тариф ПРО, и только если сервер отдал
+  // summary для этой записи (старые записи до внедрения фичи его не имеют —
+  // для них честно нет данных, чтобы продолжить, кнопку не показываем).
+  const continueBtn = document.getElementById('btn-continue-theme');
+  continueBtn.style.display = (tierAllowsContinueTheme() && d.summary) ? 'block' : 'none';
 }
 
 function backToList() {
@@ -3733,6 +3746,8 @@ function onRequestInput(el) {
 function resetForNewGeneration() {
   // Очищаем результат прошлой генерации
   document.getElementById('analysis-box').innerHTML = '';
+  const continueThemeBanner = document.getElementById('continue-theme-banner');
+  if (continueThemeBanner) continueThemeBanner.remove();
   const actionButtons = document.getElementById('action-buttons');
   if (actionButtons) actionButtons.remove();
   const ratingBlock = document.getElementById('rating-block');
@@ -3750,6 +3765,59 @@ function resetForNewGeneration() {
   // Данные клиента (имя, дата, место, пол) НЕ трогаем — currentClientData/currentSummary остаются
 
   // Возвращаем кнопку генерации
+  document.getElementById('continue-btn').style.display = 'none';
+  document.getElementById('reset-btn').style.display = 'none';
+  document.getElementById('gen-btn').style.display = 'inline-block';
+
+  document.getElementById('request').focus();
+  document.getElementById('request-block').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function continueThemeFromHistory() {
+  const d = currentHistoryDetail;
+  if (!d || !d.summary) return;
+
+  closeHistory();
+
+  // Очищаем текущий результат на экране (если был) — начинаем с чистого поля ответа
+  document.getElementById('analysis-box').innerHTML = '';
+  document.getElementById('analysis-box').classList.remove('show');
+  const actionButtons = document.getElementById('action-buttons');
+  if (actionButtons) actionButtons.remove();
+  const ratingBlock = document.getElementById('rating-block');
+  if (ratingBlock) ratingBlock.remove();
+  currentAnalysis = '';
+  currentRating = 0;
+
+  // Совместимость выключаем — "Продолжить тему" пока работает только для
+  // личных запросов (summary совместимости устроен иначе, отдельная задача).
+  toggleCompat(false);
+
+  // Подставляем сохранённый портрет человека вместо currentSummary, который
+  // обычно считается формой выше — теперь генерация пойдёт по данным ИЗ
+  // истории, а не по тому, что сейчас в форме.
+  currentSummary = d.summary;
+
+  // Старый вопрос+ответ становится единственным звеном истории разговора —
+  // ровно тот же механизм, что уже работает у кнопки "Продолжить диалог".
+  conversationHistory = [{ question: d.request || '', answer: d.analysis || '' }];
+
+  // Показываем человеку, чью тему он продолжает — иначе неочевидно, куда
+  // делась форма с датой рождения текущего клиента на экране.
+  const name = [d.firstname, d.lastname].filter(Boolean).join(' ') || 'без имени';
+  let banner = document.getElementById('continue-theme-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'continue-theme-banner';
+    banner.style.cssText = 'margin-bottom:10px;padding:10px 14px;border:1px solid var(--accent-dim);border-radius:2px;font-size:12px;color:var(--accent);';
+    document.getElementById('request-block').prepend(banner);
+  }
+  banner.innerHTML = `Продолжаешь тему «${name}»: «${(d.request||'').substring(0,80)}» <span style="cursor:pointer;text-decoration:underline;" onclick="this.parentElement.remove();conversationHistory=[];">отменить</span>`;
+
+  document.getElementById('request').value = '';
+  onRequestInput(document.getElementById('request'));
+  document.getElementById('request').classList.remove('submitted');
+
   document.getElementById('continue-btn').style.display = 'none';
   document.getElementById('reset-btn').style.display = 'none';
   document.getElementById('gen-btn').style.display = 'inline-block';
