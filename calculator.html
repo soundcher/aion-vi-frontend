@@ -435,7 +435,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
 <!-- Баннер "Обзор месяца" -->
 <div id="monthly-digest-banner" onclick="openMonthlyDigestBanner()" style="display:none;margin-bottom:14px;padding:12px 14px;border:1px solid var(--gold);border-radius:2px;cursor:pointer;text-align:center;font-size:12px;color:var(--gold);">
-  ✦ Готов обзор месяца — нажми, чтобы прочитать
+  <span id="t-monthly-digest-banner">✦ Готов обзор месяца — нажми, чтобы прочитать</span>
 </div>
 
 <!-- Баннер push-уведомлений -->
@@ -1077,6 +1077,8 @@ const LANG = {
     compatNeedsUpgrade: 'Compatibility is available on the Basic and Pro plans.',
     compatProOnly: 'Compatibility for 3-4 people is available on the Pro plan.',
     pdfNeedsPro: 'Branded PDF export is available on the Pro plan.',
+    monthlyDigestReady: '✦ Your monthly overview is ready — tap to read',
+    monthlyDigestTitle: '✦ Monthly Overview',
     analysesLeftLabel: 'Requests left',
     ratingLabel: 'How was this reading for you?',
     ratingCommentPh: 'What worked, what didn\'t — every word helps (optional)',
@@ -1208,6 +1210,8 @@ const LANG = {
     compatNeedsUpgrade: 'Kompatybilność jest dostępna w pakietach Podstawowy i Pro.',
     compatProOnly: 'Kompatybilność dla 3-4 osób jest dostępna w pakiecie Pro.',
     pdfNeedsPro: 'Eksport PDF z brandingiem jest dostępny w pakiecie Pro.',
+    monthlyDigestReady: '✦ Twój przegląd miesiąca jest gotowy — kliknij, aby przeczytać',
+    monthlyDigestTitle: '✦ Przegląd miesiąca',
     analysesLeftLabel: 'Pozostało zapytań',
     ratingLabel: 'Jak ci się podobał ten rozbiór?',
     ratingCommentPh: 'Co zadziałało, co nie — każde słowo pomaga (opcjonalnie)',
@@ -1339,6 +1343,8 @@ const LANG = {
     compatNeedsUpgrade: 'Сумісність доступна на тарифах Базовий і Про.',
     compatProOnly: 'Сумісність для 3-4 людей доступна на тарифі Про.',
     pdfNeedsPro: 'Фірмовий PDF доступний на тарифі Про.',
+    monthlyDigestReady: '✦ Готовий огляд місяця — натисни, щоб прочитати',
+    monthlyDigestTitle: '✦ Огляд місяця',
     analysesLeftLabel: 'Залишилось запитів',
     ratingLabel: 'Як тобі цей розбір?',
     ratingCommentPh: 'Що спрацювало, що ні — кожне слово допомагає (необов\'язково)',
@@ -1470,6 +1476,8 @@ const LANG = {
     compatNeedsUpgrade: 'Совместимость доступна на тарифах Базовый и Про.',
     compatProOnly: 'Совместимость для 3-4 человек доступна на тарифе Про.',
     pdfNeedsPro: 'Фирменный PDF доступен на тарифе Про.',
+    monthlyDigestReady: '✦ Готов обзор месяца — нажми, чтобы прочитать',
+    monthlyDigestTitle: '✦ Обзор месяца',
     analysesLeftLabel: 'Осталось запросов',
     ratingLabel: 'Как тебе мой ответ?',
     ratingCommentPh: 'Что зашло, что нет — любое слово поможет (необязательно)',
@@ -1631,6 +1639,8 @@ function applyTranslations() {
   if (dlBtn) dlBtn.textContent = L.btnDownload;
   const giftBtn = document.getElementById('action-btn-gift');
   if (giftBtn) giftBtn.textContent = L.btnShare;
+  const monthlyDigestBannerEl = document.getElementById('t-monthly-digest-banner');
+  if (monthlyDigestBannerEl) monthlyDigestBannerEl.textContent = L.monthlyDigestReady;
   const copyBtn = document.getElementById('action-btn-copy');
   if (copyBtn) copyBtn.textContent = L.btnCopy;
 
@@ -3053,7 +3063,7 @@ async function downloadPDF() {
       resp = await fetch(`${SERVER}/generate-pdf`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ analysis: currentAnalysis, name, birthdate }),
+        body: JSON.stringify({ analysis: currentAnalysis, name, birthdate, lang: currentLang }),
         signal: AbortSignal.timeout(15000) // таймаут 15 сек
       });
     } catch(fetchErr) {
@@ -3436,7 +3446,7 @@ function openMonthlyDigestBanner() {
   document.getElementById('history-overlay').classList.add('show');
   document.getElementById('history-list-view').style.display = 'none';
   document.getElementById('history-detail-view').classList.add('show');
-  document.getElementById('history-detail-name').textContent = '✦ Обзор месяца';
+  document.getElementById('history-detail-name').textContent = t('monthlyDigestTitle');
   document.getElementById('history-detail-meta').textContent = '';
   document.getElementById('history-detail-request').textContent = '';
   document.getElementById('history-detail-text').textContent = _monthlyDigestText;
@@ -3457,6 +3467,7 @@ async function checkMonthlyDigest() {
       minute: b.minute,
       lat: b.lat,
       lon: b.lon,
+      lang: currentLang,
       lang_instruction: t('generatePromptLang')
     });
     const data = await r.json();
