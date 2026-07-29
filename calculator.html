@@ -549,118 +549,15 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
         </div>
       </div>
 
-      <!-- Данные второго человека -->
-      <div id="p2-block" style="display:none;">
-      <div class="card" style="margin-bottom:0;background:var(--panel2);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="font-size:12px;margin:0;" id="lbl-person2">✦ Второй человек</h2>
-          <button onclick="removeExtraPerson(2)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;">✕</button>
-        </div>
-        <div class="row row-2" style="margin-bottom:10px;">
-          <div class="field">
-            <label id="lbl-p2-firstname">Имя</label>
-            <input type="text" id="p2-firstname" placeholder="Имя" oninput="cleanNameInput(this)">
-          </div>
-          <div class="field">
-            <label id="lbl-p2-lastname">Фамилия</label>
-            <input type="text" id="p2-lastname" placeholder="Фамилия" oninput="cleanNameInput(this)">
-          </div>
-        </div>
-        <div class="field" style="margin-bottom:10px;">
-          <label id="lbl-p2-gender">Пол</label>
-          <input type="hidden" id="p2-gender" value="">
-          <div class="gender-toggle">
-            <div class="gender-btn" id="p2-gender-m-btn" onclick="setGender('m','p2-')">Мужской</div>
-            <div class="gender-btn" id="p2-gender-f-btn" onclick="setGender('f','p2-')">Женский</div>
-          </div>
-        </div>
-        <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p2-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p2-day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p2-month',2)"></div>
-          <div class="field"><label id="lbl-p2-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p2-month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p2-year',2)"></div>
-          <div class="field"><label id="lbl-p2-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p2-year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'p2-hour',4)"></div>
-          <div class="field"><label id="lbl-p2-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p2-hour" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p2-minute',2)"></div>
-          <div class="field"><label id="lbl-p2-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p2-minute" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
-        </div>
-        <div class="field">
-          <label id="lbl-p2-place">Место рождения</label>
-          <input type="text" id="p2-place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
-          <div class="coords-display" id="p2-coords-display">Координаты не определены</div>
-          <input type="hidden" id="p2-lat" value="">
-          <input type="hidden" id="p2-lon" value="">
-        </div>
-      </div>
-      </div>
-    </div>
-
-      <!-- Третий человек -->
-      <div id="p3-block" style="display:none;margin-top:10px;">
-      <div class="card" style="margin-bottom:0;background:var(--panel2);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="font-size:12px;margin:0;" id="lbl-person3">✦ Третий человек</h2>
-          <button onclick="removeExtraPerson(3)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;">✕</button>
-        </div>
-        <div class="row row-2" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p3-firstname">Имя</label><input type="text" id="p3-firstname" placeholder="Имя"></div>
-          <div class="field"><label id="lbl-p3-lastname">Фамилия</label><input type="text" id="p3-lastname" placeholder="Фамилия"></div>
-        </div>
-        <div class="field" style="margin-bottom:10px;">
-          <label id="lbl-p3-gender">Пол</label>
-          <input type="hidden" id="p3-gender" value="">
-          <div class="gender-toggle">
-            <div class="gender-btn" id="p3-gender-m-btn" onclick="setGender('m','p3-')">Мужской</div>
-            <div class="gender-btn" id="p3-gender-f-btn" onclick="setGender('f','p3-')">Женский</div>
-          </div>
-        </div>
-        <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p3-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p3-month',2)"></div>
-          <div class="field"><label id="lbl-p3-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p3-year',2)"></div>
-          <div class="field"><label id="lbl-p3-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'p3-hour',4)"></div>
-          <div class="field"><label id="lbl-p3-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p3-hour" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p3-minute',2)"></div>
-          <div class="field"><label id="lbl-p3-minute">Минуты</label><input type="text" inputmode="numeric" autocomplete="off" id="p3-minute" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
-        </div>
-        <div class="field">
-          <label id="lbl-p3-place">Место рождения</label>
-          <input type="text" id="p3-place" placeholder="New York, USA" autocomplete="off">
-          <div class="coords-display" id="p3-coords-display">Координаты не определены</div>
-          <input type="hidden" id="p3-lat" value=""><input type="hidden" id="p3-lon" value="">
-        </div>
-      </div>
+      <!-- Данные второго/третьего/четвёртого человека — контент генерируется
+           функцией renderPersonBlocks() (см. основной скрипт), чтобы не
+           дублировать одну и ту же разметку три раза -->
+      <div id="p2-block" style="display:none;"></div>
       </div>
 
-      <!-- Четвёртый человек -->
-      <div id="p4-block" style="display:none;margin-top:10px;">
-      <div class="card" style="margin-bottom:0;background:var(--panel2);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-          <h2 style="font-size:12px;margin:0;" id="lbl-person4">✦ Четвёртый человек</h2>
-          <button onclick="removeExtraPerson(4)" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;">✕</button>
-        </div>
-        <div class="row row-2" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p4-firstname">Имя</label><input type="text" id="p4-firstname" placeholder="Имя"></div>
-          <div class="field"><label id="lbl-p4-lastname">Фамилия</label><input type="text" id="p4-lastname" placeholder="Фамилия"></div>
-        </div>
-        <div class="field" style="margin-bottom:10px;">
-          <label id="lbl-p4-gender">Пол</label>
-          <input type="hidden" id="p4-gender" value="">
-          <div class="gender-toggle">
-            <div class="gender-btn" id="p4-gender-m-btn" onclick="setGender('m','p4-')">Мужской</div>
-            <div class="gender-btn" id="p4-gender-f-btn" onclick="setGender('f','p4-')">Женский</div>
-          </div>
-        </div>
-        <div class="row row-5" style="margin-bottom:10px;">
-          <div class="field"><label id="lbl-p4-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p4-month',2)"></div>
-          <div class="field"><label id="lbl-p4-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p4-year',2)"></div>
-          <div class="field"><label id="lbl-p4-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'p4-hour',4)"></div>
-          <div class="field"><label id="lbl-p4-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p4-hour" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p4-minute',2)"></div>
-          <div class="field"><label id="lbl-p4-minute">Минуты</label><input type="text" inputmode="numeric" autocomplete="off" id="p4-minute" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
-        </div>
-        <div class="field">
-          <label id="lbl-p4-place">Место рождения</label>
-          <input type="text" id="p4-place" placeholder="New York, USA" autocomplete="off">
-          <div class="coords-display" id="p4-coords-display">Координаты не определены</div>
-          <input type="hidden" id="p4-lat" value=""><input type="hidden" id="p4-lon" value="">
-        </div>
-      </div>
-      </div>
+      <div id="p3-block" style="display:none;margin-top:10px;"></div>
+
+      <div id="p4-block" style="display:none;margin-top:10px;"></div>
 
       <!-- Кнопки добавить -->
       <div style="margin-top:10px;display:flex;gap:8px;">
@@ -2227,6 +2124,62 @@ function showQuickProfile(data, p2data) {
   }
 
   el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+// БЛОКИ 2/3/4-ГО ЧЕЛОВЕКА (Совместимость) — раньше это были три почти
+// одинаковых куска HTML в разметке страницы (person2/person3/person4),
+// теперь одна функция генерирует разметку под нужный номер n.
+// ══════════════════════════════════════════════
+const PERSON_BLOCK_TITLES = {2: 'Второй человек', 3: 'Третий человек', 4: 'Четвёртый человек'};
+
+function personBlockHTML(n) {
+  return `
+      <div class="card" style="margin-bottom:0;background:var(--panel2);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h2 style="font-size:12px;margin:0;" id="lbl-person${n}">✦ ${PERSON_BLOCK_TITLES[n]}</h2>
+          <button onclick="removeExtraPerson(${n})" style="background:none;border:none;color:var(--text-faint);cursor:pointer;font-size:16px;">✕</button>
+        </div>
+        <div class="row row-2" style="margin-bottom:10px;">
+          <div class="field">
+            <label id="lbl-p${n}-firstname">Имя</label>
+            <input type="text" id="p${n}-firstname" placeholder="Имя" oninput="cleanNameInput(this)">
+          </div>
+          <div class="field">
+            <label id="lbl-p${n}-lastname">Фамилия</label>
+            <input type="text" id="p${n}-lastname" placeholder="Фамилия" oninput="cleanNameInput(this)">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:10px;">
+          <label id="lbl-p${n}-gender">Пол</label>
+          <input type="hidden" id="p${n}-gender" value="">
+          <div class="gender-toggle">
+            <div class="gender-btn" id="p${n}-gender-m-btn" onclick="setGender('m','p${n}-')">Мужской</div>
+            <div class="gender-btn" id="p${n}-gender-f-btn" onclick="setGender('f','p${n}-')">Женский</div>
+          </div>
+        </div>
+        <div class="row row-5" style="margin-bottom:10px;">
+          <div class="field"><label id="lbl-p${n}-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="p${n}-day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'p${n}-month',2)"></div>
+          <div class="field"><label id="lbl-p${n}-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="p${n}-month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'p${n}-year',2)"></div>
+          <div class="field"><label id="lbl-p${n}-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="p${n}-year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'p${n}-hour',4)"></div>
+          <div class="field"><label id="lbl-p${n}-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p${n}-hour" placeholder="—" oninput="clampField(this,0,23,'Часы');autoNext(this,'p${n}-minute',2)"></div>
+          <div class="field"><label id="lbl-p${n}-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="p${n}-minute" placeholder="—" oninput="clampField(this,0,59,'Минуты')"></div>
+        </div>
+        <div class="field">
+          <label id="lbl-p${n}-place">Место рождения</label>
+          <input type="text" id="p${n}-place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
+          <div class="coords-display" id="p${n}-coords-display">Координаты не определены</div>
+          <input type="hidden" id="p${n}-lat" value="">
+          <input type="hidden" id="p${n}-lon" value="">
+        </div>
+      </div>`;
+}
+
+function renderPersonBlocks() {
+  [2, 3, 4].forEach(n => {
+    const block = document.getElementById(`p${n}-block`);
+    if (block) block.innerHTML = personBlockHTML(n);
+  });
 }
 
 // Добавить/убрать 3-го и 4-го человека
@@ -3942,6 +3895,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Спрашиваем у сервера настоящий баланс. Память браузера — только витрина:
   // раньше ей верили на слово, и подкрученное там число открывало доступ.
   // Настоящий баланс спросим у сервера сразу после запуска Firebase (ниже).
+
+  // Генерируем блоки 2/3/4-го человека (Совместимость) до применения
+  // переводов — иначе setText('lbl-person2'...) не найдёт ещё не
+  // созданные элементы
+  renderPersonBlocks();
 
   // Загружаем сохранённый язык
   const savedLang = localStorage.getItem('aion_lang') || 'en';
