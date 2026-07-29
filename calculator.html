@@ -3915,9 +3915,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initGreeting();
   renderAnalysesCounter();
 
-  // Тихая фоновая проверка "Обзора месяца" — не блокирует остальную загрузку
-  checkMonthlyDigest();
-
   // Баннер push-уведомлений — с небольшой задержкой, чтобы не наваливать
   // всё сразу в первую секунду захода
   // Счётчик визитов — для показа push-баннера на 2/5/10 раз
@@ -3937,9 +3934,15 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(checkServer, 10000);
   // Firebase запускается ОДИН раз. Внутри он дожидается восстановления входа,
   // поэтому дальше пропуск уже доступен и баланс можно спросить у сервера.
+  // "Обзор месяца" перенесён СЮДА (было раньше, до initFirebase) — без
+  // готового пропуска сервер почти всегда отвечал "Нужно войти заново",
+  // и баннер обзора месяца практически никогда не показывался.
   initFirebase().then(() => {
     const u = getUser();
-    if (u && u.email) refreshProfile();
+    if (u && u.email) {
+      refreshProfile();
+      checkMonthlyDigest();
+    }
   });
   // Очищаем старые профили с undefined place
   try {
