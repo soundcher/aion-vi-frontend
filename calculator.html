@@ -461,13 +461,13 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
     <div style="border:1px solid var(--gold);border-radius:2px;padding:14px;margin-bottom:10px;">
       <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;" id="tier-basic-name">Базовый — €19.99/мес</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-basic-desc">23 запроса + история + прогноз ближайшего периода + совместимость (2 человека)</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-basic-desc">23 запроса + история + прогноз + совместимость (2 человека) + продолжение темы + PDF</div>
       <a href="#" id="checkout-basic" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
     </div>
 
     <div style="border:1px solid var(--line2);border-radius:2px;padding:14px;margin-bottom:14px;">
       <div style="font-weight:bold;color:var(--gold);margin-bottom:4px;" id="tier-pro-name">Про — €29.99/мес</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-pro-desc">40 запросов + история + прогноз ближайшего периода + совместимость (до 4 человек) + фирменный PDF</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;" id="tier-pro-desc">40 запросов + история + прогноз + совместимость (до 4 человек) + продолжение темы + фирменный PDF</div>
       <a href="#" id="checkout-pro" target="_blank" class="btn-generate" style="display:block;text-align:center;text-decoration:none;">Оформить</a>
     </div>
 
@@ -553,7 +553,6 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
            функцией renderPersonBlocks() (см. основной скрипт), чтобы не
            дублировать одну и ту же разметку три раза -->
       <div id="p2-block" style="display:none;"></div>
-      </div>
 
       <div id="p3-block" style="display:none;margin-top:10px;"></div>
 
@@ -891,8 +890,8 @@ const LANG = {
     pushEnableBtn: 'Enable', pushDismissBtn: 'Not now',
     pricingTitle: '✦ Choose a package',
     tierStartName: 'Start — €9.99/mo + VAT', tierStartDesc: '10 requests/mo + conversation history + upcoming-period forecast',
-    tierBasicName: 'Basic — €19.99/mo + VAT', tierBasicDesc: '23 requests/mo + conversation history + upcoming-period forecast + compatibility (2 people)',
-    tierProName: 'Pro — €29.99/mo + VAT', tierProDesc: '40 requests/mo + conversation history + upcoming-period forecast + compatibility (up to 4 people) + branded PDF export',
+    tierBasicName: 'Basic — €19.99/mo + VAT', tierBasicDesc: '23 requests/mo + history + forecast + compatibility (2 people) + continue a topic + PDF',
+    tierProName: 'Pro — €29.99/mo + VAT', tierProDesc: '40 requests/mo + history + forecast + compatibility (up to 4 people) + continue a topic + branded PDF',
     pricingEmailNote: 'Use the same email at checkout as you used to sign in \u2014 otherwise we won\'t know whose account to credit.',
     btnCheckout: 'Get started', pricingCloseBtn: 'Close',
     btnCopy: 'Copy text',
@@ -973,7 +972,7 @@ const LANG = {
     needGender: 'Please select gender',
     compatNeedsUpgrade: 'Compatibility is available on the Basic and Pro plans.',
     compatProOnly: 'Compatibility for 3-4 people is available on the Pro plan.',
-    pdfNeedsPro: 'Branded PDF export is available on the Pro plan.',
+    pdfNeedsPro: 'PDF export is available on the Basic and Pro plans.',
     monthlyDigestReady: '✦ Your monthly overview is ready — tap to read',
     monthlyDigestTitle: '✦ Monthly Overview',
     analysesLeftLabel: 'Requests left',
@@ -1030,8 +1029,8 @@ const LANG = {
     pushEnableBtn: 'Włącz', pushDismissBtn: 'Nie teraz',
     pricingTitle: '✦ Wybierz pakiet',
     tierStartName: 'Start — €9.99/mies. + VAT', tierStartDesc: '10 zapytań/mies. + historia rozmów + prognoza na najbliższy okres',
-    tierBasicName: 'Podstawowy — €19.99/mies. + VAT', tierBasicDesc: '23 zapytania/mies. + historia rozmów + prognoza na najbliższy okres + kompatybilność (2 osoby)',
-    tierProName: 'Pro — €29.99/mies. + VAT', tierProDesc: '40 zapytań/mies. + historia rozmów + prognoza na najbliższy okres + kompatybilność (do 4 osób) + firmowy eksport PDF',
+    tierBasicName: 'Podstawowy — €19.99/mies. + VAT', tierBasicDesc: '23 zapytania/mies. + historia + prognoza + kompatybilność (2 osoby) + kontynuacja tematu + PDF',
+    tierProName: 'Pro — €29.99/mies. + VAT', tierProDesc: '40 zapytań/mies. + historia + prognoza + kompatybilność (do 4 osób) + kontynuacja tematu + firmowy PDF',
     pricingEmailNote: 'Podczas płatności podaj ten sam email, którego użyto do logowania \u2014 inaczej nie będziemy wiedzieć, komu przypisać pakiet.',
     btnCheckout: 'Zamów', pricingCloseBtn: 'Zamknij',
     btnCopy: 'Kopiuj tekst',
@@ -1106,7 +1105,7 @@ const LANG = {
     needGender: 'Proszę wybrać płeć',
     compatNeedsUpgrade: 'Kompatybilność jest dostępna w pakietach Podstawowy i Pro.',
     compatProOnly: 'Kompatybilność dla 3-4 osób jest dostępna w pakiecie Pro.',
-    pdfNeedsPro: 'Eksport PDF z brandingiem jest dostępny w pakiecie Pro.',
+    pdfNeedsPro: 'Eksport PDF jest dostępny w pakietach Podstawowy i Pro.',
     monthlyDigestReady: '✦ Twój przegląd miesiąca jest gotowy — kliknij, aby przeczytać',
     monthlyDigestTitle: '✦ Przegląd miesiąca',
     analysesLeftLabel: 'Pozostało zapytań',
@@ -1163,8 +1162,8 @@ const LANG = {
     pushEnableBtn: 'Увімкнути', pushDismissBtn: 'Не зараз',
     pricingTitle: '✦ Обери пакет',
     tierStartName: 'Старт — €9.99/міс. + ПДВ', tierStartDesc: '10 запитів/міс. + історія діалогів + прогноз на найближчий період',
-    tierBasicName: 'Базовий — €19.99/міс. + ПДВ', tierBasicDesc: '23 запити/міс. + історія діалогів + прогноз на найближчий період + сумісність (2 людини)',
-    tierProName: 'Про — €29.99/міс. + ПДВ', tierProDesc: '40 запитів/міс. + історія діалогів + прогноз на найближчий період + сумісність (до 4 людей) + фірмовий PDF',
+    tierBasicName: 'Базовий — €19.99/міс. + ПДВ', tierBasicDesc: '23 запити/міс. + історія + прогноз + сумісність (2 людини) + продовження теми + PDF',
+    tierProName: 'Про — €29.99/міс. + ПДВ', tierProDesc: '40 запитів/міс. + історія + прогноз + сумісність (до 4 людей) + продовження теми + фірмовий PDF',
     pricingEmailNote: 'При оплаті вкажи той самий email, що і при вході в застосунок \u2014 інакше ми не зрозуміємо, кому нарахувати пакет.',
     btnCheckout: 'Оформити', pricingCloseBtn: 'Закрити',
     btnCopy: 'Скопіювати текст',
@@ -1239,7 +1238,7 @@ const LANG = {
     needGender: 'Будь ласка, вкажи стать',
     compatNeedsUpgrade: 'Сумісність доступна на тарифах Базовий і Про.',
     compatProOnly: 'Сумісність для 3-4 людей доступна на тарифі Про.',
-    pdfNeedsPro: 'Фірмовий PDF доступний на тарифі Про.',
+    pdfNeedsPro: 'PDF доступний на тарифах Базовий і Про.',
     monthlyDigestReady: '✦ Готовий огляд місяця — натисни, щоб прочитати',
     monthlyDigestTitle: '✦ Огляд місяця',
     analysesLeftLabel: 'Залишилось запитів',
@@ -1296,8 +1295,8 @@ const LANG = {
     pushEnableBtn: 'Включить', pushDismissBtn: 'Не сейчас',
     pricingTitle: '✦ Выбери пакет',
     tierStartName: 'Старт — €9.99/мес + НДС', tierStartDesc: '10 запросов/мес + история диалогов + прогноз ближайшего периода',
-    tierBasicName: 'Базовый — €19.99/мес + НДС', tierBasicDesc: '23 запроса/мес + история диалогов + прогноз ближайшего периода + совместимость (2 человека)',
-    tierProName: 'Про — €29.99/мес + НДС', tierProDesc: '40 запросов/мес + история диалогов + прогноз ближайшего периода + совместимость (до 4 человек) + фирменный PDF',
+    tierBasicName: 'Базовый — €19.99/мес + НДС', tierBasicDesc: '23 запроса/мес + история + прогноз + совместимость (2 человека) + продолжение темы + PDF',
+    tierProName: 'Про — €29.99/мес + НДС', tierProDesc: '40 запросов/мес + история + прогноз + совместимость (до 4 человек) + продолжение темы + фирменный PDF',
     pricingEmailNote: 'При оплате укажи тот же email, что и при входе в приложение \u2014 иначе мы не поймём, кому начислить пакет.',
     btnCheckout: 'Оформить', pricingCloseBtn: 'Закрыть',
     btnCopy: 'Скопировать текст',
@@ -1372,7 +1371,7 @@ const LANG = {
     needGender: 'Пожалуйста, укажи пол',
     compatNeedsUpgrade: 'Совместимость доступна на тарифах Базовый и Про.',
     compatProOnly: 'Совместимость для 3-4 человек доступна на тарифе Про.',
-    pdfNeedsPro: 'Фирменный PDF доступен на тарифе Про.',
+    pdfNeedsPro: 'PDF доступен на тарифах Базовый и Про.',
     monthlyDigestReady: '✦ Готов обзор месяца — нажми, чтобы прочитать',
     monthlyDigestTitle: '✦ Обзор месяца',
     analysesLeftLabel: 'Осталось запросов',
@@ -1646,11 +1645,17 @@ function compatMaxPeople() {
   if (tier === 'basic') return 2;
   return 0; // Старт и бесплатный — без совместимости вообще
 }
+// PDF и "Продолжить тему" — с Базового и выше. Раньше и то и другое было
+// заперто в Про: PDF расходился с прайсом (там он обещан раньше), а
+// "Продолжить тему" — это сама суть "друга и постоянного спутника",
+// держать её в топовом тарифе противоречило смыслу продукта.
 function tierAllowsPdf() {
-  return getTier() === 'pro';
+  const tier = getTier();
+  return tier === 'basic' || tier === 'pro';
 }
 function tierAllowsContinueTheme() {
-  return getTier() === 'pro';
+  const tier = getTier();
+  return tier === 'basic' || tier === 'pro';
 }
 
 // Выход из аккаунта. Firebase здесь загружается по-другому, чем на странице
