@@ -484,10 +484,10 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <!-- Индикатор шага -->
   <div id="wizard-progress" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
     <span style="font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;">
-      <span id="wizard-step-label">Шаг</span> <span id="wizard-step-num">1</span> <span id="wizard-step-of">из</span> 5
+      <span id="wizard-step-label">Шаг</span> <span id="wizard-step-num">1</span> <span id="wizard-step-of">из</span> 4
     </span>
     <div style="display:flex;gap:5px;">
-      <span class="wizard-dot" data-dot="1"></span><span class="wizard-dot" data-dot="2"></span><span class="wizard-dot" data-dot="3"></span><span class="wizard-dot" data-dot="4"></span><span class="wizard-dot" data-dot="5"></span>
+      <span class="wizard-dot" data-dot="1"></span><span class="wizard-dot" data-dot="2"></span><span class="wizard-dot" data-dot="3"></span><span class="wizard-dot" data-dot="4"></span>
     </div>
   </div>
   <style>
@@ -551,9 +551,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   <div id="no-time-warning" style="display:none;font-size:11px;color:var(--gold-dim);margin-bottom:8px;padding:6px 10px;border:1px solid var(--gold-dim);border-radius:2px;opacity:0.85;">
     ⚠ Время рождения не указано — точность натальной карты и некоторых расчётов будет ниже
   </div>
-  </div><!-- /wizard-step-3 -->
 
-  <div id="wizard-step-4" class="wizard-step" style="display:none;">
   <div class="field" style="margin-bottom:10px;">
     <label id="label-place">Место рождения</label>
     <input type="text" id="place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
@@ -563,9 +561,20 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
        с ненайденным городом молча получит расчёт по чужому месту -->
   <input type="hidden" id="lat" value="">
   <input type="hidden" id="lon" value="">
+  </div><!-- /wizard-step-3 -->
 
-  <!-- БЛОК СОВМЕСТИМОСТИ -->
-  <div id="compat-block" style="margin-top:14px;margin-bottom:10px;border-top:1px solid var(--line2);padding-top:14px;">
+  <!-- Ошибка текущего шага -->
+  <div id="wizard-error" style="display:none;color:var(--red);font-size:12px;margin-top:4px;margin-bottom:10px;text-align:center;"></div>
+
+  <!-- Навигация по шагам -->
+  <div id="wizard-nav" style="display:flex;gap:10px;margin-top:6px;margin-bottom:6px;">
+    <button class="btn-copy" id="wizard-back-btn" onclick="wizardBack()" style="display:none;flex:0 0 auto;padding-left:16px;padding-right:16px;height:46px;box-sizing:border-box;">← <span id="wizard-back-label">Назад</span></button>
+    <button class="btn-generate" id="wizard-next-btn" onclick="wizardNext()" style="flex:1;"><span id="wizard-next-label">Далее</span> →</button>
+  </div>
+
+  <!-- БЛОК СОВМЕСТИМОСТИ — показывается только на последнем шаге, вместе
+       с началом разговора, чтобы не путать во время сбора данных -->
+  <div id="compat-block" style="display:none;margin-top:0;margin-bottom:14px;border-top:1px solid var(--line2);padding-top:14px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;">
         <input type="checkbox" id="compat-toggle" onchange="toggleCompat(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--gold);">
@@ -605,16 +614,6 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
   </div><!-- /compat-form -->
   </div><!-- /compat-block -->
-  </div><!-- /wizard-step-4 -->
-
-  <!-- Ошибка текущего шага -->
-  <div id="wizard-error" style="display:none;color:var(--red);font-size:12px;margin-top:4px;margin-bottom:10px;text-align:center;"></div>
-
-  <!-- Навигация по шагам -->
-  <div id="wizard-nav" style="display:flex;gap:10px;margin-top:6px;margin-bottom:6px;">
-    <button class="btn-copy" id="wizard-back-btn" onclick="wizardBack()" style="display:none;flex:0 0 auto;padding-left:16px;padding-right:16px;">← <span id="wizard-back-label">Назад</span></button>
-    <button class="btn-generate" id="wizard-next-btn" onclick="wizardNext()" style="flex:1;"><span id="wizard-next-label">Далее</span> →</button>
-  </div>
 
   <!-- БЛОК "О ТЕБЕ" — ЗАМОРОЖЕН на период тестирования (экономия токенов) -->
   <div style="display:none;">
@@ -1034,6 +1033,7 @@ const LANG = {
     needGender: 'Please select gender',
     needName: 'Please enter first and last name',
     compatNeedsUpgrade: 'Compatibility is available on the Basic and Pro plans.',
+    compatNeedsRegister: 'Register for free to unlock compatibility — no payment needed.',
     compatProOnly: 'Compatibility for 3-4 people is available on the Pro plan.',
     pdfNeedsPro: 'PDF export is available on the Basic and Pro plans.',
     monthlyDigestReady: '✦ Your monthly overview is ready — tap to read',
@@ -1177,6 +1177,7 @@ const LANG = {
     needGender: 'Proszę wybrać płeć',
     needName: 'Proszę podać imię i nazwisko',
     compatNeedsUpgrade: 'Kompatybilność jest dostępna w pakietach Podstawowy i Pro.',
+    compatNeedsRegister: 'Zarejestruj się za darmo, aby odblokować kompatybilność — bez opłat.',
     compatProOnly: 'Kompatybilność dla 3-4 osób jest dostępna w pakiecie Pro.',
     pdfNeedsPro: 'Eksport PDF jest dostępny w pakietach Podstawowy i Pro.',
     monthlyDigestReady: '✦ Twój przegląd miesiąca jest gotowy — kliknij, aby przeczytać',
@@ -1320,6 +1321,7 @@ const LANG = {
     needGender: 'Будь ласка, вкажи стать',
     needName: "Будь ласка, вкажи ім'я та прізвище",
     compatNeedsUpgrade: 'Сумісність доступна на тарифах Базовий і Про.',
+    compatNeedsRegister: 'Зареєструйся безкоштовно — сумісність стане доступною, платити не треба.',
     compatProOnly: 'Сумісність для 3-4 людей доступна на тарифі Про.',
     pdfNeedsPro: 'PDF доступний на тарифах Базовий і Про.',
     monthlyDigestReady: '✦ Готовий огляд місяця — натисни, щоб прочитати',
@@ -1463,6 +1465,7 @@ const LANG = {
     needGender: 'Пожалуйста, укажи пол',
     needName: 'Пожалуйста, укажи имя и фамилию',
     compatNeedsUpgrade: 'Совместимость доступна на тарифах Базовый и Про.',
+    compatNeedsRegister: 'Зарегистрируйся бесплатно — совместимость станет доступна, платить не нужно.',
     compatProOnly: 'Совместимость для 3-4 человек доступна на тарифе Про.',
     pdfNeedsPro: 'PDF доступен на тарифах Базовый и Про.',
     monthlyDigestReady: '✦ Готов обзор месяца — нажми, чтобы прочитать',
@@ -1745,7 +1748,13 @@ function compatMaxPeople() {
   const tier = getTier();
   if (tier === 'pro') return 4;
   if (tier === 'basic') return 2;
-  return 0; // Старт и бесплатный — без совместимости вообще
+  // Зарегистрирован, но пока не платит — тоже даём попробовать (2 человека,
+  // как на Базовом). Именно сюда падает сценарий "коллега/пара зашли
+  // проверить совместимость" — без этого у такой аудитории вообще нет
+  // повода регистрироваться. Гостю (одноразовый бесплатный запрос) — нет:
+  // там нет отношений с продуктом, которые стоило бы завязывать.
+  if (tier === 'free' && !isGuest()) return 2;
+  return 0; // Гость и Старт — без совместимости
 }
 // PDF и "Продолжить тему" — с Базового и выше. Раньше и то и другое было
 // заперто в Про: PDF расходился с прайсом (там он обещан раньше), а
@@ -1911,14 +1920,17 @@ async function geocode() {
 }
 
 // ══════════════════════════════════════════════
-// МАСТЕР ШАГОВ (онбординг, 03.08.2026)
-// Вместо одной длинной формы — 5 экранов: имя/пол → дата → время →
-// место (+совместимость) → тема разговора. Поля и вся их логика
+// МАСТЕР ШАГОВ (онбординг, 03.08.2026, скорректировано 03.08.2026 вечером)
+// 4 экрана: имя/пол → дата → время+место → разговор (тема + Совместимость
+// + счётчик пакета + push-баннер — всё, что раньше отвлекало во время
+// сбора данных, теперь появляется только здесь). Поля и их логика
 // (автокомплит, геокодирование, клампинг дат) не тронуты — мастер только
 // показывает/прячет уже существующие блоки и валидирует перед переходом.
 // ══════════════════════════════════════════════
+const WIZARD_STEPS_TOTAL = 4;
 let wizardCurrentStep = 1;
-const WIZARD_STEP5_IDS = ['request-block', 'mode-field', 'analysis-section'];
+let wizardPushBannerScheduled = false;
+const WIZARD_FINAL_IDS = ['request-block', 'mode-field', 'analysis-section', 'compat-block', 'analyses-counter'];
 
 function wizardInit() {
   const user = getUser();
@@ -1927,7 +1939,7 @@ function wizardInit() {
     wizardFillFromOwnBirth(ob);
     document.getElementById('wizard-returning-text').textContent = t('wizardReturningNote');
     document.getElementById('wizard-returning-note').style.display = 'block';
-    wizardGoTo(5);
+    wizardGoTo(WIZARD_STEPS_TOTAL);
   } else {
     wizardGoTo(1);
   }
@@ -1975,17 +1987,17 @@ function wizardSwitchPerson() {
 
 function wizardGoTo(step) {
   wizardCurrentStep = step;
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i < WIZARD_STEPS_TOTAL; i++) {
     const el = document.getElementById(`wizard-step-${i}`);
     if (el) el.style.display = (i === step) ? 'block' : 'none';
   }
-  const isStep5 = step === 5;
-  WIZARD_STEP5_IDS.forEach(id => {
+  const isFinal = step === WIZARD_STEPS_TOTAL;
+  WIZARD_FINAL_IDS.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.display = isStep5 ? '' : 'none';
+    if (el) el.style.display = isFinal ? '' : 'none';
   });
-  document.getElementById('wizard-data-header').style.display = isStep5 ? 'none' : 'block';
-  document.getElementById('wizard-nav').style.display = isStep5 ? 'none' : 'flex';
+  document.getElementById('wizard-data-header').style.display = isFinal ? 'none' : 'block';
+  document.getElementById('wizard-nav').style.display = isFinal ? 'none' : 'flex';
   document.getElementById('wizard-step-num').textContent = step;
   document.querySelectorAll('.wizard-dot').forEach(dot => {
     const n = parseInt(dot.getAttribute('data-dot'));
@@ -1994,8 +2006,18 @@ function wizardGoTo(step) {
   });
   document.getElementById('wizard-back-btn').style.display = step > 1 ? 'inline-flex' : 'none';
   wizardClearError();
-  if (isStep5) {
+  if (isFinal) {
+    // Счётчик пакета — реальные цифры отдаёт сервер, здесь просто "проявляем"
+    // уже посчитанное renderAnalysesCounter() (сама функция теперь тоже
+    // сверяется с шагом — см. её код).
+    if (typeof renderAnalysesCounter === 'function') renderAnalysesCounter();
     typeText('step5-greeting-text', t('step5Prompt'), 28, 'step5-typing-cursor');
+    // Пуш-баннер — не раньше, чем человек реально "внутри" приложения, и не
+    // раньше, чем прочитает приглашение к разговору
+    if (!wizardPushBannerScheduled) {
+      wizardPushBannerScheduled = true;
+      setTimeout(initPushBanner, 1500);
+    }
   }
   document.querySelector('.card')?.scrollIntoView({behavior:'smooth', block:'start'});
 }
@@ -2026,7 +2048,7 @@ async function wizardNext() {
     const y = document.getElementById('year').value;
     if (!d || !m || !y) { wizardError(t('errorFields')); return; }
   }
-  if (wizardCurrentStep === 4) {
+  if (wizardCurrentStep === 3) {
     const place = document.getElementById('place').value.trim();
     if (!place) { wizardError(t('errorPlace')); return; }
     const btn = document.getElementById('wizard-next-btn');
@@ -2037,7 +2059,7 @@ async function wizardNext() {
     btn.disabled = false;
     btn.innerHTML = original;
     if (!document.getElementById('lat').value) { wizardError(t('errorPlace')); return; }
-    wizardGoTo(5);
+    wizardGoTo(WIZARD_STEPS_TOTAL);
     return;
   }
   wizardGoTo(wizardCurrentStep + 1);
@@ -2526,8 +2548,15 @@ const THEME_NAMES = {
 function toggleCompat(enabled) {
   if (enabled && compatMaxPeople() === 0) {
     document.getElementById('compat-toggle').checked = false;
-    alert(t('compatNeedsUpgrade'));
-    openPricingModal();
+    if (isGuest()) {
+      // Гостю нужна just регистрация, не оплата — платный тариф здесь
+      // вводил бы в заблуждение (ему как раз ничего платить не надо)
+      alert(t('compatNeedsRegister'));
+      location.href = 'index.html';
+    } else {
+      alert(t('compatNeedsUpgrade'));
+      openPricingModal();
+    }
     return;
   }
   compatEnabled = enabled;
@@ -2585,7 +2614,14 @@ function renderAnalysesCounter() {
   document.getElementById('analyses-counter-numbers').textContent = `${user.analysesLeft} / ${total}`;
   document.getElementById('analyses-counter-bar').style.width = pct + '%';
   if (pct <= 20) document.getElementById('analyses-counter-bar').style.background = 'var(--red, #c46a4a)';
-  box.style.display = 'block';
+  // Показываем только на финальном шаге мастера — до этого момента человек
+  // ещё не "внутри" приложения, а заполняет данные, и счётчик/подписка
+  // там были бы преждевременной темой. Функция может быть вызвана раньше
+  // (например, сразу после refreshProfile), поэтому решение принимаем
+  // именно здесь, а не только в момент перехода шага.
+  const wizardReady = (typeof wizardCurrentStep === 'undefined') || (wizardCurrentStep === WIZARD_STEPS_TOTAL);
+  box.style.display = wizardReady ? 'block' : 'none';
+  if (!wizardReady) return;
 
   // "Пополнить пакет" молчит, пока анализов достаточно, и мягко привлекает
   // внимание, когда их мало — а не висит на виду всегда одинаково тихо.
@@ -2613,7 +2649,13 @@ function initGreeting() {
   const emailKey = user?.email ? user.email.replace(/\./g,'_').replace(/@/g,'__at__') : 'anon';
   const lastVisit = localStorage.getItem(`aion_last_visit_${emailKey}`);
   const now = Date.now();
-  const isFirstEver = !localStorage.getItem(`aion_visited_calc_${emailKey}`);
+  // "Первый раз" — то же самое условие, что решает, пропускать ли шаги
+  // мастера (см. wizardInit): есть свои сохранённые данные или нет. Раньше
+  // это определялось отдельным флажком в памяти браузера, который иногда
+  // расходился с реальностью (например, при входе гостем перед регистрацией
+  // в одной и той же вкладке) — из-за этого могло прозвучать "я по тебе
+  // соскучился" человеку, который здесь впервые.
+  const isFirstEver = !(user && user.ownBirth && user.ownBirth.day);
   const daysSince = lastVisit ? (now - parseInt(lastVisit)) / (1000*60*60*24) : 0;
 
   localStorage.setItem(`aion_last_visit_${emailKey}`, now);
@@ -4171,15 +4213,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initGreeting();
   renderAnalysesCounter();
 
-  // Мастер шагов: своя данные — сразу к разговору; иначе — с шага 1
+  // Мастер шагов: своя данные — сразу к разговору; иначе — с шага 1.
+  // Push-баннер запускается ИЗНУТРИ мастера (см. wizardGoTo) — только когда
+  // человек реально дошёл до финального шага, а не с первой секунды захода.
   wizardInit();
 
-  // Баннер push-уведомлений — с небольшой задержкой, чтобы не наваливать
-  // всё сразу в первую секунду захода
   // Счётчик визитов — для показа push-баннера на 2/5/10 раз
   const visitCount = parseInt(localStorage.getItem('aion_visit_count') || '0') + 1;
   localStorage.setItem('aion_visit_count', visitCount);
-  setTimeout(initPushBanner, 1500);
 
   // Фиксируем, что человек реально был — нужно для push "по неактивности"
   (function sendHeartbeat() {
