@@ -477,8 +477,32 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
 <!-- ВВОД ДАННЫХ -->
 <div class="card">
-  <h2 id="card-title-client">Данные клиента</h2>
+  <div id="wizard-data-header">
+    <h2 id="card-title-client">Данные клиента</h2>
+  </div>
 
+  <!-- Индикатор шага -->
+  <div id="wizard-progress" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <span style="font-size:11px;color:var(--text-faint);letter-spacing:.5px;text-transform:uppercase;">
+      <span id="wizard-step-label">Шаг</span> <span id="wizard-step-num">1</span> <span id="wizard-step-of">из</span> 5
+    </span>
+    <div style="display:flex;gap:5px;">
+      <span class="wizard-dot" data-dot="1"></span><span class="wizard-dot" data-dot="2"></span><span class="wizard-dot" data-dot="3"></span><span class="wizard-dot" data-dot="4"></span><span class="wizard-dot" data-dot="5"></span>
+    </div>
+  </div>
+  <style>
+    .wizard-dot{width:7px;height:7px;border-radius:50%;background:var(--line2);transition:background .3s;}
+    .wizard-dot.done{background:var(--gold-dim);}
+    .wizard-dot.active{background:var(--gold);}
+  </style>
+
+  <!-- Возврат: свои данные уже загружены -->
+  <div id="wizard-returning-note" style="display:none;font-size:12px;color:var(--text-dim);margin-bottom:14px;padding:10px 12px;border:1px solid var(--line2);border-radius:2px;">
+    <span id="wizard-returning-text"></span>
+    <span onclick="wizardSwitchPerson()" id="wizard-change-link" style="color:var(--accent);cursor:pointer;text-decoration:underline;margin-left:6px;">изменить данные</span>
+  </div>
+
+  <div id="wizard-step-1" class="wizard-step">
   <div class="row row-2">
     <div class="field">
       <label id="label-firstname">Имя</label>
@@ -504,18 +528,32 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
       <div class="gender-btn" id="gender-f-btn" onclick="setGender('f')">Женский</div>
     </div>
   </div>
+  </div><!-- /wizard-step-1 -->
 
-  <div class="row row-5">
+  <div id="wizard-step-2" class="wizard-step" style="display:none;">
+  <style>#wizard-step-2 label{text-align:center;}</style>
+  <div class="row row-3">
     <div class="field"><label id="label-day">День</label><input type="text" inputmode="numeric" autocomplete="off" id="day" placeholder="1" oninput="clampField(this,1,31,'День');autoNext(this,'month',2)"></div>
     <div class="field"><label id="label-month">Месяц</label><input type="text" inputmode="numeric" autocomplete="off" id="month" placeholder="1" oninput="clampField(this,1,12,'Месяц');autoNext(this,'year',2)"></div>
     <div class="field"><label id="label-year">Год</label><input type="text" inputmode="numeric" autocomplete="off" id="year" placeholder="1990" oninput="clampField(this,1900,2026,'Год');autoNext(this,'hour',4)"></div>
+  </div>
+  </div><!-- /wizard-step-2 -->
+
+  <div id="wizard-step-3" class="wizard-step" style="display:none;">
+  <div class="row row-2">
     <div class="field"><label id="label-hour">Часы <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="hour" placeholder="—" oninput="clampField(this,0,23,'Часы');onTimeInput();autoNext(this,'minute',2)"></div>
     <div class="field"><label id="label-minute">Минуты <span style="color:var(--text-faint);font-size:10px;">(необяз.)</span></label><input type="text" inputmode="numeric" autocomplete="off" id="minute" placeholder="—" oninput="clampField(this,0,59,'Минуты');onTimeInput()"></div>
   </div>
+  <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--text-dim);margin-bottom:10px;">
+    <input type="checkbox" id="no-time-checkbox" onchange="onNoTimeCheckbox(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--gold);flex-shrink:0;">
+    <span id="lbl-no-time-checkbox">Не знаю точное время</span>
+  </label>
   <div id="no-time-warning" style="display:none;font-size:11px;color:var(--gold-dim);margin-bottom:8px;padding:6px 10px;border:1px solid var(--gold-dim);border-radius:2px;opacity:0.85;">
     ⚠ Время рождения не указано — точность натальной карты и некоторых расчётов будет ниже
   </div>
+  </div><!-- /wizard-step-3 -->
 
+  <div id="wizard-step-4" class="wizard-step" style="display:none;">
   <div class="field" style="margin-bottom:10px;">
     <label id="label-place">Место рождения</label>
     <input type="text" id="place" placeholder="New York, USA" autocomplete="off" oninput="cleanNameInput(this)">
@@ -528,12 +566,13 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
   <!-- БЛОК СОВМЕСТИМОСТИ -->
   <div id="compat-block" style="margin-top:14px;margin-bottom:10px;border-top:1px solid var(--line2);padding-top:14px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;">
         <input type="checkbox" id="compat-toggle" onchange="toggleCompat(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--gold);">
         <span id="lbl-compat-toggle">✦ Совместимость</span>
       </label>
     </div>
+    <div style="font-size:11px;color:var(--text-faint);margin-bottom:12px;" id="lbl-compat-hint">(Проверь себя и свою половинку, партнёра, коллегу)</div>
 
     <div id="compat-form" style="display:none;">
       <!-- Тема совместимости -->
@@ -566,6 +605,16 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 
   </div><!-- /compat-form -->
   </div><!-- /compat-block -->
+  </div><!-- /wizard-step-4 -->
+
+  <!-- Ошибка текущего шага -->
+  <div id="wizard-error" style="display:none;color:var(--red);font-size:12px;margin-top:4px;margin-bottom:10px;text-align:center;"></div>
+
+  <!-- Навигация по шагам -->
+  <div id="wizard-nav" style="display:flex;gap:10px;margin-top:6px;margin-bottom:6px;">
+    <button class="btn-copy" id="wizard-back-btn" onclick="wizardBack()" style="display:none;flex:0 0 auto;padding-left:16px;padding-right:16px;">← <span id="wizard-back-label">Назад</span></button>
+    <button class="btn-generate" id="wizard-next-btn" onclick="wizardNext()" style="flex:1;"><span id="wizard-next-label">Далее</span> →</button>
+  </div>
 
   <!-- БЛОК "О ТЕБЕ" — ЗАМОРОЖЕН на период тестирования (экономия токенов) -->
   <div style="display:none;">
@@ -668,24 +717,28 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
 </div><!-- /results -->
 
   <!-- ПОЛЕ ЗАПРОСА — после результатов О тебе -->
-  <div class="field" id="request-block" style="margin-bottom:10px;margin-top:16px;">
+  <div class="field" id="request-block" style="margin-bottom:10px;margin-top:16px;display:none;">
+    <!-- AION Vi: живое приглашение к разговору, появляется на шаге 5 -->
+    <div class="aion-greeting" id="step5-greeting" style="margin-bottom:14px;">
+      <span id="step5-greeting-text"></span><span class="typing-cursor" id="step5-typing-cursor">|</span>
+    </div>
     <label style="display:flex;justify-content:space-between;align-items:center;">
       <span id="label-request" style="font-size:15px;font-weight:bold;color:var(--text);text-transform:none;letter-spacing:normal;">Запрос</span>
       <span id="req-counter" style="font-size:11px;color:var(--text-faint);font-weight:normal;">0 / 500</span>
     </label>
     <div id="quick-questions" style="display:flex;justify-content:center;margin-bottom:8px;">
-      <button type="button" class="quick-q-btn" id="quick-q-truth" onclick="fillQuickQuestion(this)" data-q="Расскажи обо мне правду. Как друг.">✦ Правда обо мне</button>
-      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне сейчас важно понять про свои финансы и как их улучшить?" style="display:none;">💰 Финансы</button>
-      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что происходит в моей личной жизни сейчас и на что обратить внимание?" style="display:none;">💛 Личная жизнь</button>
+      <button type="button" class="quick-q-btn" id="quick-q-truth" onclick="fillQuickQuestion(this)" data-q="Расскажи обо мне правду. Как друг." style="display:none;">✦ Правда обо мне</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне сейчас важно понять про свои финансы и как их улучшить?">💰 Деньги</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что происходит в моих отношениях сейчас и на что обратить внимание?">💛 Отношения</button>
       <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="На чём мне сосредоточиться в работе и карьере прямо сейчас?" style="display:none;">💼 Карьера</button>
-      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне важно понять о себе именно в этот период жизни?" style="display:none;">✦ Что важно сейчас</button>
+      <button type="button" class="quick-q-btn" onclick="fillQuickQuestion(this)" data-q="Что мне важно понять о себе именно в этот период жизни?">✦ Что сейчас важнее всего</button>
     </div>
     <textarea id="request" maxlength="1000" placeholder="Задай вопрос и подробно опиши контекст" oninput="onRequestInput(this)" onfocus="autoGeocodeAll()" style="min-height:80px;"></textarea>
     <div id="req-warning" style="display:none;font-size:11px;color:var(--red);margin-top:3px;">⚠ Осталось менее 50 знаков — формулируй лаконично</div>
   </div>
 
   <!-- Режим ответа -->
-  <div class="field" style="margin-bottom:14px;">
+  <div class="field" id="mode-field" style="margin-bottom:14px;display:none;">
     <label id="mode-label" style="font-size:12px;color:var(--text-dim);margin-bottom:6px;display:block;">Формат ответа</label>
     <input type="hidden" id="answer-mode" value="deep">
     <div class="gender-toggle">
@@ -695,7 +748,7 @@ input.field-error{border-color:#c05555 !important;background:#241414 !important;
   </div>
 
   <!-- ГЕНЕРАЦИЯ АНАЛИЗА — под полем запроса -->
-  <div class="analysis-section">
+  <div class="analysis-section" id="analysis-section" style="display:none;">
     <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;">
       <div></div>
       <button class="btn-generate" onclick="generateAnalysis()" id="gen-btn">✦ Отправить запрос</button>
@@ -860,8 +913,8 @@ const LANG = {
     labelDay: 'Day',
     labelMonth: 'Month',
     labelYear: 'Year',
-    labelHour: 'Hour',
-    labelMinute: 'Minute',
+    labelHour: 'Hr',
+    labelMinute: 'Min',
     labelPlace: 'Place of Birth',
     labelGender: 'Gender', genderMale: 'Male', genderFemale: 'Female',
     compatToggle: '✦ Compatibility', compatThemeLabel: 'Request topic',
@@ -905,6 +958,15 @@ const LANG = {
     errorFields: 'Please fill in day, month and year of birth',
     errorPlace: 'I could not find this place of birth. Please check the city name — without it the calculation would be wrong.',
     errorServer: 'Cannot connect to server. Make sure server.py is running.',
+    wizardStep: 'Step',
+    wizardOf: 'of',
+    wizardBack: 'Back',
+    wizardNext: 'Next',
+    wizardNoTime: "I don't know the exact time",
+    wizardChangeData: 'change details',
+    wizardReturningNote: 'Your details are already filled in',
+    step5Prompt: 'What shall we talk about? We can go into money, relationships, or whatever matters most right now — where do you want to start?',
+    compatHint: '(Check yourself and your other half, a partner, a colleague)',
     modalGiftTitle: '🎁 Share answer',
     modalGiftSub: 'The answer will be opened for saving or sharing',
     modalClose: 'Close',
@@ -970,6 +1032,7 @@ const LANG = {
     copyManual: 'Select text manually and copy (Ctrl+C)',
     needCalculate: 'Calculate client data first',
     needGender: 'Please select gender',
+    needName: 'Please enter first and last name',
     compatNeedsUpgrade: 'Compatibility is available on the Basic and Pro plans.',
     compatProOnly: 'Compatibility for 3-4 people is available on the Pro plan.',
     pdfNeedsPro: 'PDF export is available on the Basic and Pro plans.',
@@ -999,8 +1062,8 @@ const LANG = {
     labelDay: 'Dzień',
     labelMonth: 'Miesiąc',
     labelYear: 'Rok',
-    labelHour: 'Godzina',
-    labelMinute: 'Minuta',
+    labelHour: 'Godz.',
+    labelMinute: 'Min',
     labelPlace: 'Miejsce urodzenia',
     labelGender: 'Płeć', genderMale: 'Mężczyzna', genderFemale: 'Kobieta',
     compatToggle: '✦ Kompatybilność', compatThemeLabel: 'Temat zapytania',
@@ -1044,6 +1107,15 @@ const LANG = {
     errorFields: 'Uzupełnij dzień, miesiąc i rok urodzenia',
     errorPlace: 'Nie udało mi się znaleźć tego miejsca urodzenia. Sprawdź nazwę miasta — bez tego obliczenie będzie błędne.',
     errorServer: 'Nie można połączyć się z serwerem. Upewnij się, że server.py działa.',
+    wizardStep: 'Krok',
+    wizardOf: 'z',
+    wizardBack: 'Wstecz',
+    wizardNext: 'Dalej',
+    wizardNoTime: 'Nie znam dokładnej godziny',
+    wizardChangeData: 'zmień dane',
+    wizardReturningNote: 'Twoje dane są już uzupełnione',
+    step5Prompt: 'O czym teraz porozmawiamy? Możemy o pieniądzach, o relacjach albo o tym, co teraz jest najważniejsze — od czego zaczniemy?',
+    compatHint: '(Sprawdź siebie i swoją drugą połówkę, partnera, kolegę)',
     modalGiftTitle: '🎁 Udostępnij odpowiedź',
     modalGiftSub: 'Odpowiedź zostanie otwarta do zapisania lub wysłania',
     modalClose: 'Zamknij',
@@ -1103,6 +1175,7 @@ const LANG = {
     copyManual: 'Zaznacz tekst ręcznie i skopiuj (Ctrl+C)',
     needCalculate: 'Najpierw oblicz dane klienta',
     needGender: 'Proszę wybrać płeć',
+    needName: 'Proszę podać imię i nazwisko',
     compatNeedsUpgrade: 'Kompatybilność jest dostępna w pakietach Podstawowy i Pro.',
     compatProOnly: 'Kompatybilność dla 3-4 osób jest dostępna w pakiecie Pro.',
     pdfNeedsPro: 'Eksport PDF jest dostępny w pakietach Podstawowy i Pro.',
@@ -1132,8 +1205,8 @@ const LANG = {
     labelDay: 'День',
     labelMonth: 'Місяць',
     labelYear: 'Рік',
-    labelHour: 'Години',
-    labelMinute: 'Хвилини',
+    labelHour: 'Год',
+    labelMinute: 'Хв',
     labelPlace: 'Місце народження',
     labelGender: 'Стать', genderMale: 'Чоловіча', genderFemale: 'Жіноча',
     compatToggle: '✦ Сумісність', compatThemeLabel: 'Тема запиту',
@@ -1177,6 +1250,15 @@ const LANG = {
     errorFields: 'Заповни день, місяць і рік народження',
     errorPlace: 'Не вдалося знайти це місце народження. Перевір назву міста — без нього розрахунок буде хибним.',
     errorServer: 'Не можу підключитись до сервера. Переконайся що server.py запущено.',
+    wizardStep: 'Крок',
+    wizardOf: 'з',
+    wizardBack: 'Назад',
+    wizardNext: 'Далі',
+    wizardNoTime: 'Не знаю точний час',
+    wizardChangeData: 'змінити дані',
+    wizardReturningNote: 'Твої дані вже заповнені',
+    step5Prompt: 'Про що зараз поговоримо? Можемо про гроші, про стосунки або про те, що зараз важливіше за все — з чого почнемо?',
+    compatHint: '(Перевір себе і свою половинку, партнера, колегу)',
     modalGiftTitle: '🎁 Поділитись відповіддю',
     modalGiftSub: 'Відповідь буде відкрито для збереження або відправки',
     modalClose: 'Закрити',
@@ -1236,6 +1318,7 @@ const LANG = {
     copyManual: 'Виділи текст вручну та скопіюй (Ctrl+C)',
     needCalculate: 'Спочатку розрахуй дані клієнта',
     needGender: 'Будь ласка, вкажи стать',
+    needName: "Будь ласка, вкажи ім'я та прізвище",
     compatNeedsUpgrade: 'Сумісність доступна на тарифах Базовий і Про.',
     compatProOnly: 'Сумісність для 3-4 людей доступна на тарифі Про.',
     pdfNeedsPro: 'PDF доступний на тарифах Базовий і Про.',
@@ -1266,7 +1349,7 @@ const LANG = {
     labelMonth: 'Месяц',
     labelYear: 'Год',
     labelHour: 'Часы',
-    labelMinute: 'Минуты',
+    labelMinute: 'Мин',
     labelPlace: 'Место рождения',
     labelGender: 'Пол', genderMale: 'Мужской', genderFemale: 'Женский',
     compatToggle: '✦ Совместимость', compatThemeLabel: 'Тема запроса',
@@ -1310,6 +1393,15 @@ const LANG = {
     errorFields: 'Заполни день, месяц и год рождения',
     errorPlace: 'Не удалось найти это место рождения. Проверь название города — без него расчёт будет неверным.',
     errorServer: 'Не могу подключиться к серверу. Убедись что server.py запущен в cmd.',
+    wizardStep: 'Шаг',
+    wizardOf: 'из',
+    wizardBack: 'Назад',
+    wizardNext: 'Далее',
+    wizardNoTime: 'Не знаю точное время',
+    wizardChangeData: 'изменить данные',
+    wizardReturningNote: 'Твои данные уже заполнены',
+    step5Prompt: 'О чём сейчас поговорим? Можем про деньги, про отношения или про то, что сейчас важнее всего — с чего начнём?',
+    compatHint: '(Проверь себя и свою половинку, партнёра, коллегу)',
     modalGiftTitle: '🎁 Поделиться ответом',
     modalGiftSub: 'Ответ будет открыт для сохранения или отправки',
     modalClose: 'Закрыть',
@@ -1369,6 +1461,7 @@ const LANG = {
     copyManual: 'Выдели текст вручную и скопируй (Ctrl+C)',
     needCalculate: 'Сначала рассчитай данные клиента',
     needGender: 'Пожалуйста, укажи пол',
+    needName: 'Пожалуйста, укажи имя и фамилию',
     compatNeedsUpgrade: 'Совместимость доступна на тарифах Базовый и Про.',
     compatProOnly: 'Совместимость для 3-4 человек доступна на тарифе Про.',
     pdfNeedsPro: 'PDF доступен на тарифах Базовый и Про.',
@@ -1443,6 +1536,15 @@ function applyTranslations() {
   setText('label-gender', L.labelGender);
   setText('gender-m-btn', L.genderMale);
   setText('gender-f-btn', L.genderFemale);
+
+  // Мастер шагов (онбординг)
+  setText('wizard-step-label', L.wizardStep);
+  setText('wizard-step-of', L.wizardOf);
+  setText('wizard-back-label', L.wizardBack);
+  setText('wizard-next-label', L.wizardNext);
+  setText('lbl-no-time-checkbox', L.wizardNoTime);
+  setText('wizard-change-link', L.wizardChangeData);
+  setText('lbl-compat-hint', L.compatHint);
 
   // Блок совместимости
   setText('lbl-compat-toggle', L.compatToggle);
@@ -1806,6 +1908,151 @@ async function geocode() {
   } catch(e) {
     disp.textContent = t('geocodeError');
   }
+}
+
+// ══════════════════════════════════════════════
+// МАСТЕР ШАГОВ (онбординг, 03.08.2026)
+// Вместо одной длинной формы — 5 экранов: имя/пол → дата → время →
+// место (+совместимость) → тема разговора. Поля и вся их логика
+// (автокомплит, геокодирование, клампинг дат) не тронуты — мастер только
+// показывает/прячет уже существующие блоки и валидирует перед переходом.
+// ══════════════════════════════════════════════
+let wizardCurrentStep = 1;
+const WIZARD_STEP5_IDS = ['request-block', 'mode-field', 'analysis-section'];
+
+function wizardInit() {
+  const user = getUser();
+  const ob = user && user.ownBirth;
+  if (ob && ob.day && ob.month && ob.year && ob.firstname) {
+    wizardFillFromOwnBirth(ob);
+    document.getElementById('wizard-returning-text').textContent = t('wizardReturningNote');
+    document.getElementById('wizard-returning-note').style.display = 'block';
+    wizardGoTo(5);
+  } else {
+    wizardGoTo(1);
+  }
+}
+
+function wizardFillFromOwnBirth(ob) {
+  document.getElementById('firstname').value = ob.firstname || '';
+  document.getElementById('lastname').value = ob.lastname || '';
+  if (ob.gender === 'm' || ob.gender === 'f') setGender(ob.gender);
+  document.getElementById('day').value = ob.day || '';
+  document.getElementById('month').value = ob.month || '';
+  document.getElementById('year').value = ob.year || '';
+  document.getElementById('hour').value = ob.hour || '';
+  document.getElementById('minute').value = ob.minute || '';
+  document.getElementById('place').value = ob.place || '';
+  if (ob.lat) document.getElementById('lat').value = ob.lat;
+  if (ob.lon) document.getElementById('lon').value = ob.lon;
+  if (ob.place && ob.lat && ob.lon) {
+    document.getElementById('coords-display').textContent =
+      `${parseFloat(ob.lat).toFixed(4)}° с.ш. / ${parseFloat(ob.lon).toFixed(4)}° в.д.`;
+  }
+}
+
+// "Изменить данные" — не только правка своих данных (узнал точное время
+// и т.п.), но и способ ввести данные ДРУГОГО человека, не теряя удобства
+// автоподстановки для себя при следующих визитах.
+function wizardSwitchPerson() {
+  ['firstname','lastname','day','month','year','hour','minute','place'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('gender').value = '';
+  document.getElementById('gender-m-btn').classList.remove('active');
+  document.getElementById('gender-f-btn').classList.remove('active');
+  document.getElementById('lat').value = '';
+  document.getElementById('lon').value = '';
+  document.getElementById('coords-display').textContent = t('coordsDefault');
+  document.getElementById('hour').disabled = false;
+  document.getElementById('minute').disabled = false;
+  document.getElementById('no-time-checkbox').checked = false;
+  document.getElementById('no-time-warning').style.display = 'none';
+  document.getElementById('wizard-returning-note').style.display = 'none';
+  wizardGoTo(1);
+}
+
+function wizardGoTo(step) {
+  wizardCurrentStep = step;
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`wizard-step-${i}`);
+    if (el) el.style.display = (i === step) ? 'block' : 'none';
+  }
+  const isStep5 = step === 5;
+  WIZARD_STEP5_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = isStep5 ? '' : 'none';
+  });
+  document.getElementById('wizard-data-header').style.display = isStep5 ? 'none' : 'block';
+  document.getElementById('wizard-nav').style.display = isStep5 ? 'none' : 'flex';
+  document.getElementById('wizard-step-num').textContent = step;
+  document.querySelectorAll('.wizard-dot').forEach(dot => {
+    const n = parseInt(dot.getAttribute('data-dot'));
+    dot.classList.toggle('active', n === step);
+    dot.classList.toggle('done', n < step);
+  });
+  document.getElementById('wizard-back-btn').style.display = step > 1 ? 'inline-flex' : 'none';
+  wizardClearError();
+  if (isStep5) {
+    typeText('step5-greeting-text', t('step5Prompt'), 28, 'step5-typing-cursor');
+  }
+  document.querySelector('.card')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function wizardError(msg) {
+  const box = document.getElementById('wizard-error');
+  box.textContent = msg;
+  box.style.display = 'block';
+}
+function wizardClearError() {
+  document.getElementById('wizard-error').style.display = 'none';
+}
+
+function wizardBack() {
+  if (wizardCurrentStep > 1) wizardGoTo(wizardCurrentStep - 1);
+}
+
+async function wizardNext() {
+  if (wizardCurrentStep === 1) {
+    const fn = document.getElementById('firstname').value.trim();
+    const ln = document.getElementById('lastname').value.trim();
+    if (!fn || !ln) { wizardError(t('needName')); return; }
+    if (!document.getElementById('gender').value) { wizardError(t('needGender')); return; }
+  }
+  if (wizardCurrentStep === 2) {
+    const d = document.getElementById('day').value;
+    const m = document.getElementById('month').value;
+    const y = document.getElementById('year').value;
+    if (!d || !m || !y) { wizardError(t('errorFields')); return; }
+  }
+  if (wizardCurrentStep === 4) {
+    const place = document.getElementById('place').value.trim();
+    if (!place) { wizardError(t('errorPlace')); return; }
+    const btn = document.getElementById('wizard-next-btn');
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.textContent = '⟳';
+    await autoGeocodeAll();
+    btn.disabled = false;
+    btn.innerHTML = original;
+    if (!document.getElementById('lat').value) { wizardError(t('errorPlace')); return; }
+    wizardGoTo(5);
+    return;
+  }
+  wizardGoTo(wizardCurrentStep + 1);
+}
+
+// Явный чекбокс "не знаю время" — тот же результат, что и просто пустые
+// поля (сервер сам это распознаёт), но для человека это понятный жест,
+// а не brainteaser "оставить пустым или что-то ввести".
+function onNoTimeCheckbox(checked) {
+  const h = document.getElementById('hour');
+  const m = document.getElementById('minute');
+  h.disabled = checked;
+  m.disabled = checked;
+  if (checked) { h.value = ''; m.value = ''; }
+  document.getElementById('no-time-warning').style.display = checked ? 'block' : 'none';
 }
 
 // ══════════════════════════════════════════════
@@ -2390,9 +2637,9 @@ function initGreeting() {
 }
 
 let _typeTimer = null;
-function typeText(elId, text, speed) {
+function typeText(elId, text, speed, cursorElId) {
   const el = document.getElementById(elId);
-  const cursor = document.getElementById('typing-cursor');
+  const cursor = document.getElementById(cursorElId || 'typing-cursor');
   if (!el) return;
   // Гасим предыдущую анимацию. Без этого при смене языка старый и новый
   // текст печатались в один элемент одновременно, буква через букву —
@@ -2908,7 +3155,11 @@ async function generateAnalysis() {
           hour: currentClientData.hour,
           minute: currentClientData.minute,
           lat: currentClientData.lat,
-          lon: currentClientData.lon
+          lon: currentClientData.lon,
+          firstname: currentClientData.firstname,
+          lastname: currentClientData.lastname,
+          gender: currentClientData.gender,
+          place: currentClientData.place
         };
         setUser(ownUser);
       }
@@ -3919,6 +4170,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Живое приветствие AION Vi
   initGreeting();
   renderAnalysesCounter();
+
+  // Мастер шагов: своя данные — сразу к разговору; иначе — с шага 1
+  wizardInit();
 
   // Баннер push-уведомлений — с небольшой задержкой, чтобы не наваливать
   // всё сразу в первую секунду захода
